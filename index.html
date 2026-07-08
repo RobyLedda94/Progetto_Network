@@ -188,7 +188,7 @@
                   host previsti fino al più piccolo (GUEST_NET → ADMIN_NET →
                   MANAGEMENT_NET → DMZ), assegnando a ciascuno la subnet più
                   piccola possibile in grado di contenere gli host richiesti più
-                  il gateway, con la formula 2^n  host_richiesti - 2 (indirizzo
+                  il gateway, con la formula 2^n host_richiesti - 2 (indirizzo
                   di rete e broadcast non assegnabili). Procedere dal segmento
                   più grande al più piccolo è il metodo standard per evitare
                   frammentazione: se si assegnassero le subnet in ordine
@@ -352,7 +352,7 @@
 
         <h3>1. Configurazione switch</h3>
         <div class="obj-list">
-          <details class="obj-item status-todo">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text"
                 >1.1 — Hardening (forte): AAA, SSH, gestione porte non
@@ -360,7 +360,147 @@
               >
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Procedura di hardeming lavereremo un sotto step alla volta :
+                  <br />
+                  - Password di enable, accesso privilegiato. <br />
+                  - AAA locale + utente amministrativo. <br />
+                  - Dominio DNS + generazione chiavi RSA per SSH. <br />
+                  - Abilitazione SSH e disabilitazione Telnet. <br />
+                  - Password hashing robusto - Banner di accesso. <br />
+                  - Timeout e protezione brute force. <br />
+                  - Disabilitazione porte non utilizzate. <br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Accesso_Privilegiato.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  imposta la password per accedere alla modalità enable
+                  (privilegio massimo). Su questa immagine IOU 15.1 IPBASEK9 il
+                  comando genera un hash Type 4, non Type 5/8/9 come preferito —
+                  limite noto della piattaforma.
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/AAA_Locale.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - aaa new-model : Attiva il framework AAA 'Accounting,
+                  Authentication, Authorization', sostituendo il modello legacy
+                  . <br />
+                  - username admin priviledge 15 secret 'StrongPassword123':
+                  crea un utente locale con massimo privilegio. <br />
+                  - aaa authentication login default local : impone che il login
+                  su console VTY usi il DB utenti locale. <br />
+                  - aaa authorization exec default local : applica gli stessi
+                  permessi locali in modalità EXEC. <br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Dominio_e_chiavi_RSA.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - ip domain-name leonardo.local : imposta il dominio DNS per
+                  la generazione delle chiavi RSA. <br />
+                  - crypto key generate rsa : genera le chiavi RSA per SSH. Alla
+                  richiesta dei bit rispondere 2048<br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Abilitazione_SSH_Disabilitazione_Telnet.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - ip ssh version 2 : imposta il versionamento SSH 2, più
+                  sicuro <br />
+                  - line vty 0 4 : entra nella configurazione delle linee VTY
+                  (accesso remoto) <br />
+                  - transport input ssh : abilita solo SSH, disabilitando Telnet
+                  <br />
+                  - login authetication default : applica l'autenticazione AAA
+                  anche alle sessioni remote <br />
+                  - exec-timeout 5 0 : imposta timeout di inattività a 5 minuti
+                  <br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Hardening_Linee_console_e_ausiliaria.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - exec-timeout 5 0 : allinea il time out gia impostato su VTY
+                  <br />
+                  - no priviledge level 15 : rimuove l'accesso privilegiato
+                  automatico da console e aux <br />
+                  - no exec : impostato su aux disabilita completamente la porta
+                  ausiliaria. <br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Banner_di_Accesso.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - banner motd #...# : imposta un messaggio di accesso per
+                  avvisare chi si connette che l'accesso è riservato. <br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Protezione_brute_force.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - Login block for 120... : blocca tutti i tentativi di login
+                  per 120 secondi se ne rileva 3 falliti in 60 secondi. <br />
+                  - Login delay 2 : imposta un ritardo di 2 secondi tra ogni
+                  tentativo di login <br />
+                  - Login on-failure log : registra i tentativi falliti nel log di
+                  sistema <br />
+                  - Login on-success log : registra i tentativi riusciti nel log di
+                  sistema <br />
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
