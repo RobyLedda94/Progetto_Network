@@ -1,227 +1,558 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lab AD — GNS3 + FortiGate HA</title>
-<link rel="stylesheet" href="./css/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lab AD — GNS3 + FortiGate HA</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>
+        Laboratorio Active Directory in GNS3<br />con Firewall FortiGate in Alta
+        Affidabilità
+      </h1>
+      <p class="subtitle">
+        Progetto di rete enterprise simulata — VLSM, VLAN, HA, VTP, STP, Port
+        Channel, Active Directory
+      </p>
+      <span class="badge badge-progress"
+        >In corso — 6.2 Documento HTML/CSS di tracciamento</span
+      >
 
-<header class="hero">
-  <h1>Laboratorio Active Directory in GNS3<br>con Firewall FortiGate in Alta Affidabilità</h1>
-  <p class="subtitle">Progetto di rete enterprise simulata — VLSM, VLAN, HA, VTP, STP, Port Channel, Active Directory</p>
-  <span class="badge badge-progress">In corso — 6.2 Documento HTML/CSS di tracciamento</span>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <p id="progressLabel" class="progress-label">Calcolo avanzamento...</p>
+    </header>
 
-  <div class="progress-wrap">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
-  <p id="progressLabel" class="progress-label">Calcolo avanzamento...</p>
-</header>
+    <main>
+      <section id="panoramica">
+        <h2>Panoramica del progetto</h2>
+        <p>
+          Questo repository documenta la progettazione e realizzazione di un
+          laboratorio di rete completo, costruito interamente in ambiente
+          virtualizzato (GNS3 + VMware Workstation Pro), che replica
+          l'infrastruttura tipica di una piccola/media impresa con più sedi
+          fisiche.
+        </p>
+        <p>
+          L'obiettivo è dimostrare, in modo pratico e interamente documentato,
+          come progettare e implementare da zero una rete aziendale segmentata
+          per VLAN, protetta da una coppia di firewall FortiGate in cluster ad
+          alta affidabilità (Active-Passive), instradata attraverso uno strato
+          gerarchico di switch Cisco (Distribution/Access) con protocolli VTP,
+          STP e Port Channel, e completata da un dominio Active Directory su
+          Windows Server con relativi client Windows 11 uniti al dominio.
+        </p>
+        <p>
+          Il progetto nasce con finalità didattiche e dimostrative: ogni fase —
+          dalla progettazione teorica alla configurazione pratica — è tracciata
+          passo dopo passo, inclusi i problemi realmente incontrati e le
+          relative soluzioni, per renderlo replicabile anche da chi si avvicina
+          per la prima volta a questo tipo di laboratorio.
+        </p>
+      </section>
 
-<main>
+      <section id="obiettivi">
+        <h2>Obiettivi</h2>
+        <p class="section-hint">
+          Clicca su ogni voce per espandere dettagli, screenshot e traccia delle
+          configurazioni.
+        </p>
 
-  <section id="panoramica">
-    <h2>Panoramica del progetto</h2>
-    <p>Questo repository documenta la progettazione e realizzazione di un laboratorio di rete completo, costruito interamente in ambiente virtualizzato (GNS3 + VMware Workstation Pro), che replica l'infrastruttura tipica di una piccola/media impresa con più sedi fisiche.</p>
-    <p>L'obiettivo è dimostrare, in modo pratico e interamente documentato, come progettare e implementare da zero una rete aziendale segmentata per VLAN, protetta da una coppia di firewall FortiGate in cluster ad alta affidabilità (Active-Passive), instradata attraverso uno strato gerarchico di switch Cisco (Distribution/Access) con protocolli VTP, STP e Port Channel, e completata da un dominio Active Directory su Windows Server con relativi client Windows 11 uniti al dominio.</p>
-    <p>Il progetto nasce con finalità didattiche e dimostrative: ogni fase — dalla progettazione teorica alla configurazione pratica — è tracciata passo dopo passo, inclusi i problemi realmente incontrati e le relative soluzioni, per renderlo replicabile anche da chi si avvicina per la prima volta a questo tipo di laboratorio.</p>
-  </section>
-
-  <section id="obiettivi">
-    <h2>Obiettivi</h2>
-    <p class="section-hint">Clicca su ogni voce per espandere dettagli, screenshot e traccia delle configurazioni.</p>
-
-    <div class="obj-controls">
-      <button id="expandAll" type="button">Espandi tutto</button>
-      <button id="collapseAll" type="button">Comprimi tutto</button>
-    </div>
-
-    <h3>0. Progettazione della rete</h3>
-    <div class="obj-list">
-
-      <details class="obj-item status-done">
-        <summary><span class="obj-text">0.1 — Definizione della topologia logica (Core/Distribution/Access, HA firewall)</span></summary>
-        <div class="obj-content">
-          <img src="./img/Topology.png" alt="Topologia di rete - canvas GNS3" class="obj-image">
-          <p class="obj-caption">Topologia definitiva validata: cluster HA FortiGate con link heartbeat dedicato, maglia Distribution/Access ridondata (VTP Server/Client) con collegamenti pronti per Port Channel, DMZ per il Domain Controller.</p>
-          <div class="obj-trace">
-            <h4>Traccia / note</h4>
-            <p>Fase di solo disegno logico — nessun comando CLI eseguito. Validata la coerenza con gli standard reali (HA heartbeat su interfaccia dedicata, maglia Core/Distribution-Access, VTP Server ridondato).</p>
-          </div>
+        <div class="obj-controls">
+          <button id="expandAll" type="button">Espandi tutto</button>
+          <button id="collapseAll" type="button">Comprimi tutto</button>
         </div>
-      </details>
 
-      <details class="obj-item status-done">
-        <summary><span class="obj-text">0.2 — Piano di indirizzamento IP con metodologia VLSM</span></summary>
-          <div class="obj-content">
-            <p class="obj-caption">Blocco base: <code>192.168.0.0/24</code> + link HA dedicato fuori blocco.</p>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr><th>Segmento</th><th>VLAN</th><th>Subnet</th><th>Maschera</th><th>Gateway</th><th>Range host</th><th>Broadcast</th><th>Indirizzi assegnabili</th></tr>
-                </thead>
-                <tbody>
-                  <tr class="vlan-guest"><td>GUEST_NET</td><td>10</td><td>192.168.0.0/26</td><td>255.255.255.192</td><td>192.168.0.1</td><td>.2 – .62</td><td>192.168.0.63</td><td>62</td></tr>
-                  <tr class="vlan-admin"><td>ADMIN_NET</td><td>20</td><td>192.168.0.64/27</td><td>255.255.255.224</td><td>192.168.0.65</td><td>.66 – .94</td><td>192.168.0.95</td><td>30</td></tr>
-                  <tr class="vlan-mgmt"><td>MANAGEMENT_NET</td><td>30</td><td>192.168.0.96/28</td><td>255.255.255.240</td><td>192.168.0.97</td><td>.98 – .110</td><td>192.168.0.111</td><td>14</td></tr>
-                  <tr class="vlan-dmz"><td>DMZ (WIN-SRV-DC01)</td><td>—</td><td>192.168.0.112/29</td><td>255.255.255.248</td><td>192.168.0.113</td><td>.114 – .118</td><td>192.168.0.119</td><td>6</td></tr>
-                  <tr class="vlan-ha"><td>HA-SYNC (FW-1↔FW-2)</td><td>—</td><td>192.168.99.0/30</td><td>255.255.255.252</td><td>— (P2P)</td><td>.1 – .2</td><td>192.168.99.3</td><td>2</td></tr>
-                </tbody>
-              </table>
+        <h3>0. Progettazione della rete</h3>
+        <div class="obj-list">
+          <details class="obj-item status-done">
+            <summary>
+              <span class="obj-text"
+                >0.1 — Definizione della topologia logica
+                (Core/Distribution/Access, HA firewall)</span
+              >
+            </summary>
+            <div class="obj-content">
+              <img
+                src="./img/Topology.png"
+                alt="Topologia di rete - canvas GNS3"
+                class="obj-image"
+              />
+              <p class="obj-caption">
+                Topologia definitiva validata: cluster HA FortiGate con link
+                heartbeat dedicato, maglia Distribution/Access ridondata (VTP
+                Server/Client) con collegamenti pronti per Port Channel, DMZ per
+                il Domain Controller.
+              </p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Fase di solo disegno logico — nessun comando CLI eseguito.
+                  Validata la coerenza con gli standard reali (HA heartbeat su
+                  interfaccia dedicata, maglia Core/Distribution-Access, VTP
+                  Server ridondato).
+                </p>
+              </div>
             </div>
-            <p class="obj-caption">Spazio libero per crescita futura: 192.168.0.120 – 192.168.0.255</p>
-          </div>
-      </details>
+          </details>
 
-      <details class="obj-item status-done">
-        <summary><span class="obj-text">0.3 — Asset inventory completo</span></summary>
-        <div class="obj-content">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>#</th><th>Nodo</th><th>Ruolo</th><th>Piattaforma</th><th>Versione</th><th>Identificativo</th><th>Risorse</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>1</td><td>FW-1</td><td>Firewall primario HA</td><td>FortiGate-VM64-KVM</td><td>v7.6.7 build3704</td><td>SN: FGVMEVGT9RJSLZ87</td><td>1vCPU/2GB</td></tr>
-                <tr><td>2</td><td>FW-2</td><td>Firewall secondario HA</td><td>FortiGate-VM64-KVM</td><td>v7.6.7 build3704</td><td>SN: FGVMEV_4Z9IEEQ52</td><td>1vCPU/2GB</td></tr>
-                <tr><td>3</td><td>ISP</td><td>Switch upstream</td><td>GNS3 nativo</td><td>—</td><td>—</td><td>trascurabile</td></tr>
-                <tr><td>4</td><td>SW-1-VTP-SERVER</td><td>Core/Distribution</td><td>Cisco IOU L2</td><td>IOS 15.1(20130726)</td><td>ipbasek9-15.1g.bin</td><td>512MB</td></tr>
-                <tr><td>5</td><td>SW-2-VTP-SERVER</td><td>Core/Distribution</td><td>Cisco IOU L2</td><td>IOS 15.1(20130726)</td><td>ipbasek9-15.1g.bin</td><td>512MB</td></tr>
-                <tr><td>6</td><td>SW-1-CLIENT</td><td>Access</td><td>Cisco IOU L2</td><td>IOS 15.1(20130726)</td><td>Board ID: 2048003</td><td>512MB</td></tr>
-                <tr><td>7</td><td>SW-2-CLIENT</td><td>Access</td><td>Cisco IOU L2</td><td>IOS 15.1(20130726)</td><td>ipbasek9-15.1g.bin</td><td>512MB</td></tr>
-                <tr class="vlan-dmz"><td>8</td><td>WIN-SRV-DC01</td><td>Domain Controller</td><td>Windows Server 2022</td><td>Standard Eval, build 20348.587</td><td>Key: W8JDY</td><td>4GB/2vCPU</td></tr>
-                <tr class="vlan-guest"><td>9</td><td>PC1</td><td>Endpoint provvisorio</td><td>VPCS</td><td>—</td><td>→ futuro WIN11-CLIENT-01</td><td>trascurabile</td></tr>
-                <tr class="vlan-admin"><td>10</td><td>PC2</td><td>Endpoint provvisorio</td><td>VPCS</td><td>—</td><td>→ futuro WIN11-CLIENT-02</td><td>trascurabile</td></tr>
-                <tr class="vlan-mgmt"><td>11</td><td>PC3</td><td>Endpoint provvisorio</td><td>VPCS</td><td>—</td><td>→ futuro WIN11-CLIENT-03</td><td>trascurabile</td></tr>
-              </tbody>
-            </table>
-          </div>
+          <details class="obj-item status-done">
+            <summary>
+              <span class="obj-text"
+                >0.2 — Piano di indirizzamento IP con metodologia VLSM</span
+              >
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">
+                Blocco base: <code>192.168.0.0/24</code> + link HA dedicato
+                fuori blocco.
+              </p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Segmento</th>
+                      <th>VLAN</th>
+                      <th>Subnet</th>
+                      <th>Maschera</th>
+                      <th>Gateway</th>
+                      <th>Range host</th>
+                      <th>Broadcast</th>
+                      <th>Indirizzi assegnabili</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="vlan-guest">
+                      <td>GUEST_NET</td>
+                      <td>10</td>
+                      <td>192.168.0.0/26</td>
+                      <td>255.255.255.192</td>
+                      <td>192.168.0.1</td>
+                      <td>.2 – .62</td>
+                      <td>192.168.0.63</td>
+                      <td>62</td>
+                    </tr>
+                    <tr class="vlan-admin">
+                      <td>ADMIN_NET</td>
+                      <td>20</td>
+                      <td>192.168.0.64/27</td>
+                      <td>255.255.255.224</td>
+                      <td>192.168.0.65</td>
+                      <td>.66 – .94</td>
+                      <td>192.168.0.95</td>
+                      <td>30</td>
+                    </tr>
+                    <tr class="vlan-mgmt">
+                      <td>MANAGEMENT_NET</td>
+                      <td>30</td>
+                      <td>192.168.0.96/28</td>
+                      <td>255.255.255.240</td>
+                      <td>192.168.0.97</td>
+                      <td>.98 – .110</td>
+                      <td>192.168.0.111</td>
+                      <td>14</td>
+                    </tr>
+                    <tr class="vlan-dmz">
+                      <td>DMZ (WIN-SRV-DC01)</td>
+                      <td>—</td>
+                      <td>192.168.0.112/29</td>
+                      <td>255.255.255.248</td>
+                      <td>192.168.0.113</td>
+                      <td>.114 – .118</td>
+                      <td>192.168.0.119</td>
+                      <td>6</td>
+                    </tr>
+                    <tr class="vlan-ha">
+                      <td>HA-SYNC (FW-1↔FW-2)</td>
+                      <td>—</td>
+                      <td>192.168.99.0/30</td>
+                      <td>255.255.255.252</td>
+                      <td>— (P2P)</td>
+                      <td>.1 – .2</td>
+                      <td>192.168.99.3</td>
+                      <td>2</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="obj-caption">
+                Spazio libero per crescita futura: 192.168.0.120 – 192.168.0.255
+              </p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Il calcolo VLSM è stato condotto partendo dal segmento con più
+                  host previsti fino al più piccolo (GUEST_NET → ADMIN_NET →
+                  MANAGEMENT_NET → DMZ), assegnando a ciascuno la subnet più
+                  piccola possibile in grado di contenere gli host richiesti più
+                  il gateway, con la formula 2^n ≥ host_richiesti + 2 (indirizzo
+                  di rete e broadcast non assegnabili). Procedere dal segmento
+                  più grande al più piccolo è il metodo standard per evitare
+                  frammentazione: se si assegnassero le subnet in ordine
+                  casuale, i "buchi" residui tra un blocco e l'altro potrebbero
+                  non essere abbastanza grandi da ospitare un segmento
+                  successivo più esigente.
+                </p>
+                <br>
+                <p>
+                  Il link di sincronizzazione HA tra i due FortiGate
+                  (192.168.99.0/30) è stato deliberatamente collocato fuori dal
+                  blocco principale 192.168.0.0/24: è un collegamento
+                  punto-punto tra soli due dispositivi, non un segmento utente,
+                  e tenerlo separato evita di "sprecare" indirizzi preziosi del
+                  blocco principale su un link che non ospiterà mai host reali.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <details class="obj-item status-done">
+            <summary>
+              <span class="obj-text">0.3 — Asset inventory completo</span>
+            </summary>
+            <div class="obj-content">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Nodo</th>
+                      <th>Ruolo</th>
+                      <th>Piattaforma</th>
+                      <th>Versione</th>
+                      <th>Identificativo</th>
+                      <th>Risorse</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td>FW-1</td>
+                      <td>Firewall primario HA</td>
+                      <td>FortiGate-VM64-KVM</td>
+                      <td>v7.6.7 build3704</td>
+                      <td>SN: FGVMEVGT9RJSLZ87</td>
+                      <td>1vCPU/2GB</td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td>FW-2</td>
+                      <td>Firewall secondario HA</td>
+                      <td>FortiGate-VM64-KVM</td>
+                      <td>v7.6.7 build3704</td>
+                      <td>SN: FGVMEV_4Z9IEEQ52</td>
+                      <td>1vCPU/2GB</td>
+                    </tr>
+                    <tr>
+                      <td>3</td>
+                      <td>ISP</td>
+                      <td>Switch upstream</td>
+                      <td>GNS3 nativo</td>
+                      <td>—</td>
+                      <td>—</td>
+                      <td>trascurabile</td>
+                    </tr>
+                    <tr>
+                      <td>4</td>
+                      <td>SW-1-VTP-SERVER</td>
+                      <td>Core/Distribution</td>
+                      <td>Cisco IOU L2</td>
+                      <td>IOS 15.1(20130726)</td>
+                      <td>ipbasek9-15.1g.bin</td>
+                      <td>512MB</td>
+                    </tr>
+                    <tr>
+                      <td>5</td>
+                      <td>SW-2-VTP-SERVER</td>
+                      <td>Core/Distribution</td>
+                      <td>Cisco IOU L2</td>
+                      <td>IOS 15.1(20130726)</td>
+                      <td>ipbasek9-15.1g.bin</td>
+                      <td>512MB</td>
+                    </tr>
+                    <tr>
+                      <td>6</td>
+                      <td>SW-1-CLIENT</td>
+                      <td>Access</td>
+                      <td>Cisco IOU L2</td>
+                      <td>IOS 15.1(20130726)</td>
+                      <td>Board ID: 2048003</td>
+                      <td>512MB</td>
+                    </tr>
+                    <tr>
+                      <td>7</td>
+                      <td>SW-2-CLIENT</td>
+                      <td>Access</td>
+                      <td>Cisco IOU L2</td>
+                      <td>IOS 15.1(20130726)</td>
+                      <td>ipbasek9-15.1g.bin</td>
+                      <td>512MB</td>
+                    </tr>
+                    <tr class="vlan-dmz">
+                      <td>8</td>
+                      <td>WIN-SRV-DC01</td>
+                      <td>Domain Controller</td>
+                      <td>Windows Server 2022</td>
+                      <td>Standard Eval, build 20348.587</td>
+                      <td>Key: W8JDY</td>
+                      <td>4GB/2vCPU</td>
+                    </tr>
+                    <tr class="vlan-guest">
+                      <td>9</td>
+                      <td>PC1</td>
+                      <td>Endpoint provvisorio</td>
+                      <td>VPCS</td>
+                      <td>—</td>
+                      <td>→ futuro WIN11-CLIENT-01</td>
+                      <td>trascurabile</td>
+                    </tr>
+                    <tr class="vlan-admin">
+                      <td>10</td>
+                      <td>PC2</td>
+                      <td>Endpoint provvisorio</td>
+                      <td>VPCS</td>
+                      <td>—</td>
+                      <td>→ futuro WIN11-CLIENT-02</td>
+                      <td>trascurabile</td>
+                    </tr>
+                    <tr class="vlan-mgmt">
+                      <td>11</td>
+                      <td>PC3</td>
+                      <td>Endpoint provvisorio</td>
+                      <td>VPCS</td>
+                      <td>—</td>
+                      <td>→ futuro WIN11-CLIENT-03</td>
+                      <td>trascurabile</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </details>
         </div>
-</details>
 
-    </div>
+        <h3>1. Configurazione switch</h3>
+        <div class="obj-list">
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text"
+                >1.1 — Hardening (forte): AAA, SSH, gestione porte non
+                utilizzate</span
+              >
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text"
+                >1.2 — Configurazione VTP (dominio "LEONARDO")</span
+              >
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">1.3 — Configurazione STP</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">1.4 — Configurazione Port Channel</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+        </div>
 
-    <h3>1. Configurazione switch</h3>
-    <div class="obj-list">
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">1.1 — Hardening (forte): AAA, SSH, gestione porte non utilizzate</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">1.2 — Configurazione VTP (dominio "LEONARDO")</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">1.3 — Configurazione STP</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">1.4 — Configurazione Port Channel</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-    </div>
+        <h3>2. Configurazione firewall (FortiGate)</h3>
+        <div class="obj-list">
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">2.1 — Routing (subinterfacce VLAN)</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">2.2 — Firewall Policy</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary><span class="obj-text">2.3 — DHCP</span></summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">2.4 — Alta affidabilità (cluster HA)</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+        </div>
 
-    <h3>2. Configurazione firewall (FortiGate)</h3>
-    <div class="obj-list">
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">2.1 — Routing (subinterfacce VLAN)</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">2.2 — Firewall Policy</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">2.3 — DHCP</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">2.4 — Alta affidabilità (cluster HA)</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-    </div>
+        <h3>3. Configurazione Windows Server</h3>
+        <div class="obj-list">
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">3.1 — Definizione Active Directory</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text"
+                >3.2 — Domain Controller (DNS integrato)</span
+              >
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary><span class="obj-text">3.3 — GPO</span></summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+        </div>
 
-    <h3>3. Configurazione Windows Server</h3>
-    <div class="obj-list">
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">3.1 — Definizione Active Directory</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">3.2 — Domain Controller (DNS integrato)</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">3.3 — GPO</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-    </div>
+        <h3>4. Deployment client</h3>
+        <div class="obj-list">
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">4.1 — Creazione VM master Windows 11</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">4.2 — Clonazione e Sysprep (×3)</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">4.3 — Join al dominio</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+        </div>
 
-    <h3>4. Deployment client</h3>
-    <div class="obj-list">
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">4.1 — Creazione VM master Windows 11</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">4.2 — Clonazione e Sysprep (×3)</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">4.3 — Join al dominio</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-    </div>
+        <h3>5. Validazione e collaudo</h3>
+        <div class="obj-list">
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">5.1 — Connettività inter-VLAN</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">5.2 — Risoluzione DNS interna</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">5.3 — Lease DHCP per VLAN</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">5.4 — Test failover HA</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text"
+                >5.5 — Autenticazione dominio multi-client</span
+              >
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+        </div>
 
-    <h3>5. Validazione e collaudo</h3>
-    <div class="obj-list">
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">5.1 — Connettività inter-VLAN</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">5.2 — Risoluzione DNS interna</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">5.3 — Lease DHCP per VLAN</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">5.4 — Test failover HA</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">5.5 — Autenticazione dominio multi-client</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-    </div>
+        <h3>6. Documentazione</h3>
+        <div class="obj-list">
+          <details class="obj-item status-done">
+            <summary><span class="obj-text">6.1 — README.md</span></summary>
+            <div class="obj-content">
+              <p class="obj-caption">
+                Completato: panoramica, obiettivi, prerequisiti.
+              </p>
+            </div>
+          </details>
+          <details class="obj-item status-inprogress">
+            <summary>
+              <span class="obj-text"
+                >6.2 — Documento HTML/CSS di tracciamento</span
+              >
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">In corso — questa stessa pagina.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">6.3 — Troubleshooting log</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+    </main>
 
-    <h3>6. Documentazione</h3>
-    <div class="obj-list">
-      <details class="obj-item status-done">
-        <summary><span class="obj-text">6.1 — README.md</span></summary>
-        <div class="obj-content"><p class="obj-caption">Completato: panoramica, obiettivi, prerequisiti.</p></div>
-      </details>
-      <details class="obj-item status-inprogress">
-        <summary><span class="obj-text">6.2 — Documento HTML/CSS di tracciamento</span></summary>
-        <div class="obj-content"><p class="obj-caption">In corso — questa stessa pagina.</p></div>
-      </details>
-      <details class="obj-item status-todo">
-        <summary><span class="obj-text">6.3 — Troubleshooting log</span></summary>
-        <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
-      </details>
-    </div>
+    <footer>
+      <p>
+        Repository:
+        <a href="https://github.com/RobyLedda94" target="_blank"
+          >github.com/RobyLedda94</a
+        >
+        — Ultimo aggiornamento: correzione stati obiettivi 0.2/0.3
+      </p>
+    </footer>
 
-  </section>
-
-</main>
-
-<footer>
-  <p>Repository: <a href="https://github.com/RobyLedda94" target="_blank">github.com/RobyLedda94</a> — Ultimo aggiornamento: correzione stati obiettivi 0.2/0.3</p>
-</footer>
-
-<script src="./js/script.js"></script>
-</body>
+    <script src="./js/script.js"></script>
+  </body>
 </html>
