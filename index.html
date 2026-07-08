@@ -52,19 +52,53 @@
         </div>
       </details>
 
-      <details class="obj-item status-todo">
+      <details class="obj-item status-done">
         <summary><span class="obj-text">0.2 — Piano di indirizzamento IP con metodologia VLSM</span></summary>
-        <div class="obj-content">
-          <p class="obj-caption">Da compilare: tabella VLSM, screenshot calcolo.</p>
-        </div>
+          <div class="obj-content">
+            <p class="obj-caption">Blocco base: <code>192.168.0.0/24</code> + link HA dedicato fuori blocco.</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Segmento</th><th>VLAN</th><th>Subnet</th><th>Maschera</th><th>Gateway</th><th>Range host</th><th>Broadcast</th><th>Indirizzi assegnabili</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="vlan-guest"><td>GUEST_NET</td><td>10</td><td>192.168.0.0/26</td><td>255.255.255.192</td><td>192.168.0.1</td><td>.2 – .62</td><td>192.168.0.63</td><td>62</td></tr>
+                  <tr class="vlan-admin"><td>ADMIN_NET</td><td>20</td><td>192.168.0.64/27</td><td>255.255.255.224</td><td>192.168.0.65</td><td>.66 – .94</td><td>192.168.0.95</td><td>30</td></tr>
+                  <tr class="vlan-mgmt"><td>MANAGEMENT_NET</td><td>30</td><td>192.168.0.96/28</td><td>255.255.255.240</td><td>192.168.0.97</td><td>.98 – .110</td><td>192.168.0.111</td><td>14</td></tr>
+                  <tr class="vlan-dmz"><td>DMZ (WIN-SRV-DC01)</td><td>—</td><td>192.168.0.112/29</td><td>255.255.255.248</td><td>192.168.0.113</td><td>.114 – .118</td><td>192.168.0.119</td><td>6</td></tr>
+                  <tr class="vlan-ha"><td>HA-SYNC (FW-1↔FW-2)</td><td>—</td><td>192.168.99.0/30</td><td>255.255.255.252</td><td>— (P2P)</td><td>.1 – .2</td><td>192.168.99.3</td><td>2</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="obj-caption">Spazio libero per crescita futura: 192.168.0.120 – 192.168.0.255</p>
+          </div>
       </details>
 
-      <details class="obj-item status-todo">
+      <details class="obj-item status-done">
         <summary><span class="obj-text">0.3 — Asset inventory completo</span></summary>
         <div class="obj-content">
-          <p class="obj-caption">Da compilare: tabella inventory, output <code>show version</code> / <code>get system status</code>.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Nodo</th><th>Ruolo</th><th>Piattaforma</th><th>Versione</th><th>Identificativo</th><th>Risorse</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>FW-1</td><td>Firewall primario HA</td><td>FortiGate-VM64-KVM</td><td>v7.6.7 build3704</td><td>SN: FGVMEVGT9RJSLZ87</td><td>1vCPU/2GB</td></tr>
+                <tr><td>2</td><td>FW-2</td><td>Firewall secondario HA</td><td>FortiGate-VM64-KVM</td><td>v7.6.7 build3704</td><td>SN: FGVMEV_4Z9IEEQ52</td><td>1vCPU/2GB</td></tr>
+                <tr><td>3</td><td>ISP</td><td>Switch upstream</td><td>GNS3 nativo</td><td>—</td><td>—</td><td>trascurabile</td></tr>
+                <tr><td>4</td><td>SW-1-VTP-SERVER</td><td>Core/Distribution</td><td>Cisco IOU L2</td><td>IOS 15.1(20130726)</td><td>ipbasek9-15.1g.bin</td><td>512MB</td></tr>
+                <tr><td>5</td><td>SW-2-VTP-SERVER</td><td>Core/Distribution</td><td>Cisco IOU L2</td><td>IOS 15.1(20130726)</td><td>ipbasek9-15.1g.bin</td><td>512MB</td></tr>
+                <tr><td>6</td><td>SW-1-CLIENT</td><td>Access</td><td>Cisco IOU L2</td><td>IOS 15.1(20130726)</td><td>Board ID: 2048003</td><td>512MB</td></tr>
+                <tr><td>7</td><td>SW-2-CLIENT</td><td>Access</td><td>Cisco IOU L2</td><td>IOS 15.1(20130726)</td><td>ipbasek9-15.1g.bin</td><td>512MB</td></tr>
+                <tr class="vlan-dmz"><td>8</td><td>WIN-SRV-DC01</td><td>Domain Controller</td><td>Windows Server 2022</td><td>Standard Eval, build 20348.587</td><td>Key: W8JDY</td><td>4GB/2vCPU</td></tr>
+                <tr class="vlan-guest"><td>9</td><td>PC1</td><td>Endpoint provvisorio</td><td>VPCS</td><td>—</td><td>→ futuro WIN11-CLIENT-01</td><td>trascurabile</td></tr>
+                <tr class="vlan-admin"><td>10</td><td>PC2</td><td>Endpoint provvisorio</td><td>VPCS</td><td>—</td><td>→ futuro WIN11-CLIENT-02</td><td>trascurabile</td></tr>
+                <tr class="vlan-mgmt"><td>11</td><td>PC3</td><td>Endpoint provvisorio</td><td>VPCS</td><td>—</td><td>→ futuro WIN11-CLIENT-03</td><td>trascurabile</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </details>
+</details>
 
     </div>
 

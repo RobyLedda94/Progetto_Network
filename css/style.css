@@ -231,3 +231,46 @@ footer {
 }
 
 footer a { color: var(--accent); }
+
+
+/* Tabelle */
+/* Tabelle */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0 1rem;
+  font-size: 0.8rem;
+  table-layout: fixed;
+}
+
+th, td {
+  padding: 0.45rem 0.5rem;
+  border: 1px solid var(--border);
+  text-align: left;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+th {
+  background: var(--bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+tr:hover td {
+  background: rgba(255,255,255,0.03);
+}
+
+:root {
+  --guest: #7ee787;
+  --admin: #d2a8ff;
+  --mgmt: #f2cc60;
+  --dmz: #ff7b72;
+  --ha: #79c0ff;
+}
+
+.vlan-guest { border-left: 3px solid var(--guest); }
+.vlan-admin { border-left: 3px solid var(--admin); }
+.vlan-mgmt  { border-left: 3px solid var(--mgmt); }
+.vlan-dmz   { border-left: 3px solid var(--dmz); }
+.vlan-ha    { border-left: 3px solid var(--ha); }
