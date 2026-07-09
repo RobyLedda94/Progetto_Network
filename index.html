@@ -372,10 +372,12 @@
                   - Hardening linee console e ausiliarie. <br />
                   - Banner di accesso. <br />
                   - Protezione brute force <br />
-                  - Disabilitazione servizi non essenziali (da definire) <br />
-                  - Limitazione durata sessione e tentativi di login SSH (da definire) <br />
-                  - Spegnimento porte non utilizzate, configurazione port security (da definire al punto 1.2) <br />
-                  - Creazione VLAN parcheggio e assegnazione porte non utilizzate (da definire al punto 1.2) <br />
+                  - Disabilitazione servizi non essenziali <br />
+                  - Limitazione durata sessione e tentativi di login SSH <br />
+                  - Spegnimento porte non utilizzate, configurazione port
+                  security (da definire al punto 1.2) <br />
+                  - Creazione VLAN parcheggio e assegnazione porte non
+                  utilizzate (da definire al punto 1.2) <br />
                 </p>
               </div>
               <br />
@@ -392,6 +394,12 @@
                   (privilegio massimo). Su questa immagine IOU 15.1 IPBASEK9 il
                   comando genera un hash Type 4, non Type 5/8/9 come preferito —
                   limite noto della piattaforma.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show running-config | include enable secret : verifica hash
+                  cifrato, testo non in chiaro.
                 </p>
               </div>
               <br />
@@ -414,6 +422,12 @@
                   - aaa authorization exec default local : applica gli stessi
                   permessi locali in modalità EXEC. <br />
                 </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show running-config | include aaa|username : conferma la
+                  presenza di AAA, utente, e hash cifrato.
+                </p>
               </div>
               <br />
               <br />
@@ -429,6 +443,12 @@
                   la generazione delle chiavi RSA. <br />
                   - crypto key generate rsa : genera le chiavi RSA per SSH. Alla
                   richiesta dei bit rispondere 2048<br />
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show crypto key mypubkey rsa : visualizza le chiavi RSA
+                  generate, confermando la corretta generazione.
                 </p>
               </div>
               <br />
@@ -452,6 +472,14 @@
                   - exec-timeout 5 0 : imposta timeout di inattività a 5 minuti
                   <br />
                 </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show running-config | section line vty : conferma la
+                  configurazione delle linee VTY e il timeout impostato. <br />
+                  - show ip ssh : verifica la configurazione SSH, mostrando la
+                  versione e lo stato del servizio.
+                </p>
               </div>
               <br />
               <br />
@@ -470,6 +498,14 @@
                   - no exec : impostato su aux disabilita completamente la porta
                   ausiliaria. <br />
                 </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show running-config | section line con : conferma la
+                  configurazione della linea console. <br />
+                  - show running-config | section line aux : conferma la
+                  configurazione della linea ausiliaria. <br />
+                </p>
               </div>
               <br />
               <br />
@@ -483,6 +519,12 @@
                 <p>
                   - banner motd #...# : imposta un messaggio di accesso per
                   avvisare chi si connette che l'accesso è riservato. <br />
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show running-config | include banner : conferma la presenza
+                  del banner di accesso. <br />
                 </p>
               </div>
               <br />
@@ -499,10 +541,133 @@
                   per 120 secondi se ne rileva 3 falliti in 60 secondi. <br />
                   - Login delay 2 : imposta un ritardo di 2 secondi tra ogni
                   tentativo di login <br />
-                  - Login on-failure log : registra i tentativi falliti nel log di
-                  sistema <br />
-                  - Login on-success log : registra i tentativi riusciti nel log di
-                  sistema <br />
+                  - Login on-failure log : registra i tentativi falliti nel log
+                  di sistema <br />
+                  - Login on-success log : registra i tentativi riusciti nel log
+                  di sistema <br />
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show login : visualizza lo stato della protezione brute
+                  force e i tentativi di login recenti.
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Disabilitazione_Servizi_non_Essenziali.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - no ip http server : disattiva il server di gestione web HTTP
+                  <br />
+                  - no ip domain-lookup : evita che IOS tenti una risoluzione
+                  DNS per ogni comando non riconosciuto <br />
+                  - no service pad : disabilita il protocollo PAD (Packet
+                  Assembler/Disassembler) <br />
+                  - no ip finger : disattiva il servizio che permetteva di
+                  interrogare da remoto le sessioni attive <br />
+                  - no ip bootp server : disabilita il servizio BOOTP,
+                  'processore DHCP', non necessario dato che sara il fortigate a
+                  gestire DHCP <br />
+                  - no service tcp/udp-small-servers : disabilita i servizi
+                  TCP/UDP disattivano i servizi diagnostici legacy (echo,
+                  chargen, discard, daytime) <br />
+                  - no ip source-route : impedisce l'elaborazione di pacchetti
+                  con percorso di rete specificato dal mittente, utilizzato per
+                  aggirare la sicurezza <br />
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show running-config | include
+                  http|domain-lookup|pad|finger|bootp|source-route- : conferma
+                  la disabilitazione dei servizi non essenziali. <br />
+                  - show ip http server status : conferma che il server HTTP è
+                  disabilitato. <br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Limitazione_durata_sessione_e_login_SSH.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - ip ssh time-out 60 : limita 60 secondi il tempo massimo per
+                  completare la fase di negoziazione/autenticazione SSH <br />
+                  - ip ssh authentication-retries 3 : limita a 3 i tentativi di
+                  login consetiti dentro la stessa sessione SSH già aperta.
+                  <br />
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show ip ssh : conferma la configurazione SSH, mostrando la
+                  versione e lo stato del servizio.
+                </p>
+              </div>
+              <br />
+              <br />
+              <div class="obj-trace">
+                <h4>Problemi Riscontrati - 1.1 Hardening Switch</h4>
+                <p>
+                  Durante l'hardening sono emersi quattro limiti legati
+                  specificamente all'immagine IOU 15.1 IPBASEK9 in uso (una
+                  build sperimentale del 2013), utili da documentare per chi
+                  replica il progetto con la stessa immagine.
+                </p>
+                <br />
+                <p>
+                  Hashing password bloccato su Type 4: i tentativi di forzare
+                  esplicitamente Type 5 o Type 9 tramite algorithm-type sono
+                  sempre falliti con "Invalid input detected" — questa immagine
+                  non supporta affatto quella sintassi. Di conseguenza, il
+                  comando standard enable secret genera automaticamente un hash
+                  Type 4, algoritmo che Cisco ha ufficialmente riconosciuto come
+                  difettoso (advisory CISCO-SA-20130318-TYPE4: manca il salt e
+                  l'iterazione multipla, risultando persino più debole del più
+                  datato Type 5). Le versioni corrette (Type 8/9) sono
+                  disponibili solo da IOS 15.3(3)M in poi, quindi non
+                  raggiungibili su questa piattaforma. Accettato come limite
+                  noto e non risolvibile lato software.
+                </p>
+                <br />
+                <p>
+                  Nessun supporto HTTPS: il comando no ip http secure-server non
+                  è mai stato riconosciuto. La verifica (show ip http server
+                  status) ha confermato "HTTP secure server capability: Not
+                  present" — il sottosistema HTTPS non è proprio compilato in
+                  questa immagine, quindi il comando è risultato superfluo più
+                  che fallito.
+                </p>
+                <br />
+                <p>
+                  Comandi tcp/udp-small-servers non tracciati: pur essendo
+                  accettati senza errori dalla piattaforma, non compaiono in
+                  nessuna verifica del running-config (nemmeno con all), a
+                  differenza di tutti gli altri "no service" di default.
+                  Comportamento coerente con altre stranezze già osservate su
+                  questa build sperimentale — configurazione comunque applicata,
+                  solo non riflessa nell'output di verifica.
+                </p>
+                <br />
+                <p>
+                  Nota aggiuntiva (non un problema): show clock detail mostra un
+                  orario già corretto ("Time source is hardware calendar") pur
+                  senza NTP configurato — comportamento normale dell'emulazione
+                  IOU, che eredita l'orario della GNS3 VM all'avvio del
+                  processo. Non è però una sincronizzazione continuativa reale,
+                  motivo per cui NTP con autenticazione resta comunque
+                  pianificato più avanti per garantire timestamp affidabili nei
+                  log di audit. Non presente RTC (Real Time Clock) essendo un emulatore.
                 </p>
               </div>
             </div>
