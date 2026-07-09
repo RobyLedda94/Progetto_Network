@@ -26,9 +26,9 @@ Obiettivi :
 1.Configurazione switch
 
   - 1.1 Hardening - AAA, SSH, Gestione porte non utilizzate, Port Security
-  - 1.2 Configurazione VTP
+  - 1.2 Configurazione VTP + Port Channel
   - 1.3 Configurazione STP
-  - 1.4 Configurazione Ethernet Channel (LACP)
+  - 1.4 Verifica configurazione Ethernet Channel (LACP)
 
 
 2.Configurazione firewall (FortiGate)
