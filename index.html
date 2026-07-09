@@ -771,14 +771,38 @@
               <div class="obj-trace">
                 <h4>Traccia / note</h4>
                 <p>
-                  - vtp password StrongPassword123 hidden : imposta una password per
-                  l'autenticazione VTP, proteggendo la propagazione delle VLAN
-                  tra switch 'hidden' cifra la password. <br />
+                  - vtp password StrongPassword123 hidden : imposta una password
+                  per l'autenticazione VTP, proteggendo la propagazione delle
+                  VLAN tra switch 'hidden' cifra la password. <br />
                 </p>
                 <br />
                 <h4>Comandi di diagnostica</h4>
                 <p>
-                  - show vtp password : conferma la presenza della password VTP. <br />
+                  - show vtp password : conferma la presenza della password VTP.
+                  <br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Impostazione_modalita_VTP.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - vtp mode server : imposta lo switch come server VTP, che può
+                  creare, modificare e cancellare VLAN. <br />
+                  - vtp mode client : imposta lo switch come client VTP, che
+                  riceve le informazioni sulle VLAN dal server. <br />
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show vtp status : Verifica la modalità VTP assegnata agli
+                  switch.
+                  <br />
                 </p>
               </div>
             </div>
