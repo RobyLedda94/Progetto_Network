@@ -667,7 +667,8 @@
                   processo. Non è però una sincronizzazione continuativa reale,
                   motivo per cui NTP con autenticazione resta comunque
                   pianificato più avanti per garantire timestamp affidabili nei
-                  log di audit. Non presente RTC (Real Time Clock) essendo un emulatore.
+                  log di audit. Non presente RTC (Real Time Clock) essendo un
+                  emulatore.
                 </p>
               </div>
             </div>
@@ -679,7 +680,34 @@
               >
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Procediamo con la configurazione del VTP (VLAN Trunking
+                  Protocol) per il dominio "LEONARDO". Questo protocollo
+                  permette la gestione centralizzata delle VLAN su più switch,
+                  evitando la necessità di configurare manualmente le VLAN su
+                  ciascun dispositivo. La configurazione prevede la definizione
+                  del dominio VTP, la scelta della modalità (server/client), e
+                  l'assegnazione delle VLAN necessarie per il progetto.
+                </p>
+                <br />
+                <p>
+                  Procedura configurazione VTP, lavoreremo un sotto step alla volta :
+                  <br />
+                  - Verifica preliminare stato VTP e VLAN esistenti. <br />
+                  - Impostazione modalità VTP (definizione degli switch server e client). <br />
+                  - Configurazione del dominio VTP "TuoDominio". <br />
+                  - Password VTP per autenticazione tra switch. <br />
+                  - Versione VTP (1 o 2) in base alle esigenze del progetto. <br />
+                  - Configurazione dei link in trunk tra gli switch per permettere la propagazione delle VLAN. <br />
+                  - Verifica propagazione del dominio 'stesso dominio, stessa versione, stessa password' tra gli switch. <br />
+                  - Creazione delle VLAN necessarie (GUEST_NET, ADMIN_NET, MANAGEMENT_NET, DMZ) sullo switch VTP server. <br />
+                  - Assgnazione link in access alle VLAN sui client switch. <br />
+                  - Spegnimento delle porte non utilizzate e configurazione port security (ripreso dal punto 1.1). <br />
+                  - Creazione VLAN parcheggio e assegnazione porte non utilizzate (ripreso dal punto 1.1). <br />
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
