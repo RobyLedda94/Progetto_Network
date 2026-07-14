@@ -883,13 +883,37 @@
               />
               <div class="obj-trace">
                 <h4>Traccia / note</h4>
+                <p>- Questi comandi sono identici al precedente step.</p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
                 <p>
-                  - Questi comandi sono identici al precedente step.
+                  - show interfaces Ethernet 0/1 switchport : mostra nello
+                  specifico la configurazione di una singola interfaccia.
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Porte_Access.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - switchport mode access : definisce per l'interfaccia la
+                  modalità access, ottima misura di hardening anti-vlan-hopping
+                  tecnica di attacco che permette a un dispositivo collegato a
+                  una singola VLAN di superare la segmentazione e raggiungere il
+                  traffico di altre VLAN. <br />
+                  - switchport access vlan 'n' : assegna la porta alla VLAN
+                  specifica.
                 </p>
                 <br />
                 <h4>Comandi di diagnostica</h4>
                 <p>
-                  - show interfaces Ethernet 0/1 switchport : mostra nello specifico la configurazione di una singola interfaccia.
+                  - show interfaces status : come il precedente mostra il
+                  ripilogo delle interfacce e la loro assegnazione.
                 </p>
               </div>
             </div>
