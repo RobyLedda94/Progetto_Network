@@ -355,8 +355,7 @@
           <details class="obj-item status-done">
             <summary>
               <span class="obj-text"
-                >1.1 — Hardening (forte): AAA, SSH, gestione porte non
-                utilizzate</span
+                >1.1 — Hardening: AAA, SSH, gestione porte non utilizzate</span
               >
             </summary>
             <div class="obj-content">
@@ -702,7 +701,11 @@
                   - Password VTP. <br />
                   - Impostazione modalità VTP. <br />
                   - Creazione Port-Channel (LACP) <br />
-                  - Configurazione trunk 802.1Q, sulle interfacce Port-Channel. <br />
+                  - Configurazione trunk 802.1Q, sulle interfacce Port-Channel.
+                  <br />
+                  - Configurazione interfacce in trunk verso i firewall
+                  FortiGate. <br />
+                  - Configurazione interfacce in access verso gli endpoint.<br />
                   - Shutdown porte non utilizzate.
                   <br />
                   - Disegnazione Primary Server. <br />
@@ -710,7 +713,8 @@
                   - Creazione VLAN (solo dal Primary Server) <br />
                   - Assegnazione porte in access verso gli endpoint <br />
                   - Port Security sulle porte in access <br />
-                  - Creazione VLAN parcheggio e assegnazione porte non utilizzate <br />
+                  - Creazione VLAN parcheggio e assegnazione porte non
+                  utilizzate <br />
                 </p>
               </div>
               <br />
@@ -801,6 +805,91 @@
                   - show vtp status : Verifica la modalità VTP assegnata agli
                   switch.
                   <br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Creazione_Port-Channel.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - channel-group 1/2/3 : assegna ciascuna interfaccia fisica al
+                  relativo gruppo Ethernet-Channel, utilizzando il protocollo
+                  LACP in modalità active, questa modalità avvia attivamente la
+                  negoziazione LACP con l'altro capo del collegamento, se i due
+                  lati non sono compatibili, il protocollo rifiuta di formare il
+                  bundle, prevenendo loop di rete o traffico incoerente.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show etherchannel summary : mostra l'insieme di tutti i pool
+                  logici creati le interfacce fisiche coinvolte e il loro stato
+                  di attività. <br />
+                  - show interfaces port-channel n : mostra nel dettaglio ogni
+                  singola interfaccia logica elencando stato di attività, banda
+                  aggregata e indirizzo fisico. <br />
+                  - show lacp neighbor : conferma la negoziazione LACP attiva
+                  con l'altro capo del collegamento. <br />
+                  - show lacp counters : mostra i pacchetti LACPDU inviati e
+                  ricevuti per interfaccia utile per diagnosticare collegamenti
+                  ancora in stato 'su - suspended' <br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Configurazione_Trunk_802.1Q_Interfacce_Membro.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - switchport trunk encapsulation dot1q : specifica 802.1Q come
+                  metodo di incapsulamento <br />
+                  - switchport trunk allowed vlan 10,20,30,40 : limita il trunk
+                  alle sole VLAN specificate <br />
+                  - switchport mode trunk : imposta la modalità trunk (permette
+                  il passaggio delle informazioni di più VLAN in un unico link)
+                  <br />
+                  <br />
+                  Questa configurazione è stata ripetuta su ogni switch, su
+                  questa immagine IOU le impostazioni switchport applicate ai
+                  port-channel non si propagavano correttamente ai membri fisici
+                  coinvolti, quindi è risultata affidabile la configurazione su
+                  ogni singola porta.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show interface trunk : conferma la colonna VLAN allowed
+                  trunk <br />
+                  - show etherchannel summary : mostra che tutti i gruppi logici
+                  con link aggregati abbiano il flag (P) bundled in
+                  port-channel.
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Trunk_Verso_i_FortiGate.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - Questi comandi sono identici al precedente step.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show interfaces Ethernet 0/1 switchport : mostra nello specifico la configurazione di una singola interfaccia.
                 </p>
               </div>
             </div>
