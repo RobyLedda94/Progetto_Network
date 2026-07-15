@@ -12,7 +12,7 @@ Questo progetto nasce con finalità didattiche e dimostrative : ogni fase - dell
 
 L'obbiettivo è rendere l'intero percorso replicabile anche a chi si avvicina per la prima volta a questo tipo di laboratorio.
 
-La rete simula tre sedi/reparti distinti (Guest, Admin, Management) collegati ad una zona server (DMZ) che ospita il domain controller, il tutto instradato da un cluster ridondato di firewall che garantisce continuità di servizio anche in caso di guasto di uno dei 2 nodi.
+La rete simula tre sedi/reparti distinti (Guest, Admin, Management) collegati ad una zona server (Server_Net) che ospita il domain controller, il tutto instradato da un cluster ridondato di firewall che garantisce continuità di servizio anche in caso di guasto di uno dei 2 nodi.
 
 
 Obiettivi :

@@ -84,7 +84,7 @@
               <p class="obj-caption">
                 Topologia definitiva validata: cluster HA FortiGate con link
                 heartbeat dedicato, maglia Distribution/Access ridondata (VTP
-                Server/Client) con collegamenti pronti per Port Channel, DMZ per
+                Server/Client) con collegamenti pronti per Port Channel, Server_Net per
                 il Domain Controller.
               </p>
               <div class="obj-trace">
@@ -156,7 +156,7 @@
                       <td>14</td>
                     </tr>
                     <tr class="vlan-dmz">
-                      <td>DMZ (WIN-SRV-DC01)</td>
+                      <td>SERVER_NET (WIN-SRV-DC01)</td>
                       <td>—</td>
                       <td>192.168.0.112/29</td>
                       <td>255.255.255.248</td>
@@ -186,7 +186,7 @@
                 <p>
                   Il calcolo VLSM è stato condotto partendo dal segmento con più
                   host previsti fino al più piccolo (GUEST_NET → ADMIN_NET →
-                  MANAGEMENT_NET → DMZ), assegnando a ciascuno la subnet più
+                  MANAGEMENT_NET → SERVER_NET), assegnando a ciascuno la subnet più
                   piccola possibile in grado di contenere gli host richiesti più
                   il gateway, con la formula 2^n host_richiesti - 2 (indirizzo
                   di rete e broadcast non assegnabili). Procedere dal segmento
