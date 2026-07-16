@@ -980,6 +980,32 @@
                   l'esatta copia dell'altro.
                 </p>
               </div>
+              <br />
+              <br />
+              <img
+                src="./img/Creazione_VLAN_dal_Primary_Server.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - vlan 'id' : questo comando crea la VLAN con uno specifico
+                  numero ID. <br />
+                  - name 'nome' : assegna un nome descrittivo alla VLAN, e un
+                  dato puramente informativo ma resta fondamentale la coerenza
+                  nella nomenclatura, a mio avviso è essenziale essere il piu
+                  esplicativi possibile.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show vlan brief : esegui questo comando su ogni switch
+                  appartenente al dominio VTP, mostra il riepilogo delle VLAN
+                  create localmente nel dispositivo e accertarsi che queste
+                  vengano replicate sugli switch restanti.
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
