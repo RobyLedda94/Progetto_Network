@@ -940,6 +940,46 @@
                   riconosciuto come Primary Server lo switch selezionato.
                 </p>
               </div>
+              <br />
+              <br />
+              <img
+                src="./img/Verifica_Propragazione_Dominio_VTP.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Per questo punto non e necessario eseguire comandi specifici
+                  di esecuzione, andremo a verificare la funzionalità con dei
+                  comandi di dignostica.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show vtp status : da eseguire su tutti gli switch
+                  appartenenti al dominio VTP, prestare particolare attenzione a
+                  VTP Version Running, VTP Domain Name, Configuration Revision,
+                  MD5 digest, le voci restituite devono essere identiche per
+                  ogni switch. <br />
+                  - show vtp counters : mostra che i pacchetti VTP stanno
+                  realmente circolando sui trunk configurati.
+                  <br />
+                  <br />
+                  Prestiamo particolare attenzione a Configuration Revision, si
+                  tratta di un contatore che si incrementa di 1 ogni volta che
+                  viene apportata una modifica al database VLAN da parte del
+                  Primary Server. <br />
+                  <br />
+                  Per quanto riguarda MD5 digest si tratta di un hash calcolato
+                  sull'intero contenuto del database VLAN, e come un'impronta
+                  digitale che varia a ogni minima differenza di contenuto, si
+                  tratta del controllo più affidabile se combacia su tutti gli
+                  switch si ha la certezza che il DB VLAN sia identico byte per
+                  byte ovunque accertando che ogni switch del dominio VTP sia
+                  l'esatta copia dell'altro.
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
