@@ -84,8 +84,8 @@
               <p class="obj-caption">
                 Topologia definitiva validata: cluster HA FortiGate con link
                 heartbeat dedicato, maglia Distribution/Access ridondata (VTP
-                Server/Client) con collegamenti pronti per Port Channel, Server_Net per
-                il Domain Controller.
+                Server/Client) con collegamenti pronti per Port Channel,
+                Server_Net per il Domain Controller.
               </p>
               <div class="obj-trace">
                 <h4>Traccia / note</h4>
@@ -186,12 +186,12 @@
                 <p>
                   Il calcolo VLSM è stato condotto partendo dal segmento con più
                   host previsti fino al più piccolo (GUEST_NET → ADMIN_NET →
-                  MANAGEMENT_NET → SERVER_NET), assegnando a ciascuno la subnet più
-                  piccola possibile in grado di contenere gli host richiesti più
-                  il gateway, con la formula 2^n host_richiesti - 2 (indirizzo
-                  di rete e broadcast non assegnabili). Procedere dal segmento
-                  più grande al più piccolo è il metodo standard per evitare
-                  frammentazione: se si assegnassero le subnet in ordine
+                  MANAGEMENT_NET → SERVER_NET), assegnando a ciascuno la subnet
+                  più piccola possibile in grado di contenere gli host richiesti
+                  più il gateway, con la formula 2^n host_richiesti - 2
+                  (indirizzo di rete e broadcast non assegnabili). Procedere dal
+                  segmento più grande al più piccolo è il metodo standard per
+                  evitare frammentazione: se si assegnassero le subnet in ordine
                   casuale, i "buchi" residui tra un blocco e l'altro potrebbero
                   non essere abbastanza grandi da ospitare un segmento
                   successivo più esigente.
@@ -710,7 +710,8 @@
                   <br />
                   - Verifica propagazione del dominio VTP <br />
                   - Creazione VLAN solo dal primary SW-Server-VTP <br />
-                  - Creazione VLAN parcheggio + assgnazione porte non utilizzate <br />
+                  - Creazione VLAN parcheggio + assgnazione porte non utilizzate
+                  <br />
                   - Shutdown porte non utilizzate <br />
                   - Port Security sulle porte in access. <br />
                 </p>
@@ -912,6 +913,31 @@
                 <p>
                   - show interfaces status : come il precedente mostra il
                   ripilogo delle interfacce e la loro assegnazione.
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Designazione_Primary_Server.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - vtp primary vlan : promuove lo switch nel quale è stato
+                  eseguito il comando a Primary Server riconosciuto dal DB VLAN
+                  del dominio VTP, da questo momento lo switch protra apportare
+                  le modifiche alle VLAN. <br />
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show vtp status : mostra lo stato della configurazione del
+                  VTP, da eseguire su tutti gli switch appartenenti al dominio
+                  VTP, prestare particolare attenzione alla voce Primary
+                  Descriprion, e verificare che sia effettivamente stato
+                  riconosciuto come Primary Server lo switch selezionato.
                 </p>
               </div>
             </div>
