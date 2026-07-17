@@ -1006,6 +1006,46 @@
                   vengano replicate sugli switch restanti.
                 </p>
               </div>
+              <br />
+              <br />
+              <img
+                src="./img/Creazione_VLAN_Parcheggio_dal_Primary_Server.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <br />
+              <img
+                src="./img/Access_VLAN_Parcheggio_Shutdown_Porte_Non_Utilizzate.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Per la creazione della VLAN parcheggio la procedura
+                  corrisponde a quanto visto nella creazione delle VLAN
+                  10,20,30,40; Questa viene sempre creata dallo Switch Primary
+                  Server, ho notato che al riavvio del dispositivo la
+                  designazione di uno specifico switch a Primary Server non
+                  resta configurata, pertanto ho dovuto ripetere il comando per
+                  eleggere SW-1-VTP-SERVER a server primario; <br />
+                  - interface range ... : applica lo stesso blocco di comandi a
+                  tutte le interfacce selezionate, ottimo metodo per evitare di
+                  configurare le interfacce una alla volta. <br/>
+                  - switchport mode access : comando necessario per assegnare una VLAN access.<br/>
+                  - switchport access vlan 999 : assegna la porta fisica alla VLAN parcheggio, che resta isolata dal resto della rete. <br/>
+                  - shutdown : spegne completamente la porta, essendo non utilizzata.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show vlan brief : esegui questo comando su ogni switch
+                  appartenente al dominio VTP, mostra il riepilogo delle VLAN
+                  create localmente nel dispositivo e accertarsi che queste
+                  vengano replicate sugli switch restanti. <br/>
+                  - show interfaces status : mostra lo stato delle porte.
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
