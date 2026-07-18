@@ -711,8 +711,8 @@
                   - Verifica propagazione del dominio VTP <br />
                   - Creazione VLAN solo dal primary SW-Server-VTP <br />
                   - Creazione VLAN parcheggio + assgnazione porte non utilizzate
+                  + Shutdown porte non utilizzate
                   <br />
-                  - Shutdown porte non utilizzate <br />
                   - Port Security sulle porte in access. <br />
                 </p>
               </div>
@@ -1047,6 +1047,72 @@
                   create localmente nel dispositivo e accertarsi che queste
                   vengano replicate sugli switch restanti. <br />
                   - show interfaces status : mostra lo stato delle porte.
+                </p>
+              </div>
+              <br />
+              <br />
+              <img
+                src="./img/Port_Security.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  La funzionalità port-security è una misura di sicurezza
+                  applicata a livello 2 'Data Link', permette di controllare e
+                  limitare l'accesso fisico ad una specifica porta dello switch,
+                  senza il port security qualsiasi dispostivo collegato
+                  fisicamente a una porta in access puo ottenere accesso alla
+                  rete. <br />
+                  - switchport port-security : attiva la funzionalità sulla
+                  porta, prima di attivare questo comando la porta deve gia
+                  essere impostata in access. <br />
+                  - switchport port-security maximum 1 : limita l'accesso fisico
+                  alla porta a un solo indirizzo MAC. <br />
+                  - switchport port-security violation restrict : in caso di
+                  violazione restrict scarta il traffico dell'indirizzo non
+                  autorizzato e genera un log, e possibile anche in caso di
+                  violazione impostare lo spegnimento totale della porta che va
+                  dunque in shutdown. <br />
+                  Al momento ho deciso di non specificare gli indirizzi MAC che
+                  possono avere accesso al dispositivo, in quanto in questa fase
+                  del progetto la topologia di rete comprende i VPCS questi
+                  verrano utilizzati per testare la connettività, non appena
+                  verranno importate le Virtual Machines Windows, applicheremo
+                  un ulteriore livello di restrizione sul port security.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show port-security : mostra l'insieme di tutte le porte
+                  protette nello switch. <br />
+                  - show port-security interface ethernet 'n' : mostra il
+                  dettaglio per ogni singola porta <br />
+                  Prestiamo attenzione a quest'ultimo comando in quanto
+                  restituisce un output molto interessante. <br />
+                </p>
+                <br />
+                <img
+                  src="./img/Port_Security_Diagnostica.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <p>
+                  Questo output e molto interessante in quanto mostra nello
+                  specifico, lo stato di attività del port-security, se ci sono
+                  state violazioni, al momento non è stata registrata nessuna
+                  violazione lo capiamo dalla voce 'Port Status : Secure-up',
+                  viene indicata anche la modalità di restrizione in questo caso
+                  'Restrict', molto interessante anche la voce 'Aging Time : 0
+                  mins' si tratta di un timer di apprendimento degli indirizzi
+                  MAC possiamo impostare un timeout automatico che resetta
+                  l'indirizzo. Ci viene mostrato anche il limite degli indirizzi
+                  MAC che possono essere appresi dalla porta, e non solo anche
+                  se sono stati definiti staticamente degli indirizzi MAC. Le
+                  ultime 2 voci 'Last Source Address :' questo ci mostra il MAC
+                  appreso che identifica un host e la VLAN di provenienza,
+                  'Security Violation Count' tiene traccia delle violazioni.
                 </p>
               </div>
             </div>
