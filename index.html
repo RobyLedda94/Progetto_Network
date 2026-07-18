@@ -672,7 +672,7 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-inprogress">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text"
                 >1.2 — Configurazione VTP (dominio "LEONARDO") + Port Channel
@@ -1098,6 +1098,7 @@
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
+                <br>
                 <p>
                   Questo output e molto interessante in quanto mostra nello
                   specifico, lo stato di attività del port-security, se ci sono
@@ -1113,6 +1114,44 @@
                   ultime 2 voci 'Last Source Address :' questo ci mostra il MAC
                   appreso che identifica un host e la VLAN di provenienza,
                   'Security Violation Count' tiene traccia delle violazioni.
+                </p>
+              </div>
+              <br />
+              <br />
+              <div class="obj-trace">
+                <h4>
+                  Problemi Riscontrati - 1.2 — Configurazione VTP (dominio
+                  "LEONARDO") + Port Channel (Ethernet Channel)
+                </h4>
+                <p>
+                  Durante la configurazione de protocollo VTP 'Vlan Trunking
+                  Protocol' quando abbiamo impostato una password per il dominio
+                  VTP questa veniva mostrata in chiaro, inizialmente ho pensato
+                  fosse un problema legato alla versione del VTP ma anche
+                  impostando versione 3, la password rimaneva comunque in chiaro
+                  senza Hash. Il problema e stato risolto con il comando competo
+                  'vtp password StrongPass123 hidden' la parola chiave è proprio
+                  hidden che memorizza la password cifrata.
+                </p>
+                <br />
+                <p>
+                  Durante la configurazione del Port-Channel alcune interfacce
+                  risultavano sospese, il problema viene risolto una volta
+                  completata su tutti gli switch la configurazione del
+                  Port-Channel è un comportamento normale del protocollo LACP.
+                </p>
+                <br />
+                <p>
+                  Valori di banda (BW) inconsistenti e casuali sui Port-Channel:
+                  ogni Port-Channel su ogni switch mostrava valori di banda
+                  diversi e imprevedibili (10.000, 20.000 o 100.000 Kbit/sec,
+                  invece del corretto 20.000), accompagnati da errori di log
+                  %IDBMAN-3-INVALIDAGGPORTBANDWIDTH e %IDBMAN-3-AGGPORTMISMATCH
+                  — difetto di sincronizzazione interna della piattaforma tra la
+                  struttura dati del Port-Channel e quella delle interfacce
+                  fisiche. Corretto forzando manualmente bandwidth 20000 su ogni
+                  Port-Channel di ogni switch, per garantire un valore coerente
+                  ai fini del calcolo del costo STP.
                 </p>
               </div>
             </div>
