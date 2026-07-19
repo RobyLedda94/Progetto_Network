@@ -1098,7 +1098,7 @@
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br>
+                <br />
                 <p>
                   Questo output e molto interessante in quanto mostra nello
                   specifico, lo stato di attività del port-security, se ci sono
@@ -1156,12 +1156,55 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-todo">
+          <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text">1.3 — Configurazione STP</span>
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Procediamo con la la configurazione del protocollo STP
+                  'Spanning Tree Protocol', è un protocollo di livello 2 'Data
+                  Link' che ha lo scopo di prevenire i loop in una rete dove
+                  esistono percorsi ridondanti tra switch, funziona costruendo
+                  automaticamente una topologia logica ad albero 'da cui il nome
+                  'spanning tree'' a partire dalla topologia fisica reale :
+                  elegge uno switch come Root Bridge 'radice dell' albero',
+                  calcola il percorso più breve da ogni altro switch verso il
+                  root bridge e blocca selettivamente le porte con un percorso
+                  alternativo 'ridondante'. <br />
+                  Nel nosto caso risulta molto utile defenire la sua
+                  configurazione, senza questo protocollo, un frame in broadcast
+                  ad esempio una richiesta ARP inviata da un host circolerebbe
+                  all'infinito tra i vari perscorsi paralleli ogni switch lo
+                  riceverebbe generando un ciclo continuo, questo fenomeno è
+                  noto come 'broadcast storm'. Questo protocollo si attiva di
+                  default, al momento i link ridondandi sono già bloccati,
+                  quindi la rete funziona, la configurazione che vedremo in
+                  questo punto, non serve a far funzionare il protocollo STP ma
+                  a controllarlo deliberatamente. Andremo a definire quale
+                  switch sarà eletto a roop bridge primario e secondario
+                  definendo un subentro deterministico e prevedibile, definiremo
+                  anche la sicurezza con la funzionalità BPDU Guard, impedendo
+                  che un dispositivo non autorizzato collegato ad una porta
+                  access possa interferire con l'elezione del Root Bridge
+                  fingendosi uno switch legittimo.
+                </p>
+                <br />
+                <p>
+                  Procedura configurazione STP, lavoreremo un sotto step alla
+                  volta :
+                  <br />
+                  - Verifica preliminare stato STP attuale (root bridge di
+                  default, porte in blocking). <br />
+                  - Scelta del protocollo STP (PVST+ gia attivo di default,
+                  valuteremo se passare a Rapid-PVST+ per convergenza più veloce). <br>
+                  - Impostazione esplicita del Root Bridge primario e secondario. <br>
+                  - Protezioni STP aggiuntive (BPDU Guard sulle porte in access). <br>
+                  - Verifica finale della topologia STP risultante. <br>
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
