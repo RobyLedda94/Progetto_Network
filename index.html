@@ -1411,6 +1411,66 @@
                   spanning-tree-portfast.
                 </p>
               </div>
+              <br />
+              <br />
+              <img
+                src="./img/Impostazione_Esplicita_Root_Bridge.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <br />
+              <img
+                src="./img/Impostazione_priorità_Root_secondario.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - sapanning-tree vlan 'n' priority 'value' : impostiamo
+                  manualmente la prirorità dello switch, per la specifica
+                  istanza della VLAN indicata. <br />
+                  <br />
+                  Prima di procedere e bene comprendere la priority e cio che ci
+                  permette di fare, come detto in precedenza in questo punto non
+                  abbiamo configurato il protocollo STP, ma il nostro obbiettivo
+                  è controllarlo deliberatamente. <br />
+                  La priority è un valore numerico arbitrario, che rappresenta
+                  il 'peso' con cui ogni switch partecipa all'elezione del Root
+                  Bridge. Questo valore non riflette alcuna caratteristica
+                  fisica dello switch. <br />
+                  Questo valore non agisce da solo, ma in correlazione con il
+                  MAC, la priority è la componente principale del Bridge ID si
+                  tratta di un valore a 64 bit totali, suddiviso tra Priority
+                  '16 - bit' + MAC '48 - bit'. <br />
+                  L'elezione del Root Bridge avviene per confronto numerico del
+                  Bridge ID vince lo switch con valore complessivo più basso.
+                  <br />
+                  Il primo valore calcolato è la Priority e questo vige sul
+                  secondo valore ovvero il MAC. <br />
+                  Il valore priority può assumere solo valori multipli di 4096,
+                  da 0 a 61440 '16 combinazioni possibili in totale' <br />
+                  Nelle implementazioni moderne 'PVST+ / Rapid-PVST+' il campo
+                  priority a 16 bit viene suddiviso ulteriormente in 12 bit per
+                  il valore della priority e 4 bit per l'Extended System ID che
+                  codifica l'ID della VLAN. Questo permette a un singolo switch
+                  di avere una Priority effettiva per ciascuna VLAN, meccanismo
+                  necessario perche PVST+ e Rapid-PVST+ gestiscono un'istanza
+                  STP indipendente per ogni VLAN ciascuna con una prorpia
+                  elezione di Root Bridge. <br />
+                  La scelta del valore della priority non è correlato solo
+                  all'elezione del Root Bridge ma anche la flessibilità di
+                  gestione nel tempo.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show spanning-tree summary : conferma per quali VLAN questo
+                  switch risulta Root Bridge. <br />
+                  - show spanning-tree vlan 'n' : mostra il valore priority
+                  effettivo nel campo Bridge ID per ciascuna VLAN. <br />
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
