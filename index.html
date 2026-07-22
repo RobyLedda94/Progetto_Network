@@ -1151,7 +1151,13 @@
                   struttura dati del Port-Channel e quella delle interfacce
                   fisiche. Corretto forzando manualmente bandwidth 20000 su ogni
                   Port-Channel di ogni switch, per garantire un valore coerente
-                  ai fini del calcolo del costo STP.
+                  ai fini del calcolo del costo STP. Questo processo non è
+                  compreso negli step visti in precedenza, questo passaggio
+                  possiamo comprenderlo dello step 1.2.5 dove abbiamo creato il
+                  link aggragati, entriamo nell'interfaccia aggregata lanciando
+                  il comando interface port-channel 'n', una volta dentro
+                  forziamo manualmente la banda con il comando bandwidth 20000,
+                  questo passaggio è da ripetere su tutti i link aggregati.
                 </p>
               </div>
             </div>
@@ -1362,6 +1368,49 @@
               </div>
               <br />
               <br />
+              <img
+                src="./img/Passaggio_a_Rapid_PVST+.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <br />
+              <img
+                src="./img/Correzione_link-type_sui_Port-Channel.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <br />
+              <img
+                src="./img/Correzione_link-type_collegamento_verso_FortiGate.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - spanning-tree mode rapid-pvst : questo comando attiva 802.1w
+                  su tutte le vlan esistenti <br />
+                  - spanning-tree link-type point-to-point : forza manualmente
+                  il riconoscimento del collegamento, necessario dato che
+                  Rapid-PVST ottiene la convergenza rapida solo sui collegamenti
+                  riconosciuti come P2p. <br />
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show spanning-tree summary : deve mostrare Swith is in
+                  rapid-pvst mode. <br />
+                  - show spanning-tree vlan 'n' : deve mostrare 'Type:P2p' sulle
+                  interfacce corrette. <br />
+                  <br />
+                  Durante la configurazione del link-type è stato valutato se
+                  applicare lo stesso comando anche nei link che si connettono
+                  agli endpoint, ma verificando su fonti Cisco non risulta
+                  essere il comando adeguato, la designazione verso quei link
+                  deve essere in Edge e questa si ottiene con il comando
+                  spanning-tree-portfast.
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
