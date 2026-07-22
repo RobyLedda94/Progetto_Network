@@ -1199,12 +1199,169 @@
                   - Verifica preliminare stato STP attuale (root bridge di
                   default, porte in blocking). <br />
                   - Scelta del protocollo STP (PVST+ gia attivo di default,
-                  valuteremo se passare a Rapid-PVST+ per convergenza più veloce). <br>
-                  - Impostazione esplicita del Root Bridge primario e secondario. <br>
-                  - Protezioni STP aggiuntive (BPDU Guard sulle porte in access). <br>
-                  - Verifica finale della topologia STP risultante. <br>
+                  valuteremo se passare a Rapid-PVST+ per convergenza più
+                  veloce). <br />
+                  - Impostazione esplicita del Root Bridge primario e
+                  secondario. <br />
+                  - Protezioni STP aggiuntive (BPDU Guard sulle porte in
+                  access). <br />
+                  - Verifica finale della topologia STP risultante. <br />
                 </p>
               </div>
+              <br />
+              <br />
+              <img
+                src="./img/Verifica_preliminare_stato_STP.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  - show spanning-tree summary : offre una panoramica generale
+                  del protocollo STP attivo e numero VLAN gestite. <br />
+                  - show spanning-tree vlan 'n' : mostra dettagli specifici per
+                  ciascuna VLAN.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  I comandi appena elencati restituiscono informazioni molto
+                  importanti da comprendere, le vedremo una alla volta. <br />
+                  1 - show spanning-tree summary : <br />
+                  <br />
+                  <img
+                    src="./img/Diagnostica_STP_Summ.png"
+                    alt=""
+                    class="obj-image"
+                  />
+                  <br />
+                  Da questo output possiamo vedere che tipo di protocollo STP
+                  risulta essere attivo, nel nostro caso è confermato PVST+
+                  'Per-VLAN Spanning Tree Plus', si tratta di una variante Cisco
+                  che calcola un'istanza STP indipendente per ciascuna VLAN.
+                  <br /><br />
+                  Possiamo notare anche che questo specifico Switch
+                  'SW-1-VTP-SERVER' è il root bridge per tutte le VLAN definite,
+                  come citato in precedenza questo protocollo si attiva di
+                  default, conincidenza ha voluto che proprio SW-1-VTP-SERVER
+                  fosse eletto come centro logico in base al suo MAC-ADDRESS, in
+                  fase operativa saremo noi a definire con esattezza in base
+                  alla priorità chi dovrà essere il root bridge. <br /><br />
+                  La voce Extended system ID è una funzionalità che incorpora
+                  l'ID della VLAN all'interno del campo priority bridge, campo
+                  che vedremo piu nel dettaglio in seguito quando dovremo
+                  eleggere il root bridge. <br />
+                  <br />
+                  Il Portfast Default è una funzionalità che permette ad un link
+                  in access di saltare le fasi iniziali di Listening/Learning e
+                  passare immediatamente al Forwarding riducendo i tempi di
+                  convergenza. <br /><br />
+                  La voce BPDU Guard è una funzionalità di sicurezza, se attiva
+                  una porta in PortFast nel momento in cui riceve un BPDU 'sono
+                  dei messaggi piu tecnicamente dei frame che utilizzano gli
+                  Switch attraverso il protocollo STP per scambiarsi
+                  informazioni, in questo modo apprendono la topologia di rete
+                  prevenendo i loop garantendo la stabilità della rete stessa'
+                  non autorizzato disattiva automaticamente la porta.
+                  <br /><br />
+                  Portfast BPDU filter è simile al Guard ma piu drastico invece
+                  di disattivare la porta ignora semplicemente i BPDU è
+                  sconsigliato in quanto nasconde il problema invece che
+                  segnalarlo. <br />
+                  <br />
+                  Loopguard Default è una protezione contro uno specifico loop
+                  causato da collegamenti unidirezionali. <br />
+                  <br />
+                  EtherChannel misconfig funzionalità attiva di default serve a
+                  rilevare se i membri di un EtherChannel sono configurati in
+                  modo coerente tra loro. <br />
+                  <br />
+                  UplinkFast è una funzionalità Cisco proprietaria è precedente
+                  a Rapid STP serve ad accelerare i tempi di convergenza. <br />
+                  <br />
+                  Come la precedente BackboneFast is disabled è una funzionalità
+                  Cisco proprietaria ormai resa obsoleta da Rapid STP, accelera
+                  i tempi di converfenza in caso di guasto di un collegamento
+                  non connesso direttamente allo switch. <br />
+                  <br />
+                  L'ultima parte mostra una tabella con varie voci
+                  Blocking/Listening/Learning/Forwarding/STP Active, mostra un
+                  conteggio di quante porte, per ciascuna VLAN, si trovano in
+                  ciascuno dei possibili stati STP, in questo caso siamo nel
+                  Root Bridge e tutte le 4 porte per ciascuna VLAN sono in
+                  Forwarding, questo è coerente con il fatto che il Root Bridge
+                  non blocca mai nessuna nessuna delle proprie porte. <br />
+                  <br />
+                  2 - show spanning-tree vlan 'n' : <br />
+                  <br />
+                  <img
+                    src="./img/Verifica_STP_Per_VLAN.png"
+                    alt=""
+                    class="obj-image"
+                  />
+                  <br />
+                  Anche questo output mostra informazioni molto utili, ci
+                  conferma che il protocollo STP segue lo standardi IEEE '802.1D
+                  classico, nel caso di PVST+'. <br />
+                  <br />
+                  La sezione Root ID ci restituisce la Priority con valore 32778
+                  qui possiamo capire la funzionalità Extended System ID, il
+                  valore priority di default è 32768 + l'ID della VLAN in questo
+                  caso è mostrata la VLAN 10, totale 32778. <br />
+                  <br />
+                  La voce Address mostra il MAC del Root Bridge. <br />
+                  <br />
+                  Possamo notare anche la voce This bridge is the root, conferma
+                  esplicita, presente solo nell'output dello switch che è
+                  realmente il Root per quella VLAN. <br />
+                  <br />
+                  La voce Hello Time indica l'intervallo con cui il Root Bridge
+                  invia periodicamente i messaggi BPDU, Max Age 20 sec indica
+                  per quanto tempo uno switch considera ancora valide le
+                  informazioni BPDU ricevute, prima di scartarle come obsolete
+                  se non ne arrivano di nuove. Invece Forward Delay indica la
+                  durata di ciascuna delle fasi intermedie Listening e Learning
+                  prima che una porta passi in Forwoarding. <br />
+                  <br />
+                  La sezione Bridge ID mostra gli stessi cambi della sezione
+                  Root ID, ma questi sono riferiti a questo switch specifico, le
+                  voci coincidono con la precedente sezione in quanto questo
+                  switch e il Root, nell'output degli altri 3 switch questa
+                  sezione mostrerebbe MAC e priorità differenti. <br />
+                  <br />
+                  Priority scompone esplicitamente il valore 32778 nei suoi 2
+                  componenti, ovvero la priorità base configurabile e il system
+                  ID. <br />
+                  <br />
+                  La voce AgingTime non si tratta di un timer STP ma è il tempo
+                  di invecchiamento della tabella degli indirizzi MAC, per
+                  questa VLAN dopo 300 sec di inattività, uno switch dimentica
+                  su quale porta aveva visto un certo MAC, se non riceve più
+                  traffico da quell'indirizzo. <br />
+                  <br />
+                  La tabella delle interfacce mostra il nome della porta e del
+                  gruppo logico, il ruolo che ricopre nel protocollo STP, in
+                  questo caso sono tutte Deigniated quindi tutte le porte stanno
+                  inoltrando traffico verso la rete. La sezione Status mostra lo
+                  stato operativo delle porte. <br />
+                  Il costo STP per quella specifica porta, per quanto riguarda
+                  Prio.Nbr è la combinazione del Port P1riority e numero interno
+                  della porta. <br />
+                  Type Shr, indica il tipo di collegamento rilevato, in questo
+                  caso Shared, non coerente con quanto aspettato P2p
+                  'Point-to-Point', normalmente un collegamento full-duplex 'che
+                  indica un tipo di comunicazione in cui i dati possono essere
+                  inviati e ricevuti contemporaneamente in entrambe le
+                  direzioni' verrebbe rilevato come P2p questo e sicuramente un
+                  aspetto da rivedere in fase di configurazione in quanto il
+                  Rapid-PVST+ utilizza prorpio il P2p per attivare le
+                  convergenze rapide tramite handshake diretto tra due porte
+                  <br />
+                </p>
+              </div>
+              <br />
+              <br />
             </div>
           </details>
           <details class="obj-item status-todo">
