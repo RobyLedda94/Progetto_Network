@@ -1471,6 +1471,52 @@
                   effettivo nel campo Bridge ID per ciascuna VLAN. <br />
                 </p>
               </div>
+              <br />
+              <br />
+              <img
+                src="./img/Attivazione_PortFast_e_BPDU_Guard.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Il PortFast va abilitato solo sulle porte che si collegano
+                  agli endpoint (PC, server, stampanti). In una rete STP, ogni
+                  porta attraversa normalmente gli stati Listening e Learning
+                  prima di raggiungere lo stato Forwarding — tempi di
+                  convergenza necessari sui collegamenti diretti tra switch,
+                  dove serve verificare che non si stia creando un loop, ma
+                  superflui verso un host singolo che non può generarne uno.
+                  Quando PortFast è attivo, la porta salta questi due stati e
+                  passa direttamente a Forwarding, permettendo al dispositivo di
+                  inviare traffico non appena rileva il collegamento. Il BPDU
+                  Guard va abilitato insieme al PortFast sulle stesse porte,
+                  come misura di protezione complementare. Una porta PortFast
+                  parte dal presupposto che non riceverà mai un BPDU, poiché
+                  solo gli switch li generano, non un host finale. Se quel
+                  presupposto venisse smentito — ad esempio perché qualcuno
+                  collega un dispositivo di rete non autorizzato al posto
+                  dell'endpoint atteso — il BPDU Guard disattiva immediatamente
+                  la porta (stato err-disabled), impedendo che possa interferire
+                  con l'elezione del Root Bridge o alterare la topologia STP.
+                  <br />
+                  <br />
+                  - spanning-tree portfast : disegna la porta come Edge port
+                  passando direttamente allo stato Forwarding. <br />
+                  - spanning-tree bpduguard enable : disattiva automaticamente
+                  la porta se riceve un BPDU inatteso. <br />
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show spanning-tree interface Ethernet'n detail : conferma lo
+                  stato di attivazione del PortFast. <br />
+                  - show running-config | include portfast|bpduguard : conferma
+                  che entrambi i comandi siano stati scritti in configurazione
+                  sulle porte. <br />
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
