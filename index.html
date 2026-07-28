@@ -1518,6 +1518,64 @@
                   sulle porte. <br />
                 </p>
               </div>
+              <br />
+              <br />
+              <img
+                src="./img/Intro_Test_Convergenza.png"
+                alt="Traccia configurazioni - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  A questo punto facciamo un test concreto, che verifica cosa
+                  succede quando il Root Bridge primario smette di funzionare
+                  questo, rappresenta il caso peggiore e realistico per una
+                  topologia di rete basata su STP. Non cade un singolo link ma
+                  l'intero centro della topologia logica. <br />
+                  Il risultato atteso è che SW-2-VTP-SERVER con prioorità 16384,
+                  venga eletto il nuovo Root Bridge e che i link attualmente in
+                  stato Alternate/Blocking passino automaticamente a Forwarding.
+                  Di seguito saranno elencati degli screen che mostrano i
+                  risultati attesi a seguito dello spegnimento dello Switch
+                  primario.
+                </p>
+                <br />
+                <p>
+                  La prima immagine mostra la diagnostica per lo switch
+                  'SW-2-VTP-SERVER', possiamo notare Root bridge for, che
+                  conferma l'elezione a Primary Root.
+                </p>
+                <br>
+                <img
+                  src="./img/Test_Convergenza_SW-2-VTP-SERVER.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <p>
+                  Le seguenti immagini mostrano la diagnostica degli switch
+                  client, confermano il corretto funzionamento del protocollo
+                  STP, confermano il nuovo Root Bridge, e la variazione dello
+                  stato dei link.
+                </p>
+                <br>
+                <img
+                  src="./img/Test_Convergenza_SW-1-CLIENT.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <img
+                  src="./img/Test_Convergenza_SW-2-CLIENT.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show spannin-tree summary : mostra il nuovo Root Bridge. <br>
+                  - show spanning-tree root : mostra la variazione di stato dei link per raggiungere il nuovo Root Bridge. <br>
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
