@@ -1598,14 +1598,78 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-todo">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text"
                 >1.4 — Verifica configurazione Port Channel</span
               >
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  <br />
+                  <img
+                    src="./img/Verifica_PortChannel.png"
+                    alt="Traccia configurazioni - canvas GNS3"
+                    class="obj-image"
+                  />
+                  In questo step verifichiamo il metodo di load-balancing del
+                  Port-Channel: prima capiamo di cosa si tratta, poi perché è
+                  necessario controllarlo invece di darlo per scontato. <br />
+                  Immaginiamo il Port-Channel come un'autostrada a più corsie
+                  tra due switch: il traffico totale può usare tutte le corsie
+                  disponibili, ma ogni singolo flusso — una singola
+                  conversazione tra due dispositivi — percorre sempre la stessa
+                  corsia dall'inizio alla fine, senza mai saltare da una corsia
+                  all'altra a metà strada. Se lo facesse, i pacchetti
+                  arriverebbero a destinazione in ordine sparso, causando il
+                  malfunzionamento di diversi protocolli. <br />
+                  La domanda chiave diventa quindi: come decide lo switch, per
+                  ogni singolo flusso, quale corsia usare? È esattamente questo
+                  il compito del metodo di load-balancing: la regola con cui lo
+                  switch assegna ciascun flusso a una specifica corsia,
+                  calcolando un hash su alcuni campi del pacchetto (indirizzi
+                  MAC e/o IP, sorgente e/o destinazione). <br />
+                  Va verificato, e non semplicemente lasciato al caso, perché
+                  una regola mal scelta può concentrare quasi tutto il traffico
+                  su una sola corsia, lasciando le altre inutilizzate. Esempio
+                  concreto: se la regola fosse "scegli la corsia guardando solo
+                  l'indirizzo di destinazione", e la maggior parte del nostro
+                  traffico avesse sempre la stessa destinazione (il FortiGate,
+                  gateway per tutte le VLAN), lo switch sceglierebbe sempre la
+                  stessa corsia per quasi tutto il traffico — sprecando di fatto
+                  metà della capacità del Port-Channel.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - show etherchannel load-balance : questo comando ci mostra la
+                  regola attiva.
+                </p>
+                <br />
+                <img
+                  src="./img/Esito_Load-balance.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <p>
+                  Il comando è stato eseguito su tutti e quattro gli switch
+                  della topologia, con lo stesso risultato ovunque:
+                  <code>src-dst-ip</code>. <br />
+                  Questo significa che, per calcolare su quale corsia far
+                  passare un flusso, lo switch guarda insieme due valori:
+                  l'indirizzo IP di partenza e quello di destinazione. <br />
+                  È un buon comportamento per la nostra rete: anche se molti
+                  flussi condividono la stessa destinazione (il FortiGate,
+                  gateway comune a tutte le VLAN), ogni PC o server di partenza
+                  ha comunque un indirizzo IP diverso dagli altri — quindi la
+                  combinazione partenza+destinazione risulta comunque diversa da
+                  un flusso all'altro, e il traffico si distribuisce bene su
+                  tutte le corsie disponibili, invece di concentrarsi su una
+                  sola.
+                </p>
+              </div>
             </div>
           </details>
         </div>
