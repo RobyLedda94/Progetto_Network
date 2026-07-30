@@ -1687,13 +1687,47 @@
                   Prima di configurare, HA, routing e firewall policy,
                   stabiliamo un'identità chiara per ciscun dispositivo in rete e
                   definiamo alcune protezioni base sull'accesso amministrativor,
-                  stesso approccio gia visto al punto 1.1 <br>
-                  <br>
-                  - Imostazione hostname (GUI). <br>
-                  - Time out sessione amministrativa. <br>
-                  - Soglia durata e blocco account. <br>
-                  - Verifica e diagnostica. <br>
+                  stesso approccio gia visto al punto 1.1 <br />
+                  <br />
+                  - Imostazione hostname (GUI). <br />
+                  - Time out sessione amministrativa. <br />
+                  - Soglia durata e blocco account. <br />
+                  - Verifica e diagnostica. <br />
                 </p>
+              </div>
+              <br />
+              <br />
+              <div class="obj-trace">
+                <h4>2.1.1 - Impostazione Hostname (GUI)</h4>
+                <p>
+                  Il primo passo è assrgnare un nome identificativo univoco a
+                  ciascun fortigate, la documentazione ufficiale Fortinet è
+                  esplicita su questo punto. <br />
+                  Essendo i due firewall destinati a formare un cluster HA, è
+                  necessario un hostname univoco e chiaro per distinguerli
+                  facilmente l'uno dall'altro nella rete e nei log. <br />
+                  Se restassero entrambi con il nome di default, diventerebbe
+                  difficile capire quale dei due nodi si sta effettivamente
+                  interrogando in un dato momento. <br />
+                  <br />
+                  Questa configurazione viene svolta tramite interfaccia grafica
+                  del FortiGate : <br />
+                  Il percorso da seguire è System, una volta dentro selezionare
+                  la voce Settings, da questo punto è possibile variare il nome
+                  del dispositivo. <br />
+                  Vi fornisco per questo punto un video che tiene traccia del
+                  processo svolto : <br />
+                  'La stessa procudura va svolta anche nel secondo Firewall'.
+                </p>
+                <br>
+                <video class="obj-video" controls muted preload="metadata">
+                  <source
+                    src="./video/Configurazione_Hostname_Firewall.mp4"
+                    type="video/mp4"
+                  />
+                  Il tuo browser non supporta la riproduzione video.
+                  <a href="./video/Configurazione_Hostname_Firewall.mp4">Scarica il video</a>.
+                </video>
               </div>
             </div>
           </details>
