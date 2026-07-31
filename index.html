@@ -381,14 +381,14 @@
               </div>
               <br />
               <br />
-
               <div class="obj-trace">
+                <h4>1.1.1 - Accesso privilegiato</h4>
+                <br />
                 <img
                   src="./img/Accesso_Privilegiato.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
                 <p>
                   imposta la password per accedere alla modalità enable
                   (privilegio massimo). Su questa immagine IOU 15.1 IPBASEK9 il
@@ -404,14 +404,14 @@
               </div>
               <br />
               <br />
-
               <div class="obj-trace">
+                <h4>1.1.2 - AAA locale</h4>
+                <br />
                 <img
                   src="./img/AAA_Locale.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
                 <p>
                   - aaa new-model : Attiva il framework AAA 'Accounting,
                   Authentication, Authorization', sostituendo il modello legacy
@@ -432,14 +432,14 @@
               </div>
               <br />
               <br />
-
               <div class="obj-trace">
+                <h4>1.1.3 - Prerequisiti SSH : dominio e chiavi RSA</h4>
+                <br />
                 <img
                   src="./img/Dominio_e_chiavi_RSA.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
                 <p>
                   - ip domain-name leonardo.local : imposta il dominio DNS per
                   la generazione delle chiavi RSA. <br />
@@ -455,14 +455,15 @@
               </div>
               <br />
               <br />
-
               <div class="obj-trace">
+                <h4>1.1.4 - Attivazione SSH v2, disabilitazione Telnet</h4>
+                <br />
                 <img
                   src="./img/Abilitazione_SSH_Disabilitazione_Telnet.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - ip ssh version 2 : imposta il versionamento SSH 2, più
                   sicuro <br />
@@ -488,12 +489,13 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.1.5 - Hardening linee console e ausiliaria</h4>
+                <br />
                 <img
                   src="./img/Hardening_Linee_console_e_ausiliaria.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
                 <p>
                   - exec-timeout 5 0 : allinea il time out gia impostato su VTY
                   <br />
@@ -513,14 +515,15 @@
               </div>
               <br />
               <br />
-
               <div class="obj-trace">
+                <h4>1.1.6 - Banner di accesso</h4>
+                <br />
                 <img
                   src="./img/Banner_di_Accesso.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - banner motd #...# : imposta un messaggio di accesso per
                   avvisare chi si connette che l'accesso è riservato. <br />
@@ -536,12 +539,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.1.7 - Protezione brute-force</h4>
+                <br />
                 <img
                   src="./img/Protezione_brute_force.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - Login block for 120... : blocca tutti i tentativi di login
                   per 120 secondi se ne rileva 3 falliti in 60 secondi. <br />
@@ -563,12 +568,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.1.8 - disabilitazione servizi non essenziali</h4>
+                <br />
                 <img
                   src="./img/Disabilitazione_Servizi_non_Essenziali.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - no ip http server : disattiva il server di gestione web HTTP
                   <br />
@@ -602,7 +609,10 @@
               <br />
 
               <div class="obj-trace">
-                <h4>Traccia / note</h4>
+                <h4>
+                  1.1.9 - Limitazione durata sessione e tentativi di login SSH
+                </h4>
+                <br />
                 <img
                   src="./img/Limitazione_durata_sessione_e_login_SSH.png"
                   alt="Traccia configurazioni - canvas GNS3"
@@ -729,12 +739,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.2.1 - Verifica preliminare stato VTP</h4>
+                <br />
                 <img
                   src="./img/Verifica_preliminare_stato_VTP.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - show vtp status : verifica lo stato del VTP, mostrando il
                   dominio attuale, la modalità (server/client), la versione e
@@ -754,12 +766,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.2.2 - Impostazione dominio VTP version 3</h4>
+                <br />
                 <img
                   src="./img/Impostazione_del_dominio_VTP_e_versionamento.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - vtp domain TuoDominio : imposta il dominio VTP su
                   "TuoDominio". <br />
@@ -775,14 +789,14 @@
               </div>
               <br />
               <br />
-
               <div class="obj-trace">
+                <h4>1.2.3 - Password VTP</h4>
+                <br />
                 <img
                   src="./img/Password_VTP.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
                 <p>
                   - vtp password StrongPassword123 hidden : imposta una password
                   per l'autenticazione VTP, proteggendo la propagazione delle
@@ -799,12 +813,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.2.4 - Impostazione modalità VTP</h4>
+                <br />
                 <img
                   src="./img/Impostazione_modalita_VTP.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - vtp mode server : imposta lo switch come server VTP, che può
                   creare, modificare e cancellare VLAN. <br />
@@ -823,12 +839,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.2.5 - Creazione dei port-channel (lacp)</h4>
+                <br />
                 <img
                   src="./img/Creazione_Port-Channel.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - channel-group 1/2/3 : assegna ciascuna interfaccia fisica al
                   relativo gruppo Ethernet-Channel, utilizzando il protocollo
@@ -857,12 +875,16 @@
               <br />
 
               <div class="obj-trace">
+                <h4>
+                  1.2.6 - Configurazione trunk 802.1q sulle interfacce membro
+                </h4>
+                <br />
                 <img
                   src="./img/Configurazione_Trunk_802.1Q_Interfacce_Membro.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - switchport trunk encapsulation dot1q : specifica 802.1Q come
                   metodo di incapsulamento <br />
@@ -892,12 +914,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.2.7 - Trunk verso i FortiGate</h4>
+                <br />
                 <img
                   src="./img/Trunk_Verso_i_FortiGate.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>- Questi comandi sono identici al precedente step.</p>
                 <br />
                 <h4>Comandi di diagnostica</h4>
@@ -910,12 +934,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.2.8 - Porte access verso gli endpoint</h4>
+                <br />
                 <img
                   src="./img/Porte_Access.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - switchport mode access : definisce per l'interfaccia la
                   modalità access, ottima misura di hardening anti-vlan-hopping
@@ -936,12 +962,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.2.9 - Designazione primaty server</h4>
+                <br />
                 <img
                   src="./img/Designazione_Primary_Server.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - vtp primary vlan : promuove lo switch nel quale è stato
                   eseguito il comando a Primary Server riconosciuto dal DB VLAN
@@ -962,12 +990,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.2.10 - Verifica propagazione dominio vtp</h4>
+                <br />
                 <img
                   src="./img/Verifica_Propragazione_Dominio_VTP.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   Per questo punto non e necessario eseguire comandi specifici
                   di esecuzione, andremo a verificare la funzionalità con dei
@@ -1003,12 +1033,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.2.11 - creazione delle vlan (dal primary server)</h4>
+                <br />
                 <img
                   src="./img/Creazione_VLAN_dal_Primary_Server.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - vlan 'id' : questo comando crea la VLAN con uno specifico
                   numero ID. <br />
@@ -1030,6 +1062,11 @@
               <br />
 
               <div class="obj-trace">
+                <h4>
+                  1.2.12 - Creazione vlan parcheggio + assegnazione porte non
+                  utilizzate
+                </h4>
+                <br />
                 <img
                   src="./img/Creazione_VLAN_Parcheggio_dal_Primary_Server.png"
                   alt="Traccia configurazioni - canvas GNS3"
@@ -1041,7 +1078,7 @@
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   Per la creazione della VLAN parcheggio la procedura
                   corrisponde a quanto visto nella creazione delle VLAN
@@ -1074,12 +1111,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.2.13 - Port security sulle porte access</h4>
+                <br />
                 <img
                   src="./img/Port_Security.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   La funzionalità port-security è una misura di sicurezza
                   applicata a livello 2 'Data Link', permette di controllare e
@@ -1241,12 +1280,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.3.1 - Verifica preliminare stato stp</h4>
+                <br />
                 <img
                   src="./img/Verifica_preliminare_stato_STP.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - show spanning-tree summary : offre una panoramica generale
                   del protocollo STP attivo e numero VLAN gestite. <br />
@@ -1394,6 +1435,8 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.3.2 - Passaggio a rapid-pvst+ (802.1w)</h4>
+                <br />
                 <img
                   src="./img/Passaggio_a_Rapid_PVST+.png"
                   alt="Traccia configurazioni - canvas GNS3"
@@ -1411,7 +1454,7 @@
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - spanning-tree mode rapid-pvst : questo comando attiva 802.1w
                   su tutte le vlan esistenti <br />
@@ -1440,6 +1483,8 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.3.3 - Impostazione esplicita del root bridge</h4>
+                <br />
                 <img
                   src="./img/Impostazione_Esplicita_Root_Bridge.png"
                   alt="Traccia configurazioni - canvas GNS3"
@@ -1451,7 +1496,7 @@
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   - sapanning-tree vlan 'n' priority 'value' : impostiamo
                   manualmente la prirorità dello switch, per la specifica
@@ -1501,12 +1546,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.3.4 - Attivazione port fast e BPDU Guard</h4>
+                <br />
                 <img
                   src="./img/Attivazione_PortFast_e_BPDU_Guard.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   Il PortFast va abilitato solo sulle porte che si collegano
                   agli endpoint (PC, server, stampanti). In una rete STP, ogni
@@ -1548,12 +1595,14 @@
               <br />
 
               <div class="obj-trace">
+                <h4>1.3.5 - Test failover root bridge primario</h4>
+                <br>
                 <img
                   src="./img/Intro_Test_Convergenza.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <h4>Traccia / note</h4>
+
                 <p>
                   A questo punto facciamo un test concreto, che verifica cosa
                   succede quando il Root Bridge primario smette di funzionare
@@ -1633,7 +1682,7 @@
             </summary>
             <div class="obj-content">
               <div class="obj-trace">
-                <h4>Traccia / note</h4>
+                <h4>1.4 - Verifica load-balancing</h4>
                 <p>
                   <br />
                   <img
@@ -1641,6 +1690,7 @@
                     alt="Traccia configurazioni - canvas GNS3"
                     class="obj-image"
                   />
+                  <br>
                   In questo step verifichiamo il metodo di load-balancing del
                   Port-Channel: prima capiamo di cosa si tratta, poi perché è
                   necessario controllarlo invece di darlo per scontato. <br />
@@ -1719,7 +1769,6 @@
                   - Imostazione hostname (GUI). <br />
                   - Time out sessione amministrativa. <br />
                   - Soglia durata e blocco account. <br />
-                  - Verifica e diagnostica. <br />
                 </p>
               </div>
               <br />
@@ -1761,7 +1810,7 @@
               <br />
               <br />
               <div class="obj-trace">
-                <h4>2.1.1 - Timeout sessione amministrativa (GUI)</h4>
+                <h4>2.1.2 - Timeout sessione amministrativa (GUI)</h4>
                 <p>
                   In questo punto impostiamo dopo quanti minuti di inattività
                   una sessione GUI/CLI amministrativa, viene disconnessa
@@ -1777,8 +1826,8 @@
                   'Administration Settings' e manipolare il campo 'Idle
                   timeout', di default è impostato a 5 minuti è consigliato
                   lasciarlo al default oppure abbassarlo. <br />
-                  Il video che segue mostra come trovare la voce 'Idle
-                  timeout' verrà lasciato al valore di default : <br />
+                  Il video che segue mostra come trovare la voce 'Idle timeout'
+                  verrà lasciato al valore di default : <br />
                 </p>
                 <br />
                 <video class="obj-video" controls muted preload="metadata">
@@ -1791,6 +1840,25 @@
                     >Scarica il video</a
                   >.
                 </video>
+              </div>
+              <br />
+              <br />
+              <div class="obj-trace">
+                <h4>2.1.3 - Soglia e durara blocco account</h4>
+                <br />
+                <p>
+                  <img
+                    src="./img/Soglia_e_durata_blocco_account.png"
+                    alt="Traccia configurazioni - canvas GNS3"
+                    class="obj-image"
+                  />
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - get system global | grep admin-lockout : conferma la
+                  soglia/durata blocco impostate.
+                </p>
               </div>
             </div>
           </details>
