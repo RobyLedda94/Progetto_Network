@@ -1596,7 +1596,7 @@
 
               <div class="obj-trace">
                 <h4>1.3.5 - Test failover root bridge primario</h4>
-                <br>
+                <br />
                 <img
                   src="./img/Intro_Test_Convergenza.png"
                   alt="Traccia configurazioni - canvas GNS3"
@@ -1690,7 +1690,7 @@
                     alt="Traccia configurazioni - canvas GNS3"
                     class="obj-image"
                   />
-                  <br>
+                  <br />
                   In questo step verifichiamo il metodo di load-balancing del
                   Port-Channel: prima capiamo di cosa si tratta, poi perché è
                   necessario controllarlo invece di darlo per scontato. <br />
@@ -1753,7 +1753,7 @@
 
         <h3>2. Configurazione firewall (FortiGate)</h3>
         <div class="obj-list">
-          <details class="obj-item status-inprogress">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text">2.1 — Hardening Firewall Fortigate</span>
             </summary>
@@ -1769,6 +1769,7 @@
                   - Imostazione hostname (GUI). <br />
                   - Time out sessione amministrativa. <br />
                   - Soglia durata e blocco account. <br />
+                  - Password policy amministratori. <br />
                 </p>
               </div>
               <br />
@@ -1845,7 +1846,6 @@
               <br />
               <div class="obj-trace">
                 <h4>2.1.3 - Soglia e durara blocco account</h4>
-                <br />
                 <p>
                   <img
                     src="./img/Soglia_e_durata_blocco_account.png"
@@ -1858,6 +1858,60 @@
                 <p>
                   - get system global | grep admin-lockout : conferma la
                   soglia/durata blocco impostate.
+                </p>
+              </div>
+              <br />
+              <br />
+              <div class="obj-trace">
+                <h4>2.1.4 - Password policy amministratori</h4>
+                <p>
+                  In questo punto impostiamo esplicitamente, i requisiti minimi
+                  di robustezza per le password amministrative locali.
+                  Particolarità importante, verificata dalla docmentazione
+                  ufficiale Fortinet, a partine dalle versioni FortiOS 7.6.5 la
+                  password policy è gia abilitata di default e applicata
+                  automaticamente. Vediamo comunque come verificare questi
+                  parametri in caso si voglia apportare qualche modifica. <br />
+                  Possiamo verificare lo stato della password policy
+                  amministratore tramite interfaccia grafica selezionando la
+                  voce System, una volta dentro selezionare la voce Settings e
+                  andare nella sezione security. <br />
+                  Riporto anche la procedura tramite CLI per la configurazione e
+                  la verifica.
+                </p>
+                <br />
+                <img
+                  src="./img/Password_Policy_admin_Firewall.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - get system password-policy : conferma i parametri di policy
+                  attualmente attivi.
+                  <br />
+                  <br />
+                  <img
+                    src="./img/Output_Password_Policy.png"
+                    alt="Traccia configurazioni - canvas GNS3"
+                    class="obj-image"
+                  />
+                </p>
+              </div>
+              <br />
+              <br />
+              <div class="obj-trace">
+                <h4>Configurazioni sicurezza sucessive</h4>
+                <p>
+                  Le configurazioni di sicurezza attuali sono molto basilari,
+                  non appena verranno definiti il routing interr VLAN, create le
+                  macchine virtuali e definito il dominio, andremo ad applicare
+                  delle impostazioni di sicurezza piu restrittive, chiaramente
+                  rispettando i limiti della licenza del Fireawall. <br>
+                  Le prossime configurazioni di suicurezza saranno : <br />
+                  - Trust Hosts : definizione degli host autorizzati ad accedere al firewall. <br />
+                  - Web Filtering : definizione di regole per il filtraggio del traffico web.
                 </p>
               </div>
             </div>
