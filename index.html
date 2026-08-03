@@ -1908,20 +1908,94 @@
                   non appena verranno definiti il routing interr VLAN, create le
                   macchine virtuali e definito il dominio, andremo ad applicare
                   delle impostazioni di sicurezza piu restrittive, chiaramente
-                  rispettando i limiti della licenza del Fireawall. <br>
+                  rispettando i limiti della licenza del Fireawall. <br />
                   Le prossime configurazioni di suicurezza saranno : <br />
-                  - Trust Hosts : definizione degli host autorizzati ad accedere al firewall. <br />
-                  - Web Filtering : definizione di regole per il filtraggio del traffico web.
+                  - Trust Hosts : definizione degli host autorizzati ad accedere
+                  al firewall. <br />
+                  - Web Filtering : definizione di regole per il filtraggio del
+                  traffico web.
                 </p>
               </div>
             </div>
           </details>
-          <details class="obj-item status-todo">
+          <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text">2.2 — Alta affidabilità (cluster HA)</span>
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Configuriamo il cluster HA 'High Availability' tra i due
+                  firewall, in modalità Active-Passive, se il nodo attivo si
+                  guasta, il secondo subentra automaticamente senza interruzione
+                  percepibile di servizio. E' lo stesso principio applicato con
+                  STP sugli switch, in questo caso applicato a livello di
+                  firewall/gateway. Per questa configurazione dobbiamo
+                  considerare 2 aspetti fondamentali, l'heartbeat Fortigate
+                  standard usa frame Ethernet a livello 2 con EtherType
+                  dedicati, questi non funzionano bene su piattaforme
+                  virtualizzare come GNS3, quindi dobbiamo forzare l'uso di
+                  heartbeat a livello 3, e dobbiamo considerare che il cluster
+                  HA richiede un collegamento diretto tra i due nodi, quindi
+                  dobbiamo creare un link dedicato tra i due firewall, nel piano
+                  di indirizzamento abbiamo definito un indirizzamento per i
+                  link in HA dedicato <br />
+                  <br />
+                  Il secondo aspetto da considerare è l Override abilitato,
+                  questo parametro rende deterministica l'elezione del nodo
+                  primario 'vince sempre il nodo con priorità più alta', se
+                  disabilitato, in caso di guasto del nodo primario, il nodo
+                  secondario subentra come attivo, ma al ritorno del nodo
+                  primario, questo non riprende automaticamente il ruolo di
+                  attivo, ma rimane secondario. <br />
+                  <br />
+                  - Assegnazione IP dedicato per il link HA. <br />
+                  - Configurazione cluster HA Active-Passive. <br />
+                  - Verifica stato cluster HA. <br />
+                </p>
+              </div>
+              <br />
+              <br />
+              <div class="obj-trace">
+                <h4>2.2.1 - Assegnazione IP dedicato per il link HA</h4>
+                <p>
+                  In questo punto assegnamo staticamente l'indirizzo IP dedicato
+                  all'interfaccia fisicia che collega i due firewall, è un
+                  prerequisito indispensabile per l'Unicast HA, che comunica via
+                  IP invece che con frame Ethernet L2. <br />
+                  Questo processo dobbiamo eseguirlo su entrambi i firewall,
+                  assgnando a ciscuno un indirizzo IP univoco. <br />
+                  Appena sotto potete vedere lo screen della configurazione
+                  effettuata tramite CLI, queste configurazioni possono essere
+                  effettuate anche da intergaccia grafica.
+                </p>
+                <br />
+                <img
+                  src="./img/Assegnazione_IP_dedicato_al_link_HA.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <p>
+                  Una funzionalità interessante del Fortigate, è la possibilità
+                  di assegnare un alias, alla porta fisica, questo permette di
+                  essere il più esplicativi possibile. <br />
+                </p>
+                <br>
+                <img
+                  src="./img/Set_Alias_sulle_porte.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - get system interface physical : mostra lo stato e la
+                  configurazione di tutte le interfacce fisiche, incluso
+                  l'indirizzo IP appena ssegnato alla porta 3.
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
