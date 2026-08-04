@@ -1918,7 +1918,7 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-inprogress">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text">2.2 — Alta affidabilità (cluster HA)</span>
             </summary>
@@ -1952,7 +1952,6 @@
                   <br />
                   - Assegnazione IP dedicato per il link HA. <br />
                   - Configurazione cluster HA Active-Passive. <br />
-                  - Verifica stato cluster HA. <br />
                 </p>
               </div>
               <br />
@@ -1976,13 +1975,13 @@
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br>
+                <br />
                 <p>
                   Una funzionalità interessante del Fortigate, è la possibilità
                   di assegnare un alias, alla porta fisica, questo permette di
                   essere il più esplicativi possibile. <br />
                 </p>
-                <br>
+                <br />
                 <img
                   src="./img/Set_Alias_sulle_porte.png"
                   alt="Traccia configurazioni - canvas GNS3"
@@ -1994,6 +1993,95 @@
                   - get system interface physical : mostra lo stato e la
                   configurazione di tutte le interfacce fisiche, incluso
                   l'indirizzo IP appena ssegnato alla porta 3.
+                </p>
+              </div>
+              <br />
+              <br />
+              <div class="obj-trace">
+                <h4>2.2.2 - Configurazione cluster HA Active-Passive.</h4>
+                <p>
+                  Definiamo ora i parametri che permettono ai due FortiGate di
+                  riconoscersi a vicenda e formare il cluster HA, modalità,
+                  gruppo, password condvisa e priorità, interfaccia di heartbeat
+                  e le impostazioni di override deterministico con il comando
+                  'override-wait-time' questo attenua il doppio failover, quando
+                  il nodo primario torna online. <br />
+                  Questa configurazione deve essere identica su entrambi i nodi
+                  fatta eccezione per la priority questa determina chi deve
+                  essere eletto nodo primario. <br />
+                  Di seguito lo screen delle configurazioni effettuate tramite
+                  CLI, su entrambi i nodi : <br />
+                  <br />
+                  <img
+                    src="./img/HA_FW_1.png"
+                    alt="Traccia configurazioni - canvas GNS3"
+                    class="obj-image"
+                  />
+                  <br />
+                  <img
+                    src="./img/HA_FW_2.png"
+                    alt="Traccia configurazioni - canvas GNS3"
+                    class="obj-image"
+                  />
+                </p>
+                <br />
+                <p>
+                  I comandi appena elencati sono stati eseguiti su entrambi i
+                  firewall : <br />
+                  <br />
+                  group-id / group-name : Identificano univocamente il cluster
+                  HA, devono coincidere su entrambi i nodi. <br />
+                  mode a-p : Imposta la modalità di funzionamento del cluster,
+                  in questo caso Active-Passive. <br />
+                  password : E' il segreto condiviso tra i due nodi, necessario
+                  per l'autenticazione reciproca. <br />
+                  priority : Determina quale nodo deve essere eletto primario,
+                  vince il nodo con priorità più alta. <br />
+                  hbdev port3 0 : Specifica l'interfaccia fisica da utilizzare
+                  per l'heartbeat, in questo caso la porta 3, il valore 0 indica
+                  la priorità tra più interfacce heartbeat, se ne fossero state
+                  configurate più di una. <br />
+                  session-pickup enable : Abilita la ripresa delle sessioni
+                  attive in caso di failover, permettendo al nodo secondario di
+                  continuare a gestire le connessioni senza interruzioni. <br />
+                  override enable / override-wait-time 30 : Abilita l'override
+                  deterministico, permettendo al nodo primario di riprendere il
+                  ruolo di attivo al ritorno online, con un tempo di attesa di
+                  30 secondi per evitare doppio failover. <br />
+                  unicast-hb enable / unicast-hb-peerip 'IP' : Attiva
+                  l'heartbeat a livello 3, utilizzando l'indirizzo IP
+                  specificato per comunicare tra i due nodi, invece dei frame
+                  Ethernet L2. <br />
+                </p>
+                <br />
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <p>
+                  - get system ha status : mostra lo stato del cluster HA,
+                  incluso il ruolo di ciascun nodo (primario o secondario) e la
+                  priorità. <br />
+                  - diagnose sys ha checksum show : mostra un dettaglio dei
+                  checksum per tre categorie (global, root, all). Il valore che
+                  ci interessa di più è all: se il valore esadecimale mostrato
+                  per all coincide esattamente tra FW-1 e FW-2, la
+                  configurazione è davvero identica.
+                </p>
+              </div>
+              <br />
+              <br />
+              <div class="obj-trace">
+                <h4>Problemi riscontrati</h4>
+                <p>
+                  Subito dopo la formazione del cluster, il comando diagnostico
+                  get system ha status mostrava FW-2 come "out-of-sync" su
+                  entrambi i nodi. Diagnosticato con diagnose sys ha checksum
+                  show: i checksum (global, root, all) risultavano già identici
+                  su entrambi i firewall — confermando che la configurazione era
+                  realmente sincronizzata, e che l'etichetta "out-of-sync" era
+                  solo un ritardo transitorio nell'aggiornamento dello stato
+                  visualizzato, non una discrepanza reale. Risolto da solo con
+                  il passare di qualche minuto, senza bisogno di ricalcolo
+                  forzato.
                 </p>
               </div>
             </div>
