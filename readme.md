@@ -1,76 +1,82 @@
-Laboratorio Active Directory in GNS3 con Firewall Fortigate in Alta Affidabilità
-
+Laboratorio Active Directory in GNS3 con Firewall FortiGate in Alta Affidabilità
 Panoramica del progetto
 
-Questo repository documenta la progettazione e la realizazzione di un laboratorio di rete completo, costruito interamente in ambiente virtualizzato (GNS3 + VMWare Workstation Pro), che replica l'infrastruttura tipica di una piccola/media impresa con più sedi fisiche.
+Questo repository documenta la progettazione e la realizzazione di un laboratorio di rete completo, costruito interamente in ambiente virtualizzato (GNS3 + VMware Workstation Pro), che replica l'infrastruttura tipica di una piccola/media impresa con più sedi fisiche.
 
-L'obbiettivo è dimostrare, in modo pratico e interamente documentato, come progettare e implementare da zero una rete aziendale segmentata per VLAN, protetta da una coppia di firewall FortiGate in cluster ad alta affidabilità (Active - Passive), instradata attraverso uno strato gerarchico di switch Cisco (Distribuzione e Accesso), con protocolli VTP 'Vlan Trunking Protocol', STP 'Spanning Tree Protocol' e LCAP 'Link Aggregation Conltroll Protocol'.
-La rete sarà completata da un dominio in Active Directory su Windows Server con relativi client Windows 11 uniti al dominio.
+L'obiettivo è dimostrare, in modo pratico e interamente documentato, come progettare e implementare da zero una rete aziendale segmentata per VLAN, protetta da una coppia di firewall FortiGate in cluster ad alta affidabilità (Active-Passive), instradata attraverso uno strato gerarchico di switch Cisco (Distribuzione e Accesso) con protocolli VTP (VLAN Trunking Protocol), STP (Spanning Tree Protocol) e LACP (Link Aggregation Control Protocol), e da una coppia di router Cisco ridondati in HSRP (Hot Standby Router Protocol) responsabili del routing inter-VLAN e del servizio DHCP.
 
-Questo progetto nasce con finalità didattiche e dimostrative : ogni fase - della progettazione teorica (topologia, piano di indirizzamento VLSM 'Variable Lenght Subnet Mask' inventario Assets), alla configurazione pratica di ciascun dispositivo - è tracciata passo dopo passo, saranno inclusi anche i problemi incontrati durante il lavoro.
+La rete sarà completata da un dominio Active Directory su Windows Server, con relativi client Windows 11 uniti al dominio.
 
-L'obbiettivo è rendere l'intero percorso replicabile anche a chi si avvicina per la prima volta a questo tipo di laboratorio.
+Il progetto nasce con finalità didattiche e dimostrative: ogni fase — dalla progettazione teorica (topologia, piano di indirizzamento VLSM, asset inventory) alla configurazione pratica di ciascun dispositivo — è tracciata passo dopo passo, inclusi i problemi realmente incontrati durante il lavoro e le relative soluzioni. L'obiettivo è rendere l'intero percorso replicabile anche a chi si avvicina per la prima volta a questo tipo di laboratorio.
 
-La rete simula tre sedi/reparti distinti (Guest, Admin, Management) collegati ad una zona server (Server_Net) che ospita il domain controller, il tutto instradato da un cluster ridondato di firewall che garantisce continuità di servizio anche in caso di guasto di uno dei 2 nodi.
+La rete simula tre sedi/reparti distinti (Guest, Admin, Management) collegati a una zona server (Server_Net) che ospita il Domain Controller, il tutto instradato da un cluster ridondato di firewall e da una coppia di router ridondati in HSRP, che garantiscono continuità di servizio anche in caso di guasto di uno dei nodi.
+
+Nota sull'evoluzione dell'architettura: durante la configurazione del routing sul FortiGate è emerso un limite non immediatamente evidente della licenza evaluation gratuita (massimo 3 interfacce totali, fisiche e VLAN combinate) — insufficiente per ospitare le 4 subinterfacce VLAN necessarie. La rete è stata quindi ridisegnata introducendo due router Cisco dedicati al routing inter-VLAN, mantenendo sul FortiGate hardening, cluster HA e routing verso Internet. L'episodio è documentato integralmente nel tracciamento delle configurazioni, come esempio concreto di adattamento progettuale a un vincolo reale.
 
 Obiettivi :
 
-0.Progettazione della rete
+0. Progettazione della rete
 
-- 0.1 Definizione della topologia logica
-- 0.2 Piano di indirizzamento (VLSM)
-- 0.3 Asset inventory
+0.1 Definizione della topologia logica
+0.2 Piano di indirizzamento (VLSM)
+0.3 Asset inventory
 
-1.Configurazione switch
+1. Configurazione switch
 
-- 1.1 Hardening - AAA, SSH, Gestione porte non utilizzate, Port Security
-- 1.2 Configurazione VTP + Port Channel
-- 1.3 Configurazione STP
-- 1.4 Verifica configurazione Ethernet Channel (LACP)
+1.1 Hardening — AAA, SSH, gestione porte non utilizzate, Port Security
+1.2 Configurazione VTP + Port Channel
+1.3 Configurazione STP
+1.4 Verifica configurazione EtherChannel (LACP)
 
-2.Configurazione firewall (FortiGate)
+2. Configurazione Router (R1/R2)
 
-- 2.1 Hardening Firewall FortiGate - Hostname, Timeout sessione amministrativa, Soglia e durata blocco account
-- 2.2 Alta Affidabilità (cluster HA Active-Passive, unicast heartbeat)
-- 2.3 Routing (subinterface VLAN, routing inter VLAN)
-- 2.4 Firewall Policy (regole di traffico tra i segmenti)
-- 2.5 DHCP sul firewall
+2.1 Hardening dispositivo
+2.2 Configurazione subinterfacce VLAN
+2.3 Routing inter-VLAN
+2.4 DHCP verso gli endpoint
+2.5 Collegamento punto-punto R1↔R2
+2.6 Configurazione HSRP
 
-3.Configurazione Windows Server
+3. Configurazione firewall (FortiGate)
 
-- 3.1 Definizione Active Directory (foresta/dominio)
-- 3.2 Domain Controller (DNS integrato)
-- 3.3 GPO 'Group Policy Object' - criteri applicati ai client di dominio
+3.1 Hardening Firewall FortiGate — hostname, timeout sessione amministrativa, soglia e durata blocco account
+3.2 Alta Affidabilità (cluster HA Active-Passive, unicast heartbeat)
+3.3 Routing verso Internet
+3.4 Firewall Policy (regole di traffico tra i segmenti, compatibili con il limite di licenza)
 
-4.Deployment client
+4. Configurazione Windows Server
 
-- 4.1 Creazione VM Master Windows 11 Enterprice
-- 4.2 Clonazione e generalizazzione (Sysprep) per i 3 endpoint
-- 4.3 Join al dominio e verifica GPO applicate
+4.1 Definizione Active Directory (foresta/dominio)
+4.2 Domain Controller (DNS integrato)
+4.3 GPO (Group Policy Object) — criteri applicati ai client di dominio
 
-5.Validazione e collaudo
+5. Deployment client
 
-- 5.1 Test connettività
-- 5.2 Verifica risoluzione DNS interna
-- 5.3 Verifica lease DHCP attivi per VLAN
-- 5.4 Test failover HA (Simulazione guasto nodo primario)
-- 5.5 Verifica autenticazione dominio da più client
+5.1 Creazione VM master Windows 11 Enterprise
+5.2 Clonazione e generalizzazione (Sysprep) per i 3 endpoint
+5.3 Join al dominio e verifica GPO applicate
 
-6.Documentazione
+6. Validazione e collaudo
 
-- 6.1 Readme.md panoramica progetto
-- 6.2 Documento HTML/CSS tracciamento dettagliato di ogni fase
+6.1 Test connettività
+6.2 Verifica risoluzione DNS interna
+6.3 Verifica lease DHCP attivi per VLAN
+6.4 Test failover HA/HSRP (simulazione guasto nodo primario)
+6.5 Verifica autenticazione dominio da più client
 
-Prerequisiti :
+7. Documentazione
 
-GNS3 + GNS3VM
-VMWare Workstation
-2 licenze Fortigate VM
+7.1 README.md — panoramica progetto
+7.2 Documento HTML/CSS — tracciamento dettagliato di ogni fase
+Prerequisiti
+GNS3 + GNS3 VM
+VMware Workstation Pro
+2 licenze FortiGate VM
 ISO Windows Server 2022
 ISO Windows 11
-IOS Cisco Switch 'I86bi_Linux-L2-IPBASEC9-15.1G.bin
+IOS Cisco Switch — i86bi-linux-l2-ipbasek9-15.1g.bin
+IOS Cisco Router — c3725-adventerprisek9-mz.124-15.T7.bin
 FortiGate-VM64-KVM v7.6.7 build3704 (GA.M)
-
-Demo :
+Demo
 
 https://robyledda94.github.io/Progetto_Network/

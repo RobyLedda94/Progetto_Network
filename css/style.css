@@ -282,3 +282,23 @@ tr:hover td {
 .vlan-mgmt  { border-left: 3px solid var(--mgmt); }
 .vlan-dmz   { border-left: 3px solid var(--dmz); }
 .vlan-ha    { border-left: 3px solid var(--ha); }
+
+.config-explain {
+  list-style: disc;
+  padding-left: 1.2rem;
+  margin: 0.5rem 0 0;
+}
+
+.config-explain li {
+  padding: 0.25rem 0;
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.config-explain code {
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}

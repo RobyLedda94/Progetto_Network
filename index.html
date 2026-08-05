@@ -13,11 +13,11 @@
         Affidabilità
       </h1>
       <p class="subtitle">
-        Progetto di rete enterprise simulata — VLSM, VLAN, HA, VTP, STP, Port
+        Progetto di rete enterprise simulata — VLSM, HSRP, VLAN, HA, VTP, STP, Port
         Channel, Active Directory
       </p>
       <span class="badge badge-progress"
-        >In corso — 6.2 Documento HTML/CSS di tracciamento</span
+        >In corso — 7.2 Documento HTML/CSS di tracciamento</span
       >
 
       <div class="progress-wrap">
@@ -175,6 +175,36 @@
                       <td>192.168.99.3</td>
                       <td>2</td>
                     </tr>
+                    <tr class="vlan-ha">
+                      <td>FW-1 ↔ R1 (transito)</td>
+                      <td>—</td>
+                      <td>192.168.99.4/30</td>
+                      <td>255.255.255.252</td>
+                      <td>— (P2P)</td>
+                      <td>.5 – .6</td>
+                      <td>192.168.99.7</td>
+                      <td>2</td>
+                    </tr>
+                    <tr class="vlan-ha">
+                      <td>FW-2 ↔ R2 (transito)</td>
+                      <td>—</td>
+                      <td>192.168.99.8/30</td>
+                      <td>255.255.255.252</td>
+                      <td>— (P2P)</td>
+                      <td>.9 – .10</td>
+                      <td>192.168.99.11</td>
+                      <td>2</td>
+                    </tr>
+                    <tr class="vlan-ha">
+                      <td>R1 ↔ R2 (HSRP + backup Internet)</td>
+                      <td>—</td>
+                      <td>192.168.99.12/30</td>
+                      <td>255.255.255.252</td>
+                      <td>— (P2P)</td>
+                      <td>.13 – .14</td>
+                      <td>192.168.99.15</td>
+                      <td>2</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -188,7 +218,7 @@
                   host previsti fino al più piccolo (GUEST_NET → ADMIN_NET →
                   MANAGEMENT_NET → SERVER_NET), assegnando a ciascuno la subnet
                   più piccola possibile in grado di contenere gli host richiesti
-                  più il gateway, con la formula 2^n host_richiesti - 2
+                  più il gateway, con la formula 2^n ≥ host_richiesti + 2
                   (indirizzo di rete e broadcast non assegnabili). Procedere dal
                   segmento più grande al più piccolo è il metodo standard per
                   evitare frammentazione: se si assegnassero le subnet in ordine
@@ -196,7 +226,6 @@
                   non essere abbastanza grandi da ospitare un segmento
                   successivo più esigente.
                 </p>
-                <br />
                 <p>
                   Il link di sincronizzazione HA tra i due FortiGate
                   (192.168.99.0/30) è stato deliberatamente collocato fuori dal
@@ -204,6 +233,14 @@
                   punto-punto tra soli due dispositivi, non un segmento utente,
                   e tenerlo separato evita di "sprecare" indirizzi preziosi del
                   blocco principale su un link che non ospiterà mai host reali.
+                </p>
+                <p>
+                  <strong>Aggiornamento v1.1</strong>: con l'introduzione dei
+                  router R1/R2 (vedi punto 2.0), sono state aggiunte 3 nuove
+                  subnet /30 dallo stesso blocco 192.168.99.0/24 dedicato ai
+                  collegamenti di transito: FW-1↔R1, FW-2↔R2, e il link diretto
+                  R1↔R2 usato sia per HSRP sia come route di backup verso
+                  Internet.
                 </p>
               </div>
             </div>
@@ -291,8 +328,26 @@
                       <td>ipbasek9-15.1g.bin</td>
                       <td>512MB</td>
                     </tr>
-                    <tr class="vlan-dmz">
+                    <tr>
                       <td>8</td>
+                      <td>R1</td>
+                      <td>Router inter-VLAN (primario), HSRP</td>
+                      <td>Cisco 3725 (Dynamips)</td>
+                      <td>IOS 12.4(15)T7 Adv. Enterprise</td>
+                      <td>Board ID: FTX0945W0MY</td>
+                      <td>128MB / idle-PC 0x60...</td>
+                    </tr>
+                    <tr>
+                      <td>9</td>
+                      <td>R2</td>
+                      <td>Router inter-VLAN (secondario), HSRP</td>
+                      <td>Cisco 3725 (Dynamips)</td>
+                      <td>IOS 12.4(15)T7 Adv. Enterprise</td>
+                      <td>Board ID: FTX0945W0MY</td>
+                      <td>128MB / idle-PC 0x60...</td>
+                    </tr>
+                    <tr class="vlan-dmz">
+                      <td>10</td>
                       <td>WIN-SRV-DC01</td>
                       <td>Domain Controller</td>
                       <td>Windows Server 2022</td>
@@ -301,7 +356,7 @@
                       <td>4GB/2vCPU</td>
                     </tr>
                     <tr class="vlan-guest">
-                      <td>9</td>
+                      <td>11</td>
                       <td>PC1</td>
                       <td>Endpoint provvisorio</td>
                       <td>VPCS</td>
@@ -310,7 +365,7 @@
                       <td>trascurabile</td>
                     </tr>
                     <tr class="vlan-admin">
-                      <td>10</td>
+                      <td>12</td>
                       <td>PC2</td>
                       <td>Endpoint provvisorio</td>
                       <td>VPCS</td>
@@ -319,7 +374,7 @@
                       <td>trascurabile</td>
                     </tr>
                     <tr class="vlan-mgmt">
-                      <td>11</td>
+                      <td>13</td>
                       <td>PC3</td>
                       <td>Endpoint provvisorio</td>
                       <td>VPCS</td>
@@ -336,7 +391,8 @@
                   Tenere un inventario aggiornato serve a diversi scopi pratici
                   verificati durante questo stesso progetto: ha permesso di
                   individuare che i due FortiGate hanno un limite di licenza
-                  esplicito (1 vCPU / 2GB RAM ciascuno), informazione che ha
+                  esplicito (1 vCPU / 2GB RAM ciascuno, e come poi emerso anche
+                  un massimo di 3 interfacce totali), informazione che ha
                   guidato il calcolo del budget di risorse della GNS3 VM; ha
                   permesso di tracciare i giorni di valutazione residui e il
                   numero di rearm disponibili sulla licenza Windows Server,
@@ -361,279 +417,202 @@
             <div class="obj-content">
               <div class="obj-trace">
                 <h4>Traccia / note</h4>
-                <p>
-                  Procedura di hardening lavereremo un sotto step alla volta :
-                  <br />
-                  - Password di enable, accesso privilegiato. <br />
-                  - AAA locale + utente amministrativo. <br />
-                  - Dominio DNS + generazione chiavi RSA per SSH. <br />
-                  - Abilitazione SSH e disabilitazione Telnet. <br />
-                  - Hardening linee console e ausiliarie. <br />
-                  - Banner di accesso. <br />
-                  - Protezione brute force <br />
-                  - Disabilitazione servizi non essenziali <br />
-                  - Limitazione durata sessione e tentativi di login SSH <br />
-                  - Spegnimento porte non utilizzate, configurazione port
-                  security (da definire al punto 1.2) <br />
-                  - Creazione VLAN parcheggio e assegnazione porte non
-                  utilizzate (da definire al punto 1.2) <br />
-                </p>
+                <p>Procedura di hardening, lavoreremo un sotto step alla volta:</p>
+                <ul class="config-explain">
+                  <li>Password di enable, accesso privilegiato</li>
+                  <li>AAA locale + utente amministrativo</li>
+                  <li>Dominio DNS + generazione chiavi RSA per SSH</li>
+                  <li>Abilitazione SSH e disabilitazione Telnet</li>
+                  <li>Hardening linee console e ausiliarie</li>
+                  <li>Banner di accesso</li>
+                  <li>Protezione brute force</li>
+                  <li>Disabilitazione servizi non essenziali</li>
+                  <li>Limitazione durata sessione e tentativi di login SSH</li>
+                  <li>Spegnimento porte non utilizzate, configurazione port security (da definire al punto 1.2)</li>
+                  <li>Creazione VLAN parcheggio e assegnazione porte non utilizzate (da definire al punto 1.2)</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
                 <h4>1.1.1 - Accesso privilegiato</h4>
-                <br />
                 <img
                   src="./img/Accesso_Privilegiato.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
                 <p>
-                  imposta la password per accedere alla modalità enable
+                  Imposta la password per accedere alla modalità enable
                   (privilegio massimo). Su questa immagine IOU 15.1 IPBASEK9 il
                   comando genera un hash Type 4, non Type 5/8/9 come preferito —
                   limite noto della piattaforma.
                 </p>
-                <br />
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show running-config | include enable secret : verifica hash
-                  cifrato, testo non in chiaro.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show running-config | include enable secret</code> — verifica hash cifrato, testo non in chiaro.</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
                 <h4>1.1.2 - AAA locale</h4>
-                <br />
                 <img
                   src="./img/AAA_Locale.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <p>
-                  - aaa new-model : Attiva il framework AAA 'Accounting,
-                  Authentication, Authorization', sostituendo il modello legacy
-                  . <br />
-                  - username admin priviledge 15 secret 'StrongPassword123':
-                  crea un utente locale con massimo privilegio. <br />
-                  - aaa authentication login default local : impone che il login
-                  su console VTY usi il DB utenti locale. <br />
-                  - aaa authorization exec default local : applica gli stessi
-                  permessi locali in modalità EXEC. <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>aaa new-model</code> — attiva il framework AAA (Authentication, Authorization, Accounting), sostituendo il modello legacy.</li>
+                  <li><code>username admin privilege 15 secret StrongPassword123</code> — crea un utente locale con massimo privilegio.</li>
+                  <li><code>aaa authentication login default local</code> — impone che il login su console/VTY usi il database utenti locale.</li>
+                  <li><code>aaa authorization exec default local</code> — applica gli stessi permessi locali in modalità EXEC.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show running-config | include aaa|username : conferma la
-                  presenza di AAA, utente, e hash cifrato.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show running-config | include aaa|username</code> — conferma la presenza di AAA, utente, e hash cifrato.</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
-                <h4>1.1.3 - Prerequisiti SSH : dominio e chiavi RSA</h4>
-                <br />
+                <h4>1.1.3 - Prerequisiti SSH: dominio e chiavi RSA</h4>
                 <img
                   src="./img/Dominio_e_chiavi_RSA.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <p>
-                  - ip domain-name leonardo.local : imposta il dominio DNS per
-                  la generazione delle chiavi RSA. <br />
-                  - crypto key generate rsa : genera le chiavi RSA per SSH. Alla
-                  richiesta dei bit rispondere 2048<br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>ip domain-name leonardo.local</code> — imposta il dominio DNS per la generazione delle chiavi RSA.</li>
+                  <li><code>crypto key generate rsa</code> — genera le chiavi RSA per SSH. Alla richiesta dei bit rispondere 2048.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show crypto key mypubkey rsa : visualizza le chiavi RSA
-                  generate, confermando la corretta generazione.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show crypto key mypubkey rsa</code> — visualizza le chiavi RSA generate, confermando la corretta generazione.</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
                 <h4>1.1.4 - Attivazione SSH v2, disabilitazione Telnet</h4>
-                <br />
+                <br>
                 <img
                   src="./img/Abilitazione_SSH_Disabilitazione_Telnet.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - ip ssh version 2 : imposta il versionamento SSH 2, più
-                  sicuro <br />
-                  - line vty 0 4 : entra nella configurazione delle linee VTY
-                  (accesso remoto) <br />
-                  - transport input ssh : abilita solo SSH, disabilitando Telnet
-                  <br />
-                  - login authetication default : applica l'autenticazione AAA
-                  anche alle sessioni remote <br />
-                  - exec-timeout 5 0 : imposta timeout di inattività a 5 minuti
-                  <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>ip ssh version 2</code> — imposta il versionamento SSH 2, più sicuro.</li>
+                  <li><code>line vty 0 4</code> — entra nella configurazione delle linee VTY (accesso remoto).</li>
+                  <li><code>transport input ssh</code> — abilita solo SSH, disabilitando Telnet.</li>
+                  <li><code>login authentication default</code> — applica l'autenticazione AAA anche alle sessioni remote.</li>
+                  <li><code>exec-timeout 5 0</code> — imposta timeout di inattività a 5 minuti.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show running-config | section line vty : conferma la
-                  configurazione delle linee VTY e il timeout impostato. <br />
-                  - show ip ssh : verifica la configurazione SSH, mostrando la
-                  versione e lo stato del servizio.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show running-config | section line vty</code> — conferma la configurazione delle linee VTY e il timeout impostato.</li>
+                  <li><code>show ip ssh</code> — verifica la configurazione SSH, mostrando la versione e lo stato del servizio.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
                 <h4>1.1.5 - Hardening linee console e ausiliaria</h4>
-                <br />
                 <img
                   src="./img/Hardening_Linee_console_e_ausiliaria.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <p>
-                  - exec-timeout 5 0 : allinea il time out gia impostato su VTY
-                  <br />
-                  - no priviledge level 15 : rimuove l'accesso privilegiato
-                  automatico da console e aux <br />
-                  - no exec : impostato su aux disabilita completamente la porta
-                  ausiliaria. <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>exec-timeout 5 0</code> — allinea il timeout già impostato su VTY.</li>
+                  <li><code>no privilege level 15</code> — rimuove l'accesso privilegiato automatico da console e aux.</li>
+                  <li><code>no exec</code> — impostato su aux, disabilita completamente la porta ausiliaria.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show running-config | section line con : conferma la
-                  configurazione della linea console. <br />
-                  - show running-config | section line aux : conferma la
-                  configurazione della linea ausiliaria. <br />
-                </p>
+                <ul class="config-explain">
+                  <li><code>show running-config | section line con</code> — conferma la configurazione della linea console.</li>
+                  <li><code>show running-config | section line aux</code> — conferma la configurazione della linea ausiliaria.</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
                 <h4>1.1.6 - Banner di accesso</h4>
-                <br />
                 <img
                   src="./img/Banner_di_Accesso.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - banner motd #...# : imposta un messaggio di accesso per
-                  avvisare chi si connette che l'accesso è riservato. <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>banner motd #...#</code> — imposta un messaggio di accesso per avvisare chi si connette che l'accesso è riservato.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show running-config | include banner : conferma la presenza
-                  del banner di accesso. <br />
-                </p>
+                <ul class="config-explain">
+                  <li><code>show running-config | include banner</code> — conferma la presenza del banner di accesso.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
                 <h4>1.1.7 - Protezione brute-force</h4>
-                <br />
                 <img
                   src="./img/Protezione_brute_force.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - Login block for 120... : blocca tutti i tentativi di login
-                  per 120 secondi se ne rileva 3 falliti in 60 secondi. <br />
-                  - Login delay 2 : imposta un ritardo di 2 secondi tra ogni
-                  tentativo di login <br />
-                  - Login on-failure log : registra i tentativi falliti nel log
-                  di sistema <br />
-                  - Login on-success log : registra i tentativi riusciti nel log
-                  di sistema <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>login block-for 120 attempts 3 within 60</code> — blocca tutti i tentativi di login per 120 secondi se ne rileva 3 falliti in 60 secondi.</li>
+                  <li><code>login delay 2</code> — imposta un ritardo di 2 secondi tra ogni tentativo di login.</li>
+                  <li><code>login on-failure log</code> — registra i tentativi falliti nel log di sistema.</li>
+                  <li><code>login on-success log</code> — registra i tentativi riusciti nel log di sistema.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show login : visualizza lo stato della protezione brute
-                  force e i tentativi di login recenti.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show login</code> — visualizza lo stato della protezione brute-force e i tentativi di login recenti.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.1.8 - disabilitazione servizi non essenziali</h4>
-                <br />
+                <h4>1.1.8 - Disabilitazione servizi non essenziali</h4>
                 <img
                   src="./img/Disabilitazione_Servizi_non_Essenziali.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - no ip http server : disattiva il server di gestione web HTTP
-                  <br />
-                  - no ip domain-lookup : evita che IOS tenti una risoluzione
-                  DNS per ogni comando non riconosciuto <br />
-                  - no service pad : disabilita il protocollo PAD (Packet
-                  Assembler/Disassembler) <br />
-                  - no ip finger : disattiva il servizio che permetteva di
-                  interrogare da remoto le sessioni attive <br />
-                  - no ip bootp server : disabilita il servizio BOOTP,
-                  'processore DHCP', non necessario dato che sara il fortigate a
-                  gestire DHCP <br />
-                  - no service tcp/udp-small-servers : disabilita i servizi
-                  TCP/UDP disattivano i servizi diagnostici legacy (echo,
-                  chargen, discard, daytime) <br />
-                  - no ip source-route : impedisce l'elaborazione di pacchetti
-                  con percorso di rete specificato dal mittente, utilizzato per
-                  aggirare la sicurezza <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>no ip http server</code> — disattiva il server di gestione web HTTP.</li>
+                  <li><code>no ip domain-lookup</code> — evita che IOS tenti una risoluzione DNS per ogni comando non riconosciuto.</li>
+                  <li><code>no service pad</code> — disabilita il protocollo PAD (Packet Assembler/Disassembler).</li>
+                  <li><code>no ip finger</code> — disattiva il servizio che permetteva di interrogare da remoto le sessioni attive.</li>
+                  <li><code>no ip bootp server</code> — disabilita il servizio BOOTP (predecessore di DHCP), non necessario dato che sarà il Fortigate a gestire il DHCP.</li>
+                  <li><code>no service tcp/udp-small-servers</code> — disattiva i servizi diagnostici legacy (echo, chargen, discard, daytime).</li>
+                  <li><code>no ip source-route</code> — impedisce l'elaborazione di pacchetti con percorso di rete specificato dal mittente, tecnica usata per aggirare la sicurezza.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show running-config | include
-                  http|domain-lookup|pad|finger|bootp|source-route- : conferma
-                  la disabilitazione dei servizi non essenziali. <br />
-                  - show ip http server status : conferma che il server HTTP è
-                  disabilitato. <br />
-                </p>
+                <ul class="config-explain">
+                  <li><code>show running-config | include http|domain-lookup|pad|finger|bootp|source-route</code> — conferma la disabilitazione dei servizi non essenziali.</li>
+                  <li><code>show ip http server status</code> — conferma che il server HTTP è disabilitato.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>
-                  1.1.9 - Limitazione durata sessione e tentativi di login SSH
-                </h4>
-                <br />
+                <h4>1.1.9 - Limitazione durata sessione e tentativi di login SSH</h4>
                 <img
                   src="./img/Limitazione_durata_sessione_e_login_SSH.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <p>
-                  - ip ssh time-out 60 : limita 60 secondi il tempo massimo per
-                  completare la fase di negoziazione/autenticazione SSH <br />
-                  - ip ssh authentication-retries 3 : limita a 3 i tentativi di
-                  login consetiti dentro la stessa sessione SSH già aperta.
-                  <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>ip ssh time-out 60</code> — limita a 60 secondi il tempo massimo per completare la fase di negoziazione/autenticazione SSH.</li>
+                  <li><code>ip ssh authentication-retries 3</code> — limita a 3 i tentativi di login consentiti dentro la stessa sessione SSH già aperta.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show ip ssh : conferma la configurazione SSH, mostrando la
-                  versione e lo stato del servizio.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show ip ssh</code> — conferma la configurazione SSH, mostrando la versione e lo stato del servizio.</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
                 <h4>Problemi Riscontrati - 1.1 Hardening Switch</h4>
                 <p>
@@ -642,55 +621,53 @@
                   build sperimentale del 2013), utili da documentare per chi
                   replica il progetto con la stessa immagine.
                 </p>
-                <br />
                 <p>
-                  Hashing password bloccato su Type 4: i tentativi di forzare
-                  esplicitamente Type 5 o Type 9 tramite algorithm-type sono
-                  sempre falliti con "Invalid input detected" — questa immagine
-                  non supporta affatto quella sintassi. Di conseguenza, il
-                  comando standard enable secret genera automaticamente un hash
-                  Type 4, algoritmo che Cisco ha ufficialmente riconosciuto come
-                  difettoso (advisory CISCO-SA-20130318-TYPE4: manca il salt e
-                  l'iterazione multipla, risultando persino più debole del più
-                  datato Type 5). Le versioni corrette (Type 8/9) sono
-                  disponibili solo da IOS 15.3(3)M in poi, quindi non
-                  raggiungibili su questa piattaforma. Accettato come limite
-                  noto e non risolvibile lato software.
+                  <strong>Hashing password bloccato su Type 4</strong>: i
+                  tentativi di forzare esplicitamente Type 5 o Type 9 tramite
+                  algorithm-type sono sempre falliti con "Invalid input
+                  detected" — questa immagine non supporta affatto quella
+                  sintassi. Di conseguenza, il comando standard enable secret
+                  genera automaticamente un hash Type 4, algoritmo che Cisco ha
+                  ufficialmente riconosciuto come difettoso (advisory
+                  CISCO-SA-20130318-TYPE4: manca il salt e l'iterazione
+                  multipla, risultando persino più debole del più datato Type
+                  5). Le versioni corrette (Type 8/9) sono disponibili solo da
+                  IOS 15.3(3)M in poi, quindi non raggiungibili su questa
+                  piattaforma. Accettato come limite noto e non risolvibile lato
+                  software.
                 </p>
-                <br />
                 <p>
-                  Nessun supporto HTTPS: il comando no ip http secure-server non
-                  è mai stato riconosciuto. La verifica (show ip http server
-                  status) ha confermato "HTTP secure server capability: Not
-                  present" — il sottosistema HTTPS non è proprio compilato in
-                  questa immagine, quindi il comando è risultato superfluo più
-                  che fallito.
+                  <strong>Nessun supporto HTTPS</strong>: il comando no ip http
+                  secure-server non è mai stato riconosciuto. La verifica (show
+                  ip http server status) ha confermato "HTTP secure server
+                  capability: Not present" — il sottosistema HTTPS non è proprio
+                  compilato in questa immagine, quindi il comando è risultato
+                  superfluo più che fallito.
                 </p>
-                <br />
                 <p>
-                  Comandi tcp/udp-small-servers non tracciati: pur essendo
-                  accettati senza errori dalla piattaforma, non compaiono in
-                  nessuna verifica del running-config (nemmeno con all), a
-                  differenza di tutti gli altri "no service" di default.
+                  <strong>Comandi tcp/udp-small-servers non tracciati</strong>:
+                  pur essendo accettati senza errori dalla piattaforma, non
+                  compaiono in nessuna verifica del running-config (nemmeno con
+                  all), a differenza di tutti gli altri "no service" di default.
                   Comportamento coerente con altre stranezze già osservate su
                   questa build sperimentale — configurazione comunque applicata,
                   solo non riflessa nell'output di verifica.
                 </p>
-                <br />
                 <p>
-                  Nota aggiuntiva (non un problema): show clock detail mostra un
-                  orario già corretto ("Time source is hardware calendar") pur
-                  senza NTP configurato — comportamento normale dell'emulazione
-                  IOU, che eredita l'orario della GNS3 VM all'avvio del
-                  processo. Non è però una sincronizzazione continuativa reale,
-                  motivo per cui NTP con autenticazione resta comunque
-                  pianificato più avanti per garantire timestamp affidabili nei
-                  log di audit. Non presente RTC (Real Time Clock) essendo un
-                  emulatore.
+                  <strong>Nota aggiuntiva (non un problema)</strong>: show clock
+                  detail mostra un orario già corretto ("Time source is hardware
+                  calendar") pur senza NTP configurato — comportamento normale
+                  dell'emulazione IOU, che eredita l'orario della GNS3 VM
+                  all'avvio del processo. Non è però una sincronizzazione
+                  continuativa reale, motivo per cui NTP con autenticazione
+                  resta comunque pianificato più avanti per garantire timestamp
+                  affidabili nei log di audit. Non presente RTC (Real Time
+                  Clock) essendo un emulatore.
                 </p>
               </div>
             </div>
           </details>
+
           <details class="obj-item status-done">
             <summary>
               <span class="obj-text"
@@ -710,519 +687,382 @@
                   del dominio VTP, la scelta della modalità (server/client), e
                   l'assegnazione delle VLAN necessarie per il progetto.
                 </p>
-                <br />
-                <p>
-                  Procedura configurazione VTP, lavoreremo un sotto step alla
-                  volta :
-                  <br />
-                  - Verifica preliminare stato VTP. <br />
-                  - Configurazione dominio VTP e versionamento. <br />
-                  - Password VTP. <br />
-                  - Impostazione modalità VTP. <br />
-                  - Creazione Port-Channel (LACP) <br />
-                  - Configurazione trunk 802.1Q, sulle interfacce Port-Channel.
-                  <br />
-                  - Configurazione interfacce in trunk verso i firewall
-                  FortiGate. <br />
-                  - Configurazione interfacce in access verso gli endpoint.<br />
-                  - Designazione Primary Server.
-                  <br />
-                  - Verifica propagazione del dominio VTP <br />
-                  - Creazione VLAN solo dal primary SW-Server-VTP <br />
-                  - Creazione VLAN parcheggio + assgnazione porte non utilizzate
-                  + Shutdown porte non utilizzate
-                  <br />
-                  - Port Security sulle porte in access. <br />
-                </p>
+                <p>Procedura configurazione VTP, lavoreremo un sotto step alla volta:</p>
+                <ul class="config-explain">
+                  <li>Verifica preliminare stato VTP</li>
+                  <li>Configurazione dominio VTP e versionamento</li>
+                  <li>Password VTP</li>
+                  <li>Impostazione modalità VTP</li>
+                  <li>Creazione Port-Channel (LACP)</li>
+                  <li>Configurazione trunk 802.1Q sulle interfacce Port-Channel</li>
+                  <li>Configurazione interfacce in trunk verso i firewall FortiGate</li>
+                  <li>Configurazione interfacce in access verso gli endpoint</li>
+                  <li>Designazione Primary Server</li>
+                  <li>Verifica propagazione del dominio VTP</li>
+                  <li>Creazione VLAN solo dal Primary SW-Server-VTP</li>
+                  <li>Creazione VLAN parcheggio + assegnazione porte non utilizzate + shutdown porte non utilizzate</li>
+                  <li>Port Security sulle porte in access</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
                 <h4>1.2.1 - Verifica preliminare stato VTP</h4>
-                <br />
                 <img
                   src="./img/Verifica_preliminare_stato_VTP.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - show vtp status : verifica lo stato del VTP, mostrando il
-                  dominio attuale, la modalità (server/client), la versione e
-                  altre informazioni utili. <br />
-                  - show vlan brief : visualizza le VLAN attualmente configurate
-                  sullo switch. <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>show vtp status</code> — verifica lo stato del VTP, mostrando il dominio attuale, la modalità (server/client), la versione e altre informazioni utili.</li>
+                  <li><code>show vlan brief</code> — visualizza le VLAN attualmente configurate sullo switch.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  Il comando è di per sé diagnostico, non modifica la
-                  configurazione. Serve a confermare lo stato del VTP prima di
-                  procedere con le modifiche.
-                </p>
+                <p>Il comando è di per sé diagnostico, non modifica la configurazione. Serve a confermare lo stato del VTP prima di procedere con le modifiche.</p>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.2.2 - Impostazione dominio VTP version 3</h4>
-                <br />
+                <h4>1.2.2 - Impostazione dominio VTP versione 3</h4>
                 <img
                   src="./img/Impostazione_del_dominio_VTP_e_versionamento.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - vtp domain TuoDominio : imposta il dominio VTP su
-                  "TuoDominio". <br />
-                  - vtp version 3 : introduce il meccanismo primary server.
-                  <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>vtp domain TuoDominio</code> — imposta il dominio VTP su "TuoDominio".</li>
+                  <li><code>vtp version 3</code> — introduce il meccanismo Primary Server.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show vtp status : conferma la modifica del dominio e della
-                  versione. <br />
-                </p>
+                <ul class="config-explain">
+                  <li><code>show vtp status</code> — conferma la modifica del dominio e della versione.</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
                 <h4>1.2.3 - Password VTP</h4>
-                <br />
                 <img
                   src="./img/Password_VTP.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <p>
-                  - vtp password StrongPassword123 hidden : imposta una password
-                  per l'autenticazione VTP, proteggendo la propagazione delle
-                  VLAN tra switch 'hidden' cifra la password. <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>vtp password StrongPassword123 hidden</code> — imposta una password per l'autenticazione VTP, proteggendo la propagazione delle VLAN tra switch. La parola chiave "hidden" cifra la password.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show vtp password : conferma la presenza della password VTP.
-                  <br />
-                </p>
+                <ul class="config-explain">
+                  <li><code>show vtp password</code> — conferma la presenza della password VTP.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
                 <h4>1.2.4 - Impostazione modalità VTP</h4>
-                <br />
                 <img
                   src="./img/Impostazione_modalita_VTP.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - vtp mode server : imposta lo switch come server VTP, che può
-                  creare, modificare e cancellare VLAN. <br />
-                  - vtp mode client : imposta lo switch come client VTP, che
-                  riceve le informazioni sulle VLAN dal server. <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>vtp mode server</code> — imposta lo switch come server VTP, che può creare, modificare e cancellare VLAN.</li>
+                  <li><code>vtp mode client</code> — imposta lo switch come client VTP, che riceve le informazioni sulle VLAN dal server.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show vtp status : Verifica la modalità VTP assegnata agli
-                  switch.
-                  <br />
-                </p>
+                <ul class="config-explain">
+                  <li><code>show vtp status</code> — verifica la modalità VTP assegnata agli switch.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.2.5 - Creazione dei port-channel (lacp)</h4>
-                <br />
+                <h4>1.2.5 - Creazione dei Port-Channel (LACP)</h4>
                 <img
                   src="./img/Creazione_Port-Channel.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - channel-group 1/2/3 : assegna ciascuna interfaccia fisica al
-                  relativo gruppo Ethernet-Channel, utilizzando il protocollo
-                  LACP in modalità active, questa modalità avvia attivamente la
-                  negoziazione LACP con l'altro capo del collegamento, se i due
-                  lati non sono compatibili, il protocollo rifiuta di formare il
-                  bundle, prevenendo loop di rete o traffico incoerente.
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>channel-group 1/2/3 mode active</code> — assegna ciascuna interfaccia fisica al relativo gruppo EtherChannel, utilizzando il protocollo LACP in modalità active. Questa modalità avvia attivamente la negoziazione LACP con l'altro capo del collegamento: se i due lati non sono compatibili, il protocollo rifiuta di formare il bundle, prevenendo loop di rete o traffico incoerente.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show etherchannel summary : mostra l'insieme di tutti i pool
-                  logici creati le interfacce fisiche coinvolte e il loro stato
-                  di attività. <br />
-                  - show interfaces port-channel n : mostra nel dettaglio ogni
-                  singola interfaccia logica elencando stato di attività, banda
-                  aggregata e indirizzo fisico. <br />
-                  - show lacp neighbor : conferma la negoziazione LACP attiva
-                  con l'altro capo del collegamento. <br />
-                  - show lacp counters : mostra i pacchetti LACPDU inviati e
-                  ricevuti per interfaccia utile per diagnosticare collegamenti
-                  ancora in stato 'su - suspended' <br />
-                </p>
+                <ul class="config-explain">
+                  <li><code>show etherchannel summary</code> — mostra l'insieme di tutti i pool logici creati, le interfacce fisiche coinvolte e il loro stato di attività.</li>
+                  <li><code>show interfaces port-channel n</code> — mostra nel dettaglio ogni singola interfaccia logica, elencando stato di attività, banda aggregata e indirizzo fisico.</li>
+                  <li><code>show lacp neighbor</code> — conferma la negoziazione LACP attiva con l'altro capo del collegamento.</li>
+                  <li><code>show lacp counters</code> — mostra i pacchetti LACPDU inviati e ricevuti per interfaccia, utile per diagnosticare collegamenti ancora in stato "suspended".</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>
-                  1.2.6 - Configurazione trunk 802.1q sulle interfacce membro
-                </h4>
-                <br />
+                <h4>1.2.6 - Configurazione trunk 802.1Q sulle interfacce membro</h4>
                 <img
                   src="./img/Configurazione_Trunk_802.1Q_Interfacce_Membro.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
+                <ul class="config-explain">
+                  <li><code>switchport trunk encapsulation dot1q</code> — specifica 802.1Q come metodo di incapsulamento.</li>
+                  <li><code>switchport trunk allowed vlan 10,20,30,40</code> — limita il trunk alle sole VLAN specificate.</li>
+                  <li><code>switchport mode trunk</code> — imposta la modalità trunk (permette il passaggio delle informazioni di più VLAN in un unico link).</li>
+                </ul>
                 <p>
-                  - switchport trunk encapsulation dot1q : specifica 802.1Q come
-                  metodo di incapsulamento <br />
-                  - switchport trunk allowed vlan 10,20,30,40 : limita il trunk
-                  alle sole VLAN specificate <br />
-                  - switchport mode trunk : imposta la modalità trunk (permette
-                  il passaggio delle informazioni di più VLAN in un unico link)
-                  <br />
-                  <br />
-                  Questa configurazione è stata ripetuta su ogni switch, su
+                  Questa configurazione è stata ripetuta su ogni switch: su
                   questa immagine IOU le impostazioni switchport applicate ai
-                  port-channel non si propagavano correttamente ai membri fisici
-                  coinvolti, quindi è risultata affidabile la configurazione su
-                  ogni singola porta.
+                  Port-Channel non si propagavano correttamente ai membri fisici
+                  coinvolti, quindi è risultata affidabile solo la
+                  configurazione su ogni singola porta.
                 </p>
-                <br />
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show interface trunk : conferma la colonna VLAN allowed
-                  trunk <br />
-                  - show etherchannel summary : mostra che tutti i gruppi logici
-                  con link aggregati abbiano il flag (P) bundled in
-                  port-channel.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show interfaces trunk</code> — conferma la colonna VLAN allowed on trunk.</li>
+                  <li><code>show etherchannel summary</code> — mostra che tutti i gruppi logici con link aggregati abbiano il flag (P) bundled in port-channel.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
                 <h4>1.2.7 - Trunk verso i FortiGate</h4>
-                <br />
                 <img
                   src="./img/Trunk_Verso_i_FortiGate.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>- Questi comandi sono identici al precedente step.</p>
-                <br />
+                <p>Questi comandi sono identici allo step precedente.</p>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show interfaces Ethernet 0/1 switchport : mostra nello
-                  specifico la configurazione di una singola interfaccia.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show interfaces Ethernet 0/1 switchport</code> — mostra nello specifico la configurazione di una singola interfaccia.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
                 <h4>1.2.8 - Porte access verso gli endpoint</h4>
-                <br />
                 <img
                   src="./img/Porte_Access.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - switchport mode access : definisce per l'interfaccia la
-                  modalità access, ottima misura di hardening anti-vlan-hopping
-                  tecnica di attacco che permette a un dispositivo collegato a
-                  una singola VLAN di superare la segmentazione e raggiungere il
-                  traffico di altre VLAN. <br />
-                  - switchport access vlan 'n' : assegna la porta alla VLAN
-                  specifica.
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>switchport mode access</code> — definisce per l'interfaccia la modalità access, ottima misura di hardening anti-VLAN-hopping (tecnica di attacco che permette a un dispositivo collegato a una singola VLAN di superare la segmentazione e raggiungere il traffico di altre VLAN).</li>
+                  <li><code>switchport access vlan n</code> — assegna la porta alla VLAN specifica.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show interfaces status : come il precedente mostra il
-                  ripilogo delle interfacce e la loro assegnazione.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show interfaces status</code> — mostra il riepilogo delle interfacce e la loro assegnazione.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.2.9 - Designazione primaty server</h4>
-                <br />
+                <h4>1.2.9 - Designazione Primary Server</h4>
                 <img
                   src="./img/Designazione_Primary_Server.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - vtp primary vlan : promuove lo switch nel quale è stato
-                  eseguito il comando a Primary Server riconosciuto dal DB VLAN
-                  del dominio VTP, da questo momento lo switch protra apportare
-                  le modifiche alle VLAN. <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>vtp primary vlan</code> — promuove lo switch nel quale è stato eseguito il comando a Primary Server riconosciuto dal database VLAN del dominio VTP. Da questo momento lo switch potrà apportare modifiche alle VLAN.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
                 <p>
-                  - show vtp status : mostra lo stato della configurazione del
-                  VTP, da eseguire su tutti gli switch appartenenti al dominio
-                  VTP, prestare particolare attenzione alla voce Primary
-                  Descriprion, e verificare che sia effettivamente stato
-                  riconosciuto come Primary Server lo switch selezionato.
+                  <code>show vtp status</code> — mostra lo stato della
+                  configurazione del VTP, da eseguire su tutti gli switch
+                  appartenenti al dominio VTP. Prestare particolare attenzione
+                  alla voce Primary Description, e verificare che sia
+                  effettivamente stato riconosciuto come Primary Server lo
+                  switch selezionato.
                 </p>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.2.10 - Verifica propagazione dominio vtp</h4>
-                <br />
+                <h4>1.2.10 - Verifica propagazione dominio VTP</h4>
                 <img
                   src="./img/Verifica_Propragazione_Dominio_VTP.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
                 <p>
-                  Per questo punto non e necessario eseguire comandi specifici
-                  di esecuzione, andremo a verificare la funzionalità con dei
-                  comandi di dignostica.
+                  Per questo punto non è necessario eseguire comandi specifici
+                  di configurazione, andremo a verificare la funzionalità con
+                  dei comandi di diagnostica.
                 </p>
-                <br />
+                <br>
                 <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show vtp status</code> — da eseguire su tutti gli switch appartenenti al dominio VTP, prestando particolare attenzione a VTP Version Running, VTP Domain Name, Configuration Revision, MD5 digest: le voci restituite devono essere identiche per ogni switch.</li>
+                  <li><code>show vtp counters</code> — mostra che i pacchetti VTP stanno realmente circolando sui trunk configurati.</li>
+                </ul>
                 <p>
-                  - show vtp status : da eseguire su tutti gli switch
-                  appartenenti al dominio VTP, prestare particolare attenzione a
-                  VTP Version Running, VTP Domain Name, Configuration Revision,
-                  MD5 digest, le voci restituite devono essere identiche per
-                  ogni switch. <br />
-                  - show vtp counters : mostra che i pacchetti VTP stanno
-                  realmente circolando sui trunk configurati.
-                  <br />
-                  <br />
-                  Prestiamo particolare attenzione a Configuration Revision, si
+                  Prestiamo particolare attenzione a Configuration Revision: si
                   tratta di un contatore che si incrementa di 1 ogni volta che
                   viene apportata una modifica al database VLAN da parte del
-                  Primary Server. <br />
-                  <br />
-                  Per quanto riguarda MD5 digest si tratta di un hash calcolato
-                  sull'intero contenuto del database VLAN, e come un'impronta
-                  digitale che varia a ogni minima differenza di contenuto, si
-                  tratta del controllo più affidabile se combacia su tutti gli
-                  switch si ha la certezza che il DB VLAN sia identico byte per
-                  byte ovunque accertando che ogni switch del dominio VTP sia
+                  Primary Server.
+                </p>
+                <p>
+                  Per quanto riguarda MD5 digest, si tratta di un hash calcolato
+                  sull'intero contenuto del database VLAN — è come un'impronta
+                  digitale che varia a ogni minima differenza di contenuto, ed è
+                  il controllo più affidabile: se combacia su tutti gli switch,
+                  si ha la certezza che il database VLAN sia identico byte per
+                  byte ovunque, accertando che ogni switch del dominio VTP sia
                   l'esatta copia dell'altro.
                 </p>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.2.11 - creazione delle vlan (dal primary server)</h4>
-                <br />
+                <h4>1.2.11 - Creazione delle VLAN (dal Primary Server)</h4>
                 <img
                   src="./img/Creazione_VLAN_dal_Primary_Server.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - vlan 'id' : questo comando crea la VLAN con uno specifico
-                  numero ID. <br />
-                  - name 'nome' : assegna un nome descrittivo alla VLAN, e un
-                  dato puramente informativo ma resta fondamentale la coerenza
-                  nella nomenclatura, a mio avviso è essenziale essere il piu
-                  esplicativi possibile.
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>vlan id</code> — crea la VLAN con uno specifico numero ID.</li>
+                  <li><code>name nome</code> — assegna un nome descrittivo alla VLAN: è un dato puramente informativo, ma resta fondamentale la coerenza nella nomenclatura — a mio avviso è essenziale essere il più esplicativi possibile.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show vlan brief : esegui questo comando su ogni switch
-                  appartenente al dominio VTP, mostra il riepilogo delle VLAN
-                  create localmente nel dispositivo e accertarsi che queste
-                  vengano replicate sugli switch restanti.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show vlan brief</code> — da eseguire su ogni switch appartenente al dominio VTP, mostra il riepilogo delle VLAN create localmente nel dispositivo; accertarsi che queste vengano replicate sugli switch restanti.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>
-                  1.2.12 - Creazione vlan parcheggio + assegnazione porte non
-                  utilizzate
-                </h4>
-                <br />
+                <h4>1.2.12 - Creazione VLAN parcheggio + assegnazione porte non utilizzate</h4>
                 <img
                   src="./img/Creazione_VLAN_Parcheggio_dal_Primary_Server.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br />
                 <img
                   src="./img/Access_VLAN_Parcheggio_Shutdown_Porte_Non_Utilizzate.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
                 <p>
                   Per la creazione della VLAN parcheggio la procedura
                   corrisponde a quanto visto nella creazione delle VLAN
-                  10,20,30,40; Questa viene sempre creata dallo Switch Primary
-                  Server, e necessario ripetere il comando 'vtp primary vlan' in
-                  quanto essendo un comando operativo il dispositivo perde il
-                  privilegio Primary Server al suo riavvio. <br />
-                  - interface range ... : applica lo stesso blocco di comandi a
-                  tutte le interfacce selezionate, ottimo metodo per evitare di
-                  configurare le interfacce una alla volta. <br />
-                  - switchport mode access : comando necessario per assegnare
-                  una VLAN access.<br />
-                  - switchport access vlan 999 : assegna la porta fisica alla
-                  VLAN parcheggio, che resta isolata dal resto della rete.
-                  <br />
-                  - shutdown : spegne completamente la porta, essendo non
-                  utilizzata.
+                  10,20,30,40. Questa viene sempre creata dallo switch Primary
+                  Server, ed è necessario ripetere il comando
+                  <code>vtp primary vlan</code> in quanto, essendo un comando
+                  operativo, il dispositivo perde il privilegio di Primary
+                  Server al suo riavvio.
                 </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>interface range ...</code> — applica lo stesso blocco di comandi a tutte le interfacce selezionate, ottimo metodo per evitare di configurare le interfacce una alla volta.</li>
+                  <li><code>switchport mode access</code> — comando necessario per assegnare una VLAN access.</li>
+                  <li><code>switchport access vlan 999</code> — assegna la porta fisica alla VLAN parcheggio, che resta isolata dal resto della rete.</li>
+                  <li><code>shutdown</code> — spegne completamente la porta, essendo non utilizzata.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show vlan brief : esegui questo comando su ogni switch
-                  appartenente al dominio VTP, mostra il riepilogo delle VLAN
-                  create localmente nel dispositivo e accertarsi che queste
-                  vengano replicate sugli switch restanti. <br />
-                  - show interfaces status : mostra lo stato delle porte.
-                </p>
+                <ul class="config-explain">
+                  <li><code>show vlan brief</code> — da eseguire su ogni switch appartenente al dominio VTP, mostra il riepilogo delle VLAN create localmente nel dispositivo e accertarsi che queste vengano replicate sugli switch restanti.</li>
+                  <li><code>show interfaces status</code> — mostra lo stato delle porte.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.2.13 - Port security sulle porte access</h4>
-                <br />
+                <h4>1.2.13 - Port Security sulle porte access</h4>
                 <img
                   src="./img/Port_Security.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
                 <p>
-                  La funzionalità port-security è una misura di sicurezza
-                  applicata a livello 2 'Data Link', permette di controllare e
-                  limitare l'accesso fisico ad una specifica porta dello switch,
-                  senza il port security qualsiasi dispostivo collegato
-                  fisicamente a una porta in access puo ottenere accesso alla
-                  rete. <br />
-                  - switchport port-security : attiva la funzionalità sulla
-                  porta, prima di attivare questo comando la porta deve gia
-                  essere impostata in access. <br />
-                  - switchport port-security maximum 1 : limita l'accesso fisico
-                  alla porta a un solo indirizzo MAC. <br />
-                  - switchport port-security violation restrict : in caso di
-                  violazione restrict scarta il traffico dell'indirizzo non
-                  autorizzato e genera un log, e possibile anche in caso di
-                  violazione impostare lo spegnimento totale della porta che va
-                  dunque in shutdown. <br />
+                  La funzionalità Port Security è una misura di sicurezza
+                  applicata a livello 2 (Data Link): permette di controllare e
+                  limitare l'accesso fisico a una specifica porta dello switch.
+                  Senza Port Security, qualsiasi dispositivo collegato
+                  fisicamente a una porta in access può ottenere accesso alla
+                  rete.
+                </p>
+                <ul class="config-explain">
+                  <li><code>switchport port-security</code> — attiva la funzionalità sulla porta; prima di attivare questo comando la porta deve già essere impostata in access.</li>
+                  <li><code>switchport port-security maximum 1</code> — limita l'accesso fisico alla porta a un solo indirizzo MAC.</li>
+                  <li><code>switchport port-security violation restrict</code> — in caso di violazione, "restrict" scarta il traffico dell'indirizzo non autorizzato e genera un log; è possibile anche impostare, in caso di violazione, lo spegnimento totale della porta (shutdown).</li>
+                </ul>
+                <p>
                   Al momento ho deciso di non specificare gli indirizzi MAC che
                   possono avere accesso al dispositivo, in quanto in questa fase
-                  del progetto la topologia di rete comprende i VPCS questi
-                  verrano utilizzati per testare la connettività, non appena
-                  verranno importate le Virtual Machines Windows, applicheremo
-                  un ulteriore livello di restrizione sul port security.
+                  del progetto la topologia di rete comprende i VPCS, utilizzati
+                  per testare la connettività — non appena verranno importate le
+                  virtual machine Windows, applicheremo un ulteriore livello di
+                  restrizione sul Port Security.
                 </p>
-                <br />
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show port-security : mostra l'insieme di tutte le porte
-                  protette nello switch. <br />
-                  - show port-security interface ethernet 'n' : mostra il
-                  dettaglio per ogni singola porta <br />
-                  Prestiamo attenzione a quest'ultimo comando in quanto
-                  restituisce un output molto interessante. <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>show port-security</code> — mostra l'insieme di tutte le porte protette nello switch.</li>
+                  <li><code>show port-security interface ethernet n</code> — mostra il dettaglio per ogni singola porta.</li>
+                </ul>
+                <p>Prestiamo attenzione a quest'ultimo comando, in quanto restituisce un output molto interessante.</p>
                 <img
                   src="./img/Port_Security_Diagnostica.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br />
                 <p>
-                  Questo output e molto interessante in quanto mostra nello
-                  specifico, lo stato di attività del port-security, se ci sono
-                  state violazioni, al momento non è stata registrata nessuna
-                  violazione lo capiamo dalla voce 'Port Status : Secure-up',
-                  viene indicata anche la modalità di restrizione in questo caso
-                  'Restrict', molto interessante anche la voce 'Aging Time : 0
-                  mins' si tratta di un timer di apprendimento degli indirizzi
-                  MAC possiamo impostare un timeout automatico che resetta
-                  l'indirizzo. Ci viene mostrato anche il limite degli indirizzi
-                  MAC che possono essere appresi dalla porta, e non solo anche
-                  se sono stati definiti staticamente degli indirizzi MAC. Le
-                  ultime 2 voci 'Last Source Address :' questo ci mostra il MAC
-                  appreso che identifica un host e la VLAN di provenienza,
-                  'Security Violation Count' tiene traccia delle violazioni.
+                  Questo output è molto interessante in quanto mostra nello
+                  specifico lo stato di attività del Port Security e se ci sono
+                  state violazioni — lo capiamo dalla voce "Port Status:
+                  Secure-up", con nessuna violazione registrata al momento.
+                  Viene indicata anche la modalità di restrizione, in questo
+                  caso "Restrict". Molto interessante anche la voce "Aging Time:
+                  0 mins": si tratta di un timer di apprendimento degli
+                  indirizzi MAC, per cui è possibile impostare un timeout
+                  automatico che resetta l'indirizzo appreso. Viene mostrato
+                  anche il limite degli indirizzi MAC che possono essere
+                  appresi dalla porta, anche se sono stati definiti staticamente
+                  degli indirizzi MAC. Le ultime due voci — "Last Source
+                  Address" (il MAC appreso che identifica un host e la VLAN di
+                  provenienza) e "Security Violation Count" (che tiene traccia
+                  delle violazioni) — completano il quadro.
                 </p>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
-                <h4>
-                  Problemi Riscontrati - 1.2 — Configurazione VTP (dominio
-                  "LEONARDO") + Port Channel (Ethernet Channel)
-                </h4>
+                <h4>Problemi Riscontrati - 1.2 — Configurazione VTP (dominio "LEONARDO") + Port Channel</h4>
                 <p>
-                  Durante la configurazione de protocollo VTP 'Vlan Trunking
-                  Protocol' quando abbiamo impostato una password per il dominio
-                  VTP questa veniva mostrata in chiaro, inizialmente ho pensato
-                  fosse un problema legato alla versione del VTP ma anche
-                  impostando versione 3, la password rimaneva comunque in chiaro
-                  senza Hash. Il problema e stato risolto con il comando competo
-                  'vtp password StrongPass123 hidden' la parola chiave è proprio
-                  hidden che memorizza la password cifrata.
+                  Durante la configurazione del protocollo VTP, quando abbiamo
+                  impostato una password per il dominio VTP, questa veniva
+                  mostrata in chiaro — inizialmente ho pensato fosse un
+                  problema legato alla versione del VTP, ma anche impostando
+                  la versione 3 la password rimaneva comunque in chiaro senza
+                  hash. Il problema è stato risolto con il comando completo
+                  <code>vtp password StrongPassword123 hidden</code>: la
+                  parola chiave "hidden" è proprio quella che memorizza la
+                  password cifrata.
                 </p>
-                <br />
                 <p>
-                  Durante la configurazione del Port-Channel alcune interfacce
-                  risultavano sospese, il problema viene risolto una volta
+                  Durante la configurazione del Port-Channel, alcune interfacce
+                  risultavano sospese; il problema si è risolto una volta
                   completata su tutti gli switch la configurazione del
-                  Port-Channel è un comportamento normale del protocollo LACP.
+                  Port-Channel — è un comportamento normale del protocollo
+                  LACP.
                 </p>
-                <br />
                 <p>
-                  Valori di banda (BW) inconsistenti e casuali sui Port-Channel:
-                  ogni Port-Channel su ogni switch mostrava valori di banda
-                  diversi e imprevedibili (10.000, 20.000 o 100.000 Kbit/sec,
-                  invece del corretto 20.000), accompagnati da errori di log
-                  %IDBMAN-3-INVALIDAGGPORTBANDWIDTH e %IDBMAN-3-AGGPORTMISMATCH
-                  — difetto di sincronizzazione interna della piattaforma tra la
-                  struttura dati del Port-Channel e quella delle interfacce
-                  fisiche. Corretto forzando manualmente bandwidth 20000 su ogni
+                  Valori di banda (BW) inconsistenti e casuali sui
+                  Port-Channel: ogni Port-Channel su ogni switch mostrava
+                  valori di banda diversi e imprevedibili (10.000, 20.000 o
+                  100.000 Kbit/sec, invece del corretto 20.000), accompagnati
+                  da errori di log %IDBMAN-3-INVALIDAGGPORTBANDWIDTH e
+                  %IDBMAN-3-AGGPORTMISMATCH — difetto di sincronizzazione
+                  interna della piattaforma tra la struttura dati del
+                  Port-Channel e quella delle interfacce fisiche. Corretto
+                  forzando manualmente <code>bandwidth 20000</code> su ogni
                   Port-Channel di ogni switch, per garantire un valore coerente
-                  ai fini del calcolo del costo STP. Questo processo non è
-                  compreso negli step visti in precedenza, questo passaggio
-                  possiamo comprenderlo dello step 1.2.5 dove abbiamo creato il
-                  link aggragati, entriamo nell'interfaccia aggregata lanciando
-                  il comando interface port-channel 'n', una volta dentro
-                  forziamo manualmente la banda con il comando bandwidth 20000,
-                  questo passaggio è da ripetere su tutti i link aggregati.
+                  ai fini del calcolo del costo STP. Questo passaggio va
+                  eseguito entrando nell'interfaccia aggregata con
+                  <code>interface port-channel n</code>, e va ripetuto su tutti
+                  i link aggregati.
                 </p>
               </div>
             </div>
           </details>
+
           <details class="obj-item status-done">
             <summary>
               <span class="obj-text">1.3 — Configurazione STP</span>
@@ -1231,329 +1071,182 @@
               <div class="obj-trace">
                 <h4>Traccia / note</h4>
                 <p>
-                  Procediamo con la la configurazione del protocollo STP
-                  'Spanning Tree Protocol', è un protocollo di livello 2 'Data
-                  Link' che ha lo scopo di prevenire i loop in una rete dove
-                  esistono percorsi ridondanti tra switch, funziona costruendo
-                  automaticamente una topologia logica ad albero 'da cui il nome
-                  'spanning tree'' a partire dalla topologia fisica reale :
-                  elegge uno switch come Root Bridge 'radice dell' albero',
-                  calcola il percorso più breve da ogni altro switch verso il
-                  root bridge e blocca selettivamente le porte con un percorso
-                  alternativo 'ridondante'. <br />
-                  Nel nosto caso risulta molto utile defenire la sua
-                  configurazione, senza questo protocollo, un frame in broadcast
-                  ad esempio una richiesta ARP inviata da un host circolerebbe
-                  all'infinito tra i vari perscorsi paralleli ogni switch lo
-                  riceverebbe generando un ciclo continuo, questo fenomeno è
-                  noto come 'broadcast storm'. Questo protocollo si attiva di
-                  default, al momento i link ridondandi sono già bloccati,
-                  quindi la rete funziona, la configurazione che vedremo in
-                  questo punto, non serve a far funzionare il protocollo STP ma
-                  a controllarlo deliberatamente. Andremo a definire quale
-                  switch sarà eletto a roop bridge primario e secondario
-                  definendo un subentro deterministico e prevedibile, definiremo
-                  anche la sicurezza con la funzionalità BPDU Guard, impedendo
-                  che un dispositivo non autorizzato collegato ad una porta
-                  access possa interferire con l'elezione del Root Bridge
-                  fingendosi uno switch legittimo.
+                  Procediamo con la configurazione del protocollo STP
+                  (Spanning Tree Protocol): un protocollo di livello 2 (Data
+                  Link) che ha lo scopo di prevenire i loop in una rete dove
+                  esistono percorsi ridondanti tra switch. Funziona costruendo
+                  automaticamente una topologia logica ad albero (da cui il
+                  nome "spanning tree") a partire dalla topologia fisica
+                  reale: elegge uno switch come Root Bridge (radice
+                  dell'albero), calcola il percorso più breve da ogni altro
+                  switch verso il Root Bridge e blocca selettivamente le porte
+                  con un percorso alternativo (ridondante).
                 </p>
-                <br />
                 <p>
-                  Procedura configurazione STP, lavoreremo un sotto step alla
-                  volta :
-                  <br />
-                  - Verifica preliminare stato STP attuale (root bridge di
-                  default, porte in blocking). <br />
-                  - Scelta del protocollo STP (PVST+ gia attivo di default,
-                  valuteremo se passare a Rapid-PVST+ per convergenza più
-                  veloce). <br />
-                  - Impostazione esplicita del Root Bridge primario e
-                  secondario. <br />
-                  - Protezioni STP aggiuntive (BPDU Guard sulle porte in
-                  access). <br />
-                  - Test di convergenza: failover del Root Bridge primario.
-                  <br />
+                  Nel nostro caso risulta molto utile definire la sua
+                  configurazione: senza questo protocollo, un frame in
+                  broadcast (ad esempio una richiesta ARP) inviato da un host
+                  circolerebbe all'infinito tra i vari percorsi paralleli, e
+                  ogni switch lo riceverebbe generando un ciclo continuo —
+                  fenomeno noto come "broadcast storm". Questo protocollo si
+                  attiva di default, e al momento i link ridondanti sono già
+                  bloccati (la rete funziona) — la configurazione che vedremo
+                  in questo punto non serve quindi a far funzionare STP, ma a
+                  controllarlo deliberatamente. Andremo a definire quale
+                  switch sarà eletto Root Bridge primario e secondario,
+                  definendo un subentro deterministico e prevedibile, e
+                  definiremo anche la sicurezza con la funzionalità BPDU
+                  Guard, impedendo che un dispositivo non autorizzato collegato
+                  a una porta access possa interferire con l'elezione del Root
+                  Bridge fingendosi uno switch legittimo.
                 </p>
+                <p>Procedura configurazione STP, lavoreremo un sotto step alla volta:</p>
+                <ul class="config-explain">
+                  <li>Verifica preliminare stato STP attuale (root bridge di default, porte in blocking)</li>
+                  <li>Scelta del protocollo STP (PVST+ già attivo di default, valuteremo se passare a Rapid-PVST+ per convergenza più veloce)</li>
+                  <li>Impostazione esplicita del Root Bridge primario e secondario</li>
+                  <li>Protezioni STP aggiuntive (BPDU Guard sulle porte in access)</li>
+                  <li>Test di convergenza: failover del Root Bridge primario</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.3.1 - Verifica preliminare stato stp</h4>
-                <br />
+                <h4>1.3.1 - Verifica preliminare stato STP</h4>
                 <img
                   src="./img/Verifica_preliminare_stato_STP.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - show spanning-tree summary : offre una panoramica generale
-                  del protocollo STP attivo e numero VLAN gestite. <br />
-                  - show spanning-tree vlan 'n' : mostra dettagli specifici per
-                  ciascuna VLAN.
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>show spanning-tree summary</code> — offre una panoramica generale del protocollo STP attivo e del numero di VLAN gestite.</li>
+                  <li><code>show spanning-tree vlan n</code> — mostra dettagli specifici per ciascuna VLAN.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  I comandi appena elencati restituiscono informazioni molto
-                  importanti da comprendere, le vedremo una alla volta. <br />
-                  1 - show spanning-tree summary : <br />
-                  <br />
-                  <img
-                    src="./img/Diagnostica_STP_Summ.png"
-                    alt=""
-                    class="obj-image"
-                  />
-                  <br />
-                  Da questo output possiamo vedere che tipo di protocollo STP
-                  risulta essere attivo, nel nostro caso è confermato PVST+
-                  'Per-VLAN Spanning Tree Plus', si tratta di una variante Cisco
-                  che calcola un'istanza STP indipendente per ciascuna VLAN.
-                  <br /><br />
-                  Possiamo notare anche che questo specifico Switch
-                  'SW-1-VTP-SERVER' è il root bridge per tutte le VLAN definite,
-                  come citato in precedenza questo protocollo si attiva di
-                  default, conincidenza ha voluto che proprio SW-1-VTP-SERVER
-                  fosse eletto come centro logico in base al suo MAC-ADDRESS, in
-                  fase operativa saremo noi a definire con esattezza in base
-                  alla priorità chi dovrà essere il root bridge. <br /><br />
-                  La voce Extended system ID è una funzionalità che incorpora
-                  l'ID della VLAN all'interno del campo priority bridge, campo
-                  che vedremo piu nel dettaglio in seguito quando dovremo
-                  eleggere il root bridge. <br />
-                  <br />
-                  Il Portfast Default è una funzionalità che permette ad un link
-                  in access di saltare le fasi iniziali di Listening/Learning e
-                  passare immediatamente al Forwarding riducendo i tempi di
-                  convergenza. <br /><br />
-                  La voce BPDU Guard è una funzionalità di sicurezza, se attiva
-                  una porta in PortFast nel momento in cui riceve un BPDU 'sono
-                  dei messaggi piu tecnicamente dei frame che utilizzano gli
-                  Switch attraverso il protocollo STP per scambiarsi
-                  informazioni, in questo modo apprendono la topologia di rete
-                  prevenendo i loop garantendo la stabilità della rete stessa'
-                  non autorizzato disattiva automaticamente la porta.
-                  <br /><br />
-                  Portfast BPDU filter è simile al Guard ma piu drastico invece
-                  di disattivare la porta ignora semplicemente i BPDU è
-                  sconsigliato in quanto nasconde il problema invece che
-                  segnalarlo. <br />
-                  <br />
-                  Loopguard Default è una protezione contro uno specifico loop
-                  causato da collegamenti unidirezionali. <br />
-                  <br />
-                  EtherChannel misconfig funzionalità attiva di default serve a
-                  rilevare se i membri di un EtherChannel sono configurati in
-                  modo coerente tra loro. <br />
-                  <br />
-                  UplinkFast è una funzionalità Cisco proprietaria è precedente
-                  a Rapid STP serve ad accelerare i tempi di convergenza. <br />
-                  <br />
-                  Come la precedente BackboneFast is disabled è una funzionalità
-                  Cisco proprietaria ormai resa obsoleta da Rapid STP, accelera
-                  i tempi di converfenza in caso di guasto di un collegamento
-                  non connesso direttamente allo switch. <br />
-                  <br />
-                  L'ultima parte mostra una tabella con varie voci
-                  Blocking/Listening/Learning/Forwarding/STP Active, mostra un
-                  conteggio di quante porte, per ciascuna VLAN, si trovano in
-                  ciascuno dei possibili stati STP, in questo caso siamo nel
-                  Root Bridge e tutte le 4 porte per ciascuna VLAN sono in
-                  Forwarding, questo è coerente con il fatto che il Root Bridge
-                  non blocca mai nessuna nessuna delle proprie porte. <br />
-                  <br />
-                  2 - show spanning-tree vlan 'n' : <br />
-                  <br />
-                  <img
-                    src="./img/Verifica_STP_Per_VLAN.png"
-                    alt=""
-                    class="obj-image"
-                  />
-                  <br />
-                  Anche questo output mostra informazioni molto utili, ci
-                  conferma che il protocollo STP segue lo standardi IEEE '802.1D
-                  classico, nel caso di PVST+'. <br />
-                  <br />
-                  La sezione Root ID ci restituisce la Priority con valore 32778
-                  qui possiamo capire la funzionalità Extended System ID, il
-                  valore priority di default è 32768 + l'ID della VLAN in questo
-                  caso è mostrata la VLAN 10, totale 32778. <br />
-                  <br />
-                  La voce Address mostra il MAC del Root Bridge. <br />
-                  <br />
-                  Possamo notare anche la voce This bridge is the root, conferma
-                  esplicita, presente solo nell'output dello switch che è
-                  realmente il Root per quella VLAN. <br />
-                  <br />
-                  La voce Hello Time indica l'intervallo con cui il Root Bridge
-                  invia periodicamente i messaggi BPDU, Max Age 20 sec indica
-                  per quanto tempo uno switch considera ancora valide le
-                  informazioni BPDU ricevute, prima di scartarle come obsolete
-                  se non ne arrivano di nuove. Invece Forward Delay indica la
-                  durata di ciascuna delle fasi intermedie Listening e Learning
-                  prima che una porta passi in Forwoarding. <br />
-                  <br />
-                  La sezione Bridge ID mostra gli stessi cambi della sezione
-                  Root ID, ma questi sono riferiti a questo switch specifico, le
-                  voci coincidono con la precedente sezione in quanto questo
-                  switch e il Root, nell'output degli altri 3 switch questa
-                  sezione mostrerebbe MAC e priorità differenti. <br />
-                  <br />
-                  Priority scompone esplicitamente il valore 32778 nei suoi 2
-                  componenti, ovvero la priorità base configurabile e il system
-                  ID. <br />
-                  <br />
-                  La voce AgingTime non si tratta di un timer STP ma è il tempo
-                  di invecchiamento della tabella degli indirizzi MAC, per
-                  questa VLAN dopo 300 sec di inattività, uno switch dimentica
-                  su quale porta aveva visto un certo MAC, se non riceve più
-                  traffico da quell'indirizzo. <br />
-                  <br />
-                  La tabella delle interfacce mostra il nome della porta e del
-                  gruppo logico, il ruolo che ricopre nel protocollo STP, in
-                  questo caso sono tutte Deigniated quindi tutte le porte stanno
-                  inoltrando traffico verso la rete. La sezione Status mostra lo
-                  stato operativo delle porte. <br />
-                  Il costo STP per quella specifica porta, per quanto riguarda
-                  Prio.Nbr è la combinazione del Port P1riority e numero interno
-                  della porta. <br />
-                  Type Shr, indica il tipo di collegamento rilevato, in questo
-                  caso Shared, non coerente con quanto aspettato P2p
-                  'Point-to-Point', normalmente un collegamento full-duplex 'che
-                  indica un tipo di comunicazione in cui i dati possono essere
-                  inviati e ricevuti contemporaneamente in entrambe le
-                  direzioni' verrebbe rilevato come P2p questo e sicuramente un
-                  aspetto da rivedere in fase di configurazione in quanto il
-                  Rapid-PVST+ utilizza prorpio il P2p per attivare le
-                  convergenze rapide tramite handshake diretto tra due porte
-                  <br />
-                </p>
+                <p>I comandi appena elencati restituiscono informazioni molto importanti da comprendere, le vedremo una alla volta.</p>
+                <p><strong>1 — show spanning-tree summary</strong></p>
+                <br>
+                <img
+                  src="./img/Diagnostica_STP_Summ.png"
+                  alt=""
+                  class="obj-image"
+                />
+                <ul class="config-explain">
+                  <li>Da questo output possiamo vedere che tipo di protocollo STP risulta essere attivo: nel nostro caso è confermato PVST+ (Per-VLAN Spanning Tree Plus), una variante Cisco che calcola un'istanza STP indipendente per ciascuna VLAN.</li>
+                  <li>Possiamo notare anche che questo specifico switch, SW-1-VTP-SERVER, è il Root Bridge per tutte le VLAN definite — coincidenza ha voluto che fosse eletto come centro logico in base al suo MAC address; in fase operativa saremo noi a definire con esattezza, in base alla priorità, chi dovrà essere il Root Bridge.</li>
+                  <li>La voce Extended System ID è una funzionalità che incorpora l'ID della VLAN all'interno del campo priority bridge, che vedremo più nel dettaglio quando dovremo eleggere il Root Bridge.</li>
+                  <li>Il Portfast Default è una funzionalità che permette a un link in access di saltare le fasi iniziali di Listening/Learning e passare immediatamente al Forwarding, riducendo i tempi di convergenza.</li>
+                  <li>La voce BPDU Guard è una funzionalità di sicurezza: se attiva su una porta in PortFast, nel momento in cui riceve un BPDU (i frame che gli switch usano tramite il protocollo STP per scambiarsi informazioni e apprendere la topologia di rete, prevenendo i loop) non autorizzato, disattiva automaticamente la porta.</li>
+                  <li>Portfast BPDU Filter è simile al Guard ma più drastico: invece di disattivare la porta, ignora semplicemente i BPDU — è sconsigliato in quanto nasconde il problema invece che segnalarlo.</li>
+                  <li>Loopguard Default è una protezione contro uno specifico loop causato da collegamenti unidirezionali.</li>
+                  <li>EtherChannel misconfig guard, funzionalità attiva di default, serve a rilevare se i membri di un EtherChannel sono configurati in modo coerente tra loro.</li>
+                  <li>UplinkFast è una funzionalità Cisco proprietaria precedente a Rapid STP, che serve ad accelerare i tempi di convergenza.</li>
+                  <li>Come la precedente, BackboneFast è una funzionalità Cisco proprietaria ormai resa obsoleta da Rapid STP: accelera i tempi di convergenza in caso di guasto di un collegamento non connesso direttamente allo switch.</li>
+                  <li>L'ultima parte mostra una tabella (Blocking/Listening/Learning/Forwarding/STP Active) con il conteggio di quante porte, per ciascuna VLAN, si trovano in ciascuno dei possibili stati STP: in questo caso siamo nel Root Bridge e tutte le 4 porte per ciascuna VLAN sono in Forwarding, coerente col fatto che il Root Bridge non blocca mai nessuna delle proprie porte.</li>
+                </ul>
+                <br>
+                <p><strong>2 — show spanning-tree vlan n</strong></p>
+                <br>
+                <img
+                  src="./img/Verifica_STP_Per_VLAN.png"
+                  alt=""
+                  class="obj-image"
+                />
+                <ul class="config-explain">
+                  <li>Anche questo output mostra informazioni molto utili: ci conferma che il protocollo STP segue lo standard IEEE 802.1D classico, nel caso di PVST+.</li>
+                  <li>La sezione Root ID restituisce la Priority con valore 32778: qui possiamo capire la funzionalità Extended System ID, dato che il valore priority di default è 32768 + l'ID della VLAN (in questo caso VLAN 10, totale 32778).</li>
+                  <li>La voce Address mostra il MAC del Root Bridge.</li>
+                  <li>Possiamo notare anche la voce "This bridge is the root": conferma esplicita, presente solo nell'output dello switch che è realmente il Root per quella VLAN.</li>
+                  <li>La voce Hello Time indica l'intervallo con cui il Root Bridge invia periodicamente i messaggi BPDU; Max Age (20 sec) indica per quanto tempo uno switch considera ancora valide le informazioni BPDU ricevute, prima di scartarle come obsolete se non ne arrivano di nuove; Forward Delay indica la durata di ciascuna delle fasi intermedie Listening e Learning prima che una porta passi in Forwarding.</li>
+                  <li>La sezione Bridge ID mostra gli stessi campi della sezione Root ID, ma riferiti a questo switch specifico: coincidono con la sezione precedente perché questo switch è il Root; nell'output degli altri 3 switch questa sezione mostrerebbe MAC e priorità differenti.</li>
+                  <li>Priority scompone esplicitamente il valore 32778 nei suoi 2 componenti: la priorità base configurabile e il system ID.</li>
+                  <li>La voce Aging Time non è un timer STP, ma il tempo di invecchiamento della tabella degli indirizzi MAC per quella VLAN: dopo 300 secondi di inattività, uno switch dimentica su quale porta aveva visto un certo MAC, se non riceve più traffico da quell'indirizzo.</li>
+                  <li>La tabella delle interfacce mostra il nome della porta e del gruppo logico, il ruolo che ricopre nel protocollo STP (in questo caso tutte Designated, quindi tutte le porte stanno inoltrando traffico verso la rete), lo stato operativo, il costo STP per quella specifica porta, e Prio.Nbr (combinazione di Port Priority e numero interno della porta).</li>
+                  <li>Type "Shr" indica il tipo di collegamento rilevato, in questo caso Shared, non coerente con quanto aspettato (P2p, Point-to-Point): normalmente un collegamento full-duplex verrebbe rilevato come P2p — un aspetto da rivedere in fase di configurazione, dato che Rapid-PVST+ utilizza proprio il P2p per attivare la convergenza rapida tramite handshake diretto tra due porte.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.3.2 - Passaggio a rapid-pvst+ (802.1w)</h4>
-                <br />
+                <h4>1.3.2 - Passaggio a Rapid-PVST+ (802.1w)</h4>
                 <img
                   src="./img/Passaggio_a_Rapid_PVST+.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br />
                 <img
                   src="./img/Correzione_link-type_sui_Port-Channel.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br />
                 <img
                   src="./img/Correzione_link-type_collegamento_verso_FortiGate.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
-                <p>
-                  - spanning-tree mode rapid-pvst : questo comando attiva 802.1w
-                  su tutte le vlan esistenti <br />
-                  - spanning-tree link-type point-to-point : forza manualmente
-                  il riconoscimento del collegamento, necessario dato che
-                  Rapid-PVST ottiene la convergenza rapida solo sui collegamenti
-                  riconosciuti come P2p. <br />
-                </p>
-                <br />
+                <ul class="config-explain">
+                  <li><code>spanning-tree mode rapid-pvst</code> — attiva 802.1w su tutte le VLAN esistenti.</li>
+                  <li><code>spanning-tree link-type point-to-point</code> — forza manualmente il riconoscimento del collegamento, necessario dato che Rapid-PVST+ ottiene la convergenza rapida solo sui collegamenti riconosciuti come P2p.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show spanning-tree summary</code> — deve mostrare "Switch is in rapid-pvst mode".</li>
+                  <li><code>show spanning-tree vlan n</code> — deve mostrare "Type: P2p" sulle interfacce corrette.</li>
+                </ul>
                 <p>
-                  - show spanning-tree summary : deve mostrare Swith is in
-                  rapid-pvst mode. <br />
-                  - show spanning-tree vlan 'n' : deve mostrare 'Type:P2p' sulle
-                  interfacce corrette. <br />
-                  <br />
                   Durante la configurazione del link-type è stato valutato se
-                  applicare lo stesso comando anche nei link che si connettono
+                  applicare lo stesso comando anche ai link che si connettono
                   agli endpoint, ma verificando su fonti Cisco non risulta
-                  essere il comando adeguato, la designazione verso quei link
-                  deve essere in Edge e questa si ottiene con il comando
-                  spanning-tree-portfast.
+                  essere il comando adeguato: la designazione corretta per
+                  quei link è "Edge", ottenibile con il comando
+                  <code>spanning-tree portfast</code>.
                 </p>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.3.3 - Impostazione esplicita del root bridge</h4>
-                <br />
+                <h4>1.3.3 - Impostazione esplicita del Root Bridge</h4>
                 <img
                   src="./img/Impostazione_Esplicita_Root_Bridge.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br />
                 <img
                   src="./img/Impostazione_priorità_Root_secondario.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
+                <ul class="config-explain">
+                  <li><code>spanning-tree vlan n priority value</code> — imposta manualmente la priorità dello switch per la specifica istanza della VLAN indicata.</li>
+                </ul>
                 <p>
-                  - sapanning-tree vlan 'n' priority 'value' : impostiamo
-                  manualmente la prirorità dello switch, per la specifica
-                  istanza della VLAN indicata. <br />
-                  <br />
-                  Prima di procedere e bene comprendere la priority e cio che ci
-                  permette di fare, come detto in precedenza in questo punto non
-                  abbiamo configurato il protocollo STP, ma il nostro obbiettivo
-                  è controllarlo deliberatamente. <br />
-                  La priority è un valore numerico arbitrario, che rappresenta
-                  il 'peso' con cui ogni switch partecipa all'elezione del Root
-                  Bridge. Questo valore non riflette alcuna caratteristica
-                  fisica dello switch. <br />
-                  Questo valore non agisce da solo, ma in correlazione con il
-                  MAC, la priority è la componente principale del Bridge ID si
-                  tratta di un valore a 64 bit totali, suddiviso tra Priority
-                  '16 - bit' + MAC '48 - bit'. <br />
-                  L'elezione del Root Bridge avviene per confronto numerico del
-                  Bridge ID vince lo switch con valore complessivo più basso.
-                  <br />
-                  Il primo valore calcolato è la Priority e questo vige sul
-                  secondo valore ovvero il MAC. <br />
-                  Il valore priority può assumere solo valori multipli di 4096,
-                  da 0 a 61440 '16 combinazioni possibili in totale' <br />
-                  Nelle implementazioni moderne 'PVST+ / Rapid-PVST+' il campo
-                  priority a 16 bit viene suddiviso ulteriormente in 12 bit per
-                  il valore della priority e 4 bit per l'Extended System ID che
-                  codifica l'ID della VLAN. Questo permette a un singolo switch
-                  di avere una Priority effettiva per ciascuna VLAN, meccanismo
-                  necessario perche PVST+ e Rapid-PVST+ gestiscono un'istanza
-                  STP indipendente per ogni VLAN ciascuna con una prorpia
-                  elezione di Root Bridge. <br />
-                  La scelta del valore della priority non è correlato solo
-                  all'elezione del Root Bridge ma anche la flessibilità di
-                  gestione nel tempo.
+                  Prima di procedere è bene comprendere la priority e cosa ci
+                  permette di fare — ricordando che in questo punto non stiamo
+                  "configurando" il protocollo STP (già attivo di default), ma
+                  controllandolo deliberatamente.
                 </p>
-                <br />
+                <ul class="config-explain">
+                  <li>La priority è un valore numerico arbitrario, che rappresenta il "peso" con cui ogni switch partecipa all'elezione del Root Bridge. Questo valore non riflette alcuna caratteristica fisica dello switch.</li>
+                  <li>Non agisce da solo, ma in correlazione con il MAC: la priority è la componente principale del Bridge ID, un valore a 64 bit totali, suddiviso tra Priority (16 bit) + MAC (48 bit).</li>
+                  <li>L'elezione del Root Bridge avviene per confronto numerico del Bridge ID: vince lo switch con valore complessivo più basso. Il primo valore confrontato è la Priority, e questo prevale sul secondo valore (il MAC).</li>
+                  <li>Il valore priority può assumere solo valori multipli di 4096, da 0 a 61440 (16 combinazioni possibili in totale).</li>
+                  <li>Nelle implementazioni moderne (PVST+/Rapid-PVST+) il campo priority a 16 bit viene suddiviso ulteriormente in 12 bit per il valore della priority e 4 bit per l'Extended System ID, che codifica l'ID della VLAN. Questo permette a un singolo switch di avere una priority effettiva per ciascuna VLAN — meccanismo necessario perché PVST+/Rapid-PVST+ gestiscono un'istanza STP indipendente per ogni VLAN, ciascuna con una propria elezione di Root Bridge.</li>
+                  <li>La scelta del valore della priority non riguarda solo l'elezione del Root Bridge, ma anche la flessibilità di gestione nel tempo.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show spanning-tree summary : conferma per quali VLAN questo
-                  switch risulta Root Bridge. <br />
-                  - show spanning-tree vlan 'n' : mostra il valore priority
-                  effettivo nel campo Bridge ID per ciascuna VLAN. <br />
-                </p>
+                <ul class="config-explain">
+                  <li><code>show spanning-tree summary</code> — conferma per quali VLAN questo switch risulta Root Bridge.</li>
+                  <li><code>show spanning-tree vlan n</code> — mostra il valore priority effettivo nel campo Bridge ID per ciascuna VLAN.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.3.4 - Attivazione port fast e BPDU Guard</h4>
-                <br />
+                <h4>1.3.4 - Attivazione PortFast e BPDU Guard</h4>
                 <img
                   src="./img/Attivazione_PortFast_e_BPDU_Guard.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
                 <p>
                   Il PortFast va abilitato solo sulle porte che si collegano
                   agli endpoint (PC, server, stampanti). In una rete STP, ogni
@@ -1563,66 +1256,61 @@
                   dove serve verificare che non si stia creando un loop, ma
                   superflui verso un host singolo che non può generarne uno.
                   Quando PortFast è attivo, la porta salta questi due stati e
-                  passa direttamente a Forwarding, permettendo al dispositivo di
-                  inviare traffico non appena rileva il collegamento. Il BPDU
-                  Guard va abilitato insieme al PortFast sulle stesse porte,
-                  come misura di protezione complementare. Una porta PortFast
-                  parte dal presupposto che non riceverà mai un BPDU, poiché
-                  solo gli switch li generano, non un host finale. Se quel
-                  presupposto venisse smentito — ad esempio perché qualcuno
-                  collega un dispositivo di rete non autorizzato al posto
-                  dell'endpoint atteso — il BPDU Guard disattiva immediatamente
-                  la porta (stato err-disabled), impedendo che possa interferire
-                  con l'elezione del Root Bridge o alterare la topologia STP.
-                  <br />
-                  <br />
-                  - spanning-tree portfast : disegna la porta come Edge port
-                  passando direttamente allo stato Forwarding. <br />
-                  - spanning-tree bpduguard enable : disattiva automaticamente
-                  la porta se riceve un BPDU inatteso. <br />
+                  passa direttamente a Forwarding, permettendo al dispositivo
+                  di inviare traffico non appena rileva il collegamento.
                 </p>
-                <br />
-                <h4>Comandi di diagnostica</h4>
                 <p>
-                  - show spanning-tree interface Ethernet'n detail : conferma lo
-                  stato di attivazione del PortFast. <br />
-                  - show running-config | include portfast|bpduguard : conferma
-                  che entrambi i comandi siano stati scritti in configurazione
-                  sulle porte. <br />
+                  Il BPDU Guard va abilitato insieme al PortFast sulle stesse
+                  porte, come misura di protezione complementare. Una porta
+                  PortFast parte dal presupposto che non riceverà mai un BPDU,
+                  poiché solo gli switch li generano, non un host finale. Se
+                  quel presupposto venisse smentito — ad esempio perché
+                  qualcuno collega un dispositivo di rete non autorizzato al
+                  posto dell'endpoint atteso — il BPDU Guard disattiva
+                  immediatamente la porta (stato err-disabled), impedendo che
+                  possa interferire con l'elezione del Root Bridge o alterare
+                  la topologia STP.
                 </p>
+                <ul class="config-explain">
+                  <li><code>spanning-tree portfast</code> — designa la porta come Edge port, passando direttamente allo stato Forwarding.</li>
+                  <li><code>spanning-tree bpduguard enable</code> — disattiva automaticamente la porta se riceve un BPDU inatteso.</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show spanning-tree interface Ethernet n detail</code> — conferma lo stato di attivazione del PortFast.</li>
+                  <li><code>show running-config | include portfast|bpduguard</code> — conferma che entrambi i comandi siano stati scritti in configurazione sulle porte.</li>
+                </ul>
               </div>
-              <br />
-              <br />
-
+              <br>
               <div class="obj-trace">
-                <h4>1.3.5 - Test failover root bridge primario</h4>
-                <br />
+                <h4>1.3.5 - Test failover Root Bridge primario</h4>
                 <img
                   src="./img/Intro_Test_Convergenza.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-
                 <p>
                   A questo punto facciamo un test concreto, che verifica cosa
                   succede quando il Root Bridge primario smette di funzionare
-                  questo, rappresenta il caso peggiore e realistico per una
-                  topologia di rete basata su STP. Non cade un singolo link ma
-                  l'intero centro della topologia logica. <br />
-                  Il risultato atteso è che SW-2-VTP-SERVER con prioorità 16384,
-                  venga eletto il nuovo Root Bridge e che i link attualmente in
-                  stato Alternate/Blocking passino automaticamente a Forwarding.
-                  Di seguito saranno elencati degli screen che mostrano i
-                  risultati attesi a seguito dello spegnimento dello Switch
-                  primario.
+                  — il caso peggiore e più realistico per una topologia di
+                  rete basata su STP: non cade un singolo link, ma l'intero
+                  centro della topologia logica.
                 </p>
-                <br />
+                <p>
+                  Il risultato atteso è che SW-2-VTP-SERVER, con priorità
+                  16384, venga eletto nuovo Root Bridge, e che i link
+                  attualmente in stato Alternate/Blocking passino
+                  automaticamente a Forwarding. Di seguito gli screenshot che
+                  mostrano i risultati attesi a seguito dello spegnimento
+                  dello switch primario.
+                </p>
                 <p>
                   La prima immagine mostra la diagnostica per lo switch
-                  'SW-2-VTP-SERVER', possiamo notare Root bridge for, che
-                  conferma l'elezione a Primary Root.
+                  SW-2-VTP-SERVER: possiamo notare "Root bridge for", che
+                  conferma l'elezione a Root Bridge primario.
                 </p>
-                <br />
+                <br>
                 <img
                   src="./img/Test_Convergenza_SW-2-VTP-SERVER.png"
                   alt="Traccia configurazioni - canvas GNS3"
@@ -1630,11 +1318,11 @@
                 />
                 <p>
                   Le seguenti immagini mostrano la diagnostica degli switch
-                  client, confermano il corretto funzionamento del protocollo
-                  STP, confermano il nuovo Root Bridge, e la variazione dello
-                  stato dei link.
+                  client: confermano il corretto funzionamento del protocollo
+                  STP, il nuovo Root Bridge, e la variazione dello stato dei
+                  link.
                 </p>
-                <br />
+                <br>
                 <img
                   src="./img/Test_Convergenza_SW-1-CLIENT.png"
                   alt="Traccia configurazioni - canvas GNS3"
@@ -1645,35 +1333,33 @@
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br />
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - show spannin-tree summary : mostra il nuovo Root Bridge.
-                  <br />
-                  - show spanning-tree root : mostra la variazione di stato dei
-                  link per raggiungere il nuovo Root Bridge. <br />
-                </p>
+                <ul class="config-explain">
+                  <li><code>show spanning-tree summary</code> — mostra il nuovo Root Bridge.</li>
+                  <li><code>show spanning-tree root</code> — mostra la variazione di stato dei link per raggiungere il nuovo Root Bridge.</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
-                <h4>PROBLEMI RISCONTRATI - 1.3 - CONFIGURAZIONE STP</h4>
+                <h4>Problemi Riscontrati - 1.3 Configurazione STP</h4>
                 <p>
-                  Durante la configurazione è stato rilevato Link-type
-                  erroneamente come 'Shr'invece di 'P2p', tutte le interfacce,
-                  inclusi i Port-Channel, risultavano classificate come
-                  collegamento condiviso invece che punto punto, quest'immagine
-                  IOU non rileva correttamente il duplex reale delle interfacce.
-                  Questo risulta un problema per il 'Rapid-PVST+' dato che
-                  ottiene la convergenza rapida solo su collegamenti 'P2p',
-                  questo è stato risolto forzando manualmente con il comando
-                  spanning-tree link-type point-to-point eseguito su tutti i
-                  Port-channel e sui link in trunk verso i FortiGate.
+                  Durante la configurazione è stato rilevato il link-type
+                  erroneamente come "Shr" invece di "P2p": tutte le
+                  interfacce, inclusi i Port-Channel, risultavano classificate
+                  come collegamento condiviso invece che punto-punto — questa
+                  immagine IOU non rileva correttamente il duplex reale delle
+                  interfacce. È un problema per Rapid-PVST+, dato che ottiene
+                  la convergenza rapida solo su collegamenti P2p. Risolto
+                  forzando manualmente con il comando
+                  <code>spanning-tree link-type point-to-point</code>,
+                  eseguito su tutti i Port-Channel e sui link in trunk verso i
+                  FortiGate.
                 </p>
-                <br />
               </div>
             </div>
           </details>
+
           <details class="obj-item status-done">
             <summary>
               <span class="obj-text"
@@ -1683,48 +1369,51 @@
             <div class="obj-content">
               <div class="obj-trace">
                 <h4>1.4 - Verifica load-balancing</h4>
+                <img
+                  src="./img/Verifica_PortChannel.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
                 <p>
-                  <br />
-                  <img
-                    src="./img/Verifica_PortChannel.png"
-                    alt="Traccia configurazioni - canvas GNS3"
-                    class="obj-image"
-                  />
-                  <br />
                   In questo step verifichiamo il metodo di load-balancing del
                   Port-Channel: prima capiamo di cosa si tratta, poi perché è
-                  necessario controllarlo invece di darlo per scontato. <br />
+                  necessario controllarlo invece di darlo per scontato.
+                </p>
+                <p>
                   Immaginiamo il Port-Channel come un'autostrada a più corsie
                   tra due switch: il traffico totale può usare tutte le corsie
                   disponibili, ma ogni singolo flusso — una singola
-                  conversazione tra due dispositivi — percorre sempre la stessa
-                  corsia dall'inizio alla fine, senza mai saltare da una corsia
-                  all'altra a metà strada. Se lo facesse, i pacchetti
-                  arriverebbero a destinazione in ordine sparso, causando il
-                  malfunzionamento di diversi protocolli. <br />
-                  La domanda chiave diventa quindi: come decide lo switch, per
-                  ogni singolo flusso, quale corsia usare? È esattamente questo
-                  il compito del metodo di load-balancing: la regola con cui lo
-                  switch assegna ciascun flusso a una specifica corsia,
-                  calcolando un hash su alcuni campi del pacchetto (indirizzi
-                  MAC e/o IP, sorgente e/o destinazione). <br />
-                  Va verificato, e non semplicemente lasciato al caso, perché
-                  una regola mal scelta può concentrare quasi tutto il traffico
-                  su una sola corsia, lasciando le altre inutilizzate. Esempio
-                  concreto: se la regola fosse "scegli la corsia guardando solo
-                  l'indirizzo di destinazione", e la maggior parte del nostro
-                  traffico avesse sempre la stessa destinazione (il FortiGate,
-                  gateway per tutte le VLAN), lo switch sceglierebbe sempre la
-                  stessa corsia per quasi tutto il traffico — sprecando di fatto
-                  metà della capacità del Port-Channel.
+                  conversazione tra due dispositivi — percorre sempre la
+                  stessa corsia dall'inizio alla fine, senza mai saltare da
+                  una corsia all'altra a metà strada. Se lo facesse, i
+                  pacchetti arriverebbero a destinazione in ordine sparso,
+                  causando il malfunzionamento di diversi protocolli.
                 </p>
-                <br />
-                <h4>Comandi di diagnostica</h4>
                 <p>
-                  - show etherchannel load-balance : questo comando ci mostra la
-                  regola attiva.
+                  La domanda chiave diventa quindi: come decide lo switch, per
+                  ogni singolo flusso, quale corsia usare? È esattamente
+                  questo il compito del metodo di load-balancing: la regola
+                  con cui lo switch assegna ciascun flusso a una specifica
+                  corsia, calcolando un hash su alcuni campi del pacchetto
+                  (indirizzi MAC e/o IP, sorgente e/o destinazione).
                 </p>
-                <br />
+                <p>
+                  Va verificato, e non semplicemente lasciato al caso, perché
+                  una regola mal scelta può concentrare quasi tutto il
+                  traffico su una sola corsia, lasciando le altre inutilizzate.
+                  Esempio concreto: se la regola fosse "scegli la corsia
+                  guardando solo l'indirizzo di destinazione", e la maggior
+                  parte del nostro traffico avesse sempre la stessa
+                  destinazione (il FortiGate, gateway per tutte le VLAN), lo
+                  switch sceglierebbe sempre la stessa corsia per quasi tutto
+                  il traffico — sprecando di fatto metà della capacità del
+                  Port-Channel.
+                </p>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show etherchannel load-balance</code> — mostra la regola attualmente attiva.</li>
+                </ul>
                 <img
                   src="./img/Esito_Load-balance.png"
                   alt="Traccia configurazioni - canvas GNS3"
@@ -1733,70 +1422,140 @@
                 <p>
                   Il comando è stato eseguito su tutti e quattro gli switch
                   della topologia, con lo stesso risultato ovunque:
-                  <code>src-dst-ip</code>. <br />
-                  Questo significa che, per calcolare su quale corsia far
-                  passare un flusso, lo switch guarda insieme due valori:
-                  l'indirizzo IP di partenza e quello di destinazione. <br />
+                  <code>src-dst-ip</code>. Questo significa che, per calcolare
+                  su quale corsia far passare un flusso, lo switch guarda
+                  insieme due valori: l'indirizzo IP di partenza e quello di
+                  destinazione.
+                </p>
+                <p>
                   È un buon comportamento per la nostra rete: anche se molti
                   flussi condividono la stessa destinazione (il FortiGate,
-                  gateway comune a tutte le VLAN), ogni PC o server di partenza
-                  ha comunque un indirizzo IP diverso dagli altri — quindi la
-                  combinazione partenza+destinazione risulta comunque diversa da
-                  un flusso all'altro, e il traffico si distribuisce bene su
-                  tutte le corsie disponibili, invece di concentrarsi su una
-                  sola.
+                  gateway comune a tutte le VLAN), ogni PC o server di
+                  partenza ha comunque un indirizzo IP diverso dagli altri —
+                  quindi la combinazione partenza+destinazione risulta comunque
+                  diversa da un flusso all'altro, e il traffico si distribuisce
+                  bene su tutte le corsie disponibili, invece di concentrarsi
+                  su una sola.
                 </p>
               </div>
             </div>
           </details>
         </div>
 
-        <h3>2. Configurazione firewall (FortiGate)</h3>
+        <h3>2. Configurazione Router (R1/R2)</h3>
         <div class="obj-list">
           <details class="obj-item status-done">
             <summary>
-              <span class="obj-text">2.1 — Hardening Firewall Fortigate</span>
+              <span class="obj-text"
+                >2.0 — Evoluzione architetturale: perché sono stati introdotti
+                i router</span
+              >
+            </summary>
+            <div class="obj-content">
+              <img
+                src="./img/Topology.png"
+                alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Durante il punto "Routing (subinterfacce VLAN)" sul
+                  FortiGate è emerso un limite non documentato in modo
+                  evidente: la licenza evaluation gratuita del FortiGate VM
+                  impone un massimo di <strong>3 interfacce totali</strong>
+                  (fisiche e VLAN combinate). Con WAN, trunk LAN e link HA già
+                  a occupare le 3 interfacce fisiche disponibili, non restava
+                  alcun margine per creare le 4 subinterfacce VLAN necessarie
+                  al routing inter-VLAN.
+                </p>
+                <ul class="config-explain">
+                  <li>Verificato su documentazione ufficiale Fortinet (versioni 7.4.3 → 8.0.0, tutte concordi): il limite è permanente, elencato esplicitamente tra le restrizioni della licenza evaluation, e non si sblocca registrando un account FortiCloud.</li>
+                  <li>Soluzione architetturale adottata: introduzione di due router Cisco (R1, R2) tra i FortiGate e la maglia degli switch. I router ospitano le subinterfacce VLAN, il routing inter-VLAN e il servizio DHCP, con ridondanza garantita da HSRP — stesso principio di alta affidabilità già applicato tra i firewall, spostato di un livello.</li>
+                  <li>I FortiGate mantengono hardening, cluster HA e routing verso Internet — restando comunque protagonisti della sicurezza perimetrale della rete.</li>
+                </ul>
+                <br>
+                <p>
+                  Per continuità di servizio completa (non solo interna, ma
+                  anche verso Internet in caso di guasto di un firewall), R1 e
+                  R2 sono collegati anche direttamente tra loro con un link
+                  punto-punto dedicato, usato sia per HSRP sia come route di
+                  backup verso Internet.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <details class="obj-item status-todo">
+            <summary><span class="obj-text">2.1 — Hardening dispositivo</span></summary>
+            <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary><span class="obj-text">2.2 — Configurazione subinterfacce VLAN</span></summary>
+            <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary><span class="obj-text">2.3 — Routing inter-VLAN</span></summary>
+            <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary><span class="obj-text">2.4 — DHCP verso gli endpoint</span></summary>
+            <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary><span class="obj-text">2.5 — Collegamento punto-punto R1↔R2</span></summary>
+            <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary><span class="obj-text">2.6 — Configurazione HSRP</span></summary>
+            <div class="obj-content"><p class="obj-caption">Da completare.</p></div>
+          </details>
+        </div>
+
+        <h3>3. Configurazione firewall (FortiGate)</h3>
+        <div class="obj-list">
+          <details class="obj-item status-done">
+            <summary>
+              <span class="obj-text">3.1 — Hardening Firewall Fortigate</span>
             </summary>
             <div class="obj-content">
               <div class="obj-trace">
                 <h4>Traccia / note</h4>
                 <p>
-                  Prima di configurare, HA, routing e firewall policy,
-                  stabiliamo un'identità chiara per ciscun dispositivo in rete e
-                  definiamo alcune protezioni base sull'accesso amministrativor,
-                  stesso approccio gia visto al punto 1.1 <br />
-                  <br />
-                  - Imostazione hostname (GUI). <br />
-                  - Time out sessione amministrativa. <br />
-                  - Soglia durata e blocco account. <br />
-                  - Password policy amministratori. <br />
+                  Prima di configurare HA, routing e firewall policy,
+                  stabiliamo un'identità chiara per ciascun dispositivo in rete
+                  e definiamo alcune protezioni base sull'accesso
+                  amministrativo — stesso approccio già visto al punto 1.1.
                 </p>
+                <ul class="config-explain">
+                  <li>Impostazione hostname (GUI)</li>
+                  <li>Timeout sessione amministrativa</li>
+                  <li>Soglia e durata blocco account</li>
+                  <li>Password policy amministratori</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
-                <h4>2.1.1 - Impostazione Hostname (GUI)</h4>
+                <h4>3.1.1 - Impostazione hostname (GUI)</h4>
                 <p>
                   Il primo passo è assegnare un nome identificativo univoco a
-                  ciascun fortigate, la documentazione ufficiale Fortinet è
-                  esplicita su questo punto. <br />
-                  Essendo i due firewall destinati a formare un cluster HA, è
-                  necessario un hostname univoco e chiaro per distinguerli
-                  facilmente l'uno dall'altro nella rete e nei log. <br />
-                  Se restassero entrambi con il nome di default, diventerebbe
-                  difficile capire quale dei due nodi si sta effettivamente
-                  interrogando in un dato momento. <br />
-                  <br />
-                  Questa configurazione viene svolta tramite interfaccia grafica
-                  del FortiGate : <br />
-                  Il percorso da seguire è System, una volta dentro selezionare
-                  la voce Settings, da questo punto è possibile variare il nome
-                  del dispositivo. <br />
-                  Vi fornisco per questo punto un video che tiene traccia del
-                  processo svolto : <br />
-                  'La stessa procudura va svolta anche nel secondo Firewall'.
+                  ciascun FortiGate — la documentazione ufficiale Fortinet è
+                  esplicita su questo punto. Essendo i due firewall destinati a
+                  formare un cluster HA, è necessario un hostname univoco e
+                  chiaro per distinguerli facilmente l'uno dall'altro nella
+                  rete e nei log. Se restassero entrambi con il nome di
+                  default, diventerebbe difficile capire quale dei due nodi si
+                  sta effettivamente interrogando in un dato momento.
                 </p>
-                <br />
+                <p>
+                  Questa configurazione viene svolta tramite l'interfaccia
+                  grafica del FortiGate: il percorso da seguire è
+                  <code>System → Settings</code>, dove è possibile variare il
+                  nome del dispositivo. Vi fornisco per questo punto un video
+                  che tiene traccia del processo svolto (la stessa procedura va
+                  svolta anche nel secondo firewall).
+                </p>
+                <br>
                 <video class="obj-video" controls muted preload="metadata">
                   <source
                     src="./video/Configurazione_Hostname_Firewall.mp4"
@@ -1808,29 +1567,26 @@
                   >.
                 </video>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
-                <h4>2.1.2 - Timeout sessione amministrativa (GUI)</h4>
+                <h4>3.1.2 - Timeout sessione amministrativa (GUI)</h4>
                 <p>
                   In questo punto impostiamo dopo quanti minuti di inattività
-                  una sessione GUI/CLI amministrativa, viene disconnessa
-                  automaticamente, questo evita che una sessione con privilegi
-                  elevati resti aperta se il PC viene lasciato incustodito, è lo
-                  stesso principio applicato con il comando exec-timeout sugli
-                  switch.
-                  <br />
-                  Come la precedente questa configurazione verrà eseguita
-                  tramite interfaccia grafica del Fortigate : <br />
-                  Il percorso da seguire in GUI è andare in System, selezionare
-                  poi Settigns al suo interno scorrere fino alla sezione
-                  'Administration Settings' e manipolare il campo 'Idle
-                  timeout', di default è impostato a 5 minuti è consigliato
-                  lasciarlo al default oppure abbassarlo. <br />
-                  Il video che segue mostra come trovare la voce 'Idle timeout'
-                  verrà lasciato al valore di default : <br />
+                  una sessione GUI/CLI amministrativa viene disconnessa
+                  automaticamente: questo evita che una sessione con privilegi
+                  elevati resti aperta se il PC viene lasciato incustodito —
+                  stesso principio applicato con il comando
+                  <code>exec-timeout</code> sugli switch.
                 </p>
-                <br />
+                <p>
+                  Anche questa configurazione va eseguita tramite interfaccia
+                  grafica: il percorso è <code>System → Settings</code>, e al
+                  suo interno la sezione "Administration Settings", campo
+                  "Idle timeout". Di default è impostato a 5 minuti, ed è
+                  consigliato lasciarlo al default oppure abbassarlo. Il video
+                  che segue mostra come trovare la voce "Idle timeout"
+                  (lasciata al valore di default).
+                </p>
                 <video class="obj-video" controls muted preload="metadata">
                   <source
                     src="./video/Timeout_sessione_amministrativa.mp4"
@@ -1842,255 +1598,214 @@
                   >.
                 </video>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
-                <h4>2.1.3 - Soglia e durara blocco account</h4>
-                <p>
-                  <img
-                    src="./img/Soglia_e_durata_blocco_account.png"
-                    alt="Traccia configurazioni - canvas GNS3"
-                    class="obj-image"
-                  />
-                </p>
-                <br />
+                <h4>3.1.3 - Soglia e durata blocco account</h4>
+                <img
+                  src="./img/Soglia_e_durata_blocco_account.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - get system global | grep admin-lockout : conferma la
-                  soglia/durata blocco impostate.
-                </p>
+                <ul class="config-explain">
+                  <li><code>get system global | grep admin-lockout</code> — conferma la soglia/durata blocco impostate.</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
-                <h4>2.1.4 - Password policy amministratori</h4>
+                <h4>3.1.4 - Password policy amministratori</h4>
                 <p>
-                  In questo punto impostiamo esplicitamente, i requisiti minimi
+                  In questo punto impostiamo esplicitamente i requisiti minimi
                   di robustezza per le password amministrative locali.
-                  Particolarità importante, verificata dalla docmentazione
-                  ufficiale Fortinet, a partine dalle versioni FortiOS 7.6.5 la
-                  password policy è gia abilitata di default e applicata
+                  Particolarità importante, verificata dalla documentazione
+                  ufficiale Fortinet: a partire dalla versione FortiOS 7.6.5 la
+                  password policy è già abilitata di default e applicata
                   automaticamente. Vediamo comunque come verificare questi
-                  parametri in caso si voglia apportare qualche modifica. <br />
-                  Possiamo verificare lo stato della password policy
-                  amministratore tramite interfaccia grafica selezionando la
-                  voce System, una volta dentro selezionare la voce Settings e
-                  andare nella sezione security. <br />
-                  Riporto anche la procedura tramite CLI per la configurazione e
-                  la verifica.
+                  parametri, in caso si voglia apportare qualche modifica.
                 </p>
-                <br />
+                <p>
+                  Possiamo verificare lo stato della password policy
+                  amministratore tramite interfaccia grafica, selezionando
+                  <code>System → Settings</code> e la sezione "Security".
+                  Riporto anche la procedura tramite CLI per la configurazione
+                  e la verifica.
+                </p>
+                <br>
                 <img
                   src="./img/Password_Policy_admin_Firewall.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br />
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - get system password-policy : conferma i parametri di policy
-                  attualmente attivi.
-                  <br />
-                  <br />
-                  <img
-                    src="./img/Output_Password_Policy.png"
-                    alt="Traccia configurazioni - canvas GNS3"
-                    class="obj-image"
-                  />
-                </p>
+                <ul class="config-explain">
+                  <li><code>get system password-policy</code> — conferma i parametri di policy attualmente attivi.</li>
+                </ul>
+                <img
+                  src="./img/Output_Password_Policy.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
-                <h4>Configurazioni sicurezza sucessive</h4>
+                <h4>Configurazioni sicurezza successive</h4>
                 <p>
-                  Le configurazioni di sicurezza attuali sono molto basilari,
-                  non appena verranno definiti il routing interr VLAN, create le
+                  Le configurazioni di sicurezza attuali sono molto basilari.
+                  Non appena verranno definiti il routing inter-VLAN, create le
                   macchine virtuali e definito il dominio, andremo ad applicare
-                  delle impostazioni di sicurezza piu restrittive, chiaramente
-                  rispettando i limiti della licenza del Fireawall. <br />
-                  Le prossime configurazioni di suicurezza saranno : <br />
-                  - Trust Hosts : definizione degli host autorizzati ad accedere
-                  al firewall. <br />
-                  - Web Filtering : definizione di regole per il filtraggio del
-                  traffico web.
+                  impostazioni di sicurezza più restrittive, rispettando
+                  chiaramente i limiti della licenza del firewall. Le prossime
+                  configurazioni di sicurezza saranno:
                 </p>
+                <ul class="config-explain">
+                  <li>Trusted Hosts — definizione degli host autorizzati ad accedere al firewall</li>
+                  <li>Web Filtering — definizione di regole per il filtraggio del traffico web</li>
+                </ul>
               </div>
             </div>
           </details>
+
           <details class="obj-item status-done">
             <summary>
-              <span class="obj-text">2.2 — Alta affidabilità (cluster HA)</span>
+              <span class="obj-text">3.2 — Alta affidabilità (cluster HA)</span>
             </summary>
             <div class="obj-content">
               <div class="obj-trace">
                 <h4>Traccia / note</h4>
                 <p>
-                  Configuriamo il cluster HA 'High Availability' tra i due
-                  firewall, in modalità Active-Passive, se il nodo attivo si
-                  guasta, il secondo subentra automaticamente senza interruzione
-                  percepibile di servizio. E' lo stesso principio applicato con
-                  STP sugli switch, in questo caso applicato a livello di
-                  firewall/gateway. Per questa configurazione dobbiamo
-                  considerare 2 aspetti fondamentali, l'heartbeat Fortigate
-                  standard usa frame Ethernet a livello 2 con EtherType
-                  dedicati, questi non funzionano bene su piattaforme
-                  virtualizzare come GNS3, quindi dobbiamo forzare l'uso di
-                  heartbeat a livello 3, e dobbiamo considerare che il cluster
-                  HA richiede un collegamento diretto tra i due nodi, quindi
-                  dobbiamo creare un link dedicato tra i due firewall, nel piano
-                  di indirizzamento abbiamo definito un indirizzamento per i
-                  link in HA dedicato <br />
-                  <br />
-                  Il secondo aspetto da considerare è l Override abilitato,
-                  questo parametro rende deterministica l'elezione del nodo
-                  primario 'vince sempre il nodo con priorità più alta', se
-                  disabilitato, in caso di guasto del nodo primario, il nodo
-                  secondario subentra come attivo, ma al ritorno del nodo
-                  primario, questo non riprende automaticamente il ruolo di
-                  attivo, ma rimane secondario. <br />
-                  <br />
-                  - Assegnazione IP dedicato per il link HA. <br />
-                  - Configurazione cluster HA Active-Passive. <br />
+                  Configuriamo il cluster HA (High Availability) tra i due
+                  firewall, in modalità Active-Passive: se il nodo attivo si
+                  guasta, il secondo subentra automaticamente senza
+                  interruzione percepibile di servizio. È lo stesso principio
+                  applicato con STP sugli switch, in questo caso a livello di
+                  firewall/gateway.
                 </p>
-              </div>
-              <br />
-              <br />
-              <div class="obj-trace">
-                <h4>2.2.1 - Assegnazione IP dedicato per il link HA</h4>
                 <p>
-                  In questo punto assegnamo staticamente l'indirizzo IP dedicato
-                  all'interfaccia fisicia che collega i due firewall, è un
-                  prerequisito indispensabile per l'Unicast HA, che comunica via
-                  IP invece che con frame Ethernet L2. <br />
-                  Questo processo dobbiamo eseguirlo su entrambi i firewall,
-                  assgnando a ciscuno un indirizzo IP univoco. <br />
-                  Appena sotto potete vedere lo screen della configurazione
-                  effettuata tramite CLI, queste configurazioni possono essere
-                  effettuate anche da intergaccia grafica.
+                  Per questa configurazione dobbiamo considerare due aspetti
+                  fondamentali. Il primo: l'heartbeat FortiGate standard usa
+                  frame Ethernet a livello 2 con EtherType dedicati, che non
+                  funzionano bene su piattaforme virtualizzate come GNS3 —
+                  dobbiamo quindi forzare l'uso di heartbeat a livello 3. Il
+                  cluster HA richiede inoltre un collegamento diretto tra i due
+                  nodi: nel piano di indirizzamento abbiamo già definito una
+                  subnet dedicata per il link HA.
                 </p>
-                <br />
+                <p>
+                  Il secondo aspetto è l'override abilitato: questo parametro
+                  rende deterministica l'elezione del nodo primario (vince
+                  sempre il nodo con priorità più alta). Se disabilitato, in
+                  caso di guasto del nodo primario il secondario subentra come
+                  attivo, ma al ritorno del primario questo non riprende
+                  automaticamente il ruolo di attivo, restando secondario.
+                </p>
+                <ul class="config-explain">
+                  <li>Assegnazione IP dedicato per il link HA</li>
+                  <li>Configurazione cluster HA Active-Passive</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>3.2.1 - Assegnazione IP dedicato per il link HA</h4>
+                <p>
+                  In questo punto assegniamo staticamente l'indirizzo IP
+                  dedicato all'interfaccia fisica che collega i due firewall —
+                  prerequisito indispensabile per l'Unicast HA, che comunica
+                  via IP invece che con frame Ethernet L2. Questo processo va
+                  eseguito su entrambi i firewall, assegnando a ciascuno un
+                  indirizzo IP univoco. Di seguito lo screenshot della
+                  configurazione effettuata tramite CLI (queste configurazioni
+                  possono essere effettuate anche da interfaccia grafica).
+                </p>
+                <br>
                 <img
                   src="./img/Assegnazione_IP_dedicato_al_link_HA.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br />
                 <p>
-                  Una funzionalità interessante del Fortigate, è la possibilità
-                  di assegnare un alias, alla porta fisica, questo permette di
-                  essere il più esplicativi possibile. <br />
+                  Una funzionalità interessante del FortiGate è la possibilità
+                  di assegnare un alias alla porta fisica, per essere il più
+                  esplicativi possibile.
                 </p>
-                <br />
+                <br>
                 <img
                   src="./img/Set_Alias_sulle_porte.png"
                   alt="Traccia configurazioni - canvas GNS3"
                   class="obj-image"
                 />
-                <br />
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - get system interface physical : mostra lo stato e la
-                  configurazione di tutte le interfacce fisiche, incluso
-                  l'indirizzo IP appena ssegnato alla porta 3.
-                </p>
+                <ul class="config-explain">
+                  <li><code>get system interface physical</code> — mostra lo stato e la configurazione di tutte le interfacce fisiche, incluso l'indirizzo IP appena assegnato alla porta 3.</li>
+                </ul>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
-                <h4>2.2.2 - Configurazione cluster HA Active-Passive.</h4>
+                <h4>3.2.2 - Configurazione cluster HA Active-Passive</h4>
                 <p>
                   Definiamo ora i parametri che permettono ai due FortiGate di
-                  riconoscersi a vicenda e formare il cluster HA, modalità,
-                  gruppo, password condvisa e priorità, interfaccia di heartbeat
-                  e le impostazioni di override deterministico con il comando
-                  'override-wait-time' questo attenua il doppio failover, quando
-                  il nodo primario torna online. <br />
-                  Questa configurazione deve essere identica su entrambi i nodi
-                  fatta eccezione per la priority questa determina chi deve
-                  essere eletto nodo primario. <br />
-                  Di seguito lo screen delle configurazioni effettuate tramite
-                  CLI, su entrambi i nodi : <br />
-                  <br />
-                  <img
-                    src="./img/HA_FW_1.png"
-                    alt="Traccia configurazioni - canvas GNS3"
-                    class="obj-image"
-                  />
-                  <br />
-                  <img
-                    src="./img/HA_FW_2.png"
-                    alt="Traccia configurazioni - canvas GNS3"
-                    class="obj-image"
-                  />
+                  riconoscersi a vicenda e formare il cluster HA: modalità,
+                  gruppo, password condivisa e priorità, interfaccia di
+                  heartbeat, e le impostazioni di override deterministico —
+                  con il comando <code>override-wait-time</code> che attenua il
+                  doppio failover quando il nodo primario torna online. Questa
+                  configurazione deve essere identica su entrambi i nodi, fatta
+                  eccezione per la priority, che determina chi deve essere
+                  eletto nodo primario. Di seguito gli screenshot delle
+                  configurazioni effettuate tramite CLI, su entrambi i nodi.
                 </p>
-                <br />
-                <p>
-                  I comandi appena elencati sono stati eseguiti su entrambi i
-                  firewall : <br />
-                  <br />
-                  group-id / group-name : Identificano univocamente il cluster
-                  HA, devono coincidere su entrambi i nodi. <br />
-                  mode a-p : Imposta la modalità di funzionamento del cluster,
-                  in questo caso Active-Passive. <br />
-                  password : E' il segreto condiviso tra i due nodi, necessario
-                  per l'autenticazione reciproca. <br />
-                  priority : Determina quale nodo deve essere eletto primario,
-                  vince il nodo con priorità più alta. <br />
-                  hbdev port3 0 : Specifica l'interfaccia fisica da utilizzare
-                  per l'heartbeat, in questo caso la porta 3, il valore 0 indica
-                  la priorità tra più interfacce heartbeat, se ne fossero state
-                  configurate più di una. <br />
-                  session-pickup enable : Abilita la ripresa delle sessioni
-                  attive in caso di failover, permettendo al nodo secondario di
-                  continuare a gestire le connessioni senza interruzioni. <br />
-                  override enable / override-wait-time 30 : Abilita l'override
-                  deterministico, permettendo al nodo primario di riprendere il
-                  ruolo di attivo al ritorno online, con un tempo di attesa di
-                  30 secondi per evitare doppio failover. <br />
-                  unicast-hb enable / unicast-hb-peerip 'IP' : Attiva
-                  l'heartbeat a livello 3, utilizzando l'indirizzo IP
-                  specificato per comunicare tra i due nodi, invece dei frame
-                  Ethernet L2. <br />
-                </p>
-                <br />
-                <br />
+                <br>
+                <img
+                  src="./img/HA_FW_1.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <img
+                  src="./img/HA_FW_2.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <p>I comandi appena elencati sono stati eseguiti su entrambi i firewall:</p>
+                <ul class="config-explain">
+                  <li><code>group-id / group-name</code> — identificano univocamente il cluster HA, devono coincidere su entrambi i nodi.</li>
+                  <li><code>mode a-p</code> — imposta la modalità di funzionamento del cluster, in questo caso Active-Passive.</li>
+                  <li><code>password</code> — è il segreto condiviso tra i due nodi, necessario per l'autenticazione reciproca.</li>
+                  <li><code>priority</code> — determina quale nodo deve essere eletto primario: vince il nodo con priorità più alta.</li>
+                  <li><code>hbdev port3 0</code> — specifica l'interfaccia fisica da utilizzare per l'heartbeat (in questo caso la porta 3); il valore 0 indica la priorità tra più interfacce heartbeat, se ne fossero state configurate più di una.</li>
+                  <li><code>session-pickup enable</code> — abilita la ripresa delle sessioni attive in caso di failover, permettendo al nodo secondario di continuare a gestire le connessioni senza interruzioni.</li>
+                  <li><code>override enable / override-wait-time 30</code> — abilita l'override deterministico, permettendo al nodo primario di riprendere il ruolo di attivo al ritorno online, con un tempo di attesa di 30 secondi per evitare un doppio failover.</li>
+                  <li><code>unicast-hb enable / unicast-hb-peerip IP</code> — attiva l'heartbeat a livello 3, utilizzando l'indirizzo IP specificato per comunicare tra i due nodi, invece dei frame Ethernet L2.</li>
+                </ul>
+                <br>
                 <h4>Comandi di diagnostica</h4>
-                <p>
-                  - get system ha status : mostra lo stato del cluster HA,
-                  incluso il ruolo di ciascun nodo (primario o secondario) e la
-                  priorità. <br />
-                  - diagnose sys ha checksum show : mostra un dettaglio dei
-                  checksum per tre categorie (global, root, all). Il valore che
-                  ci interessa di più è all: se il valore esadecimale mostrato
-                  per all coincide esattamente tra FW-1 e FW-2, la
-                  configurazione è davvero identica.
-                  <br />
-                  <br />
-                  <video class="obj-video" controls muted preload="metadata">
-                    <source
-                      src="./video/Diagnostica_HA_Status.mp4"
-                      type="video/mp4"
-                    />
-                    Il tuo browser non supporta la riproduzione video.
-                    <a href="./video/Diagnostica_HA_Status.mp4"
-                      >Scarica il video</a
-                    >.
-                  </video>
-                </p>
+                <ul class="config-explain">
+                  <li><code>get system ha status</code> — mostra lo stato del cluster HA, incluso il ruolo di ciascun nodo (primario o secondario) e la priorità.</li>
+                  <li><code>diagnose sys ha checksum show</code> — mostra un dettaglio dei checksum per tre categorie (global, root, all). Il valore che ci interessa di più è "all": se il valore esadecimale mostrato coincide esattamente tra FW-1 e FW-2, la configurazione è davvero identica.</li>
+                </ul>
+                <br>
+                <video class="obj-video" controls muted preload="metadata">
+                  <source
+                    src="./video/Diagnostica_HA_Status.mp4"
+                    type="video/mp4"
+                  />
+                  Il tuo browser non supporta la riproduzione video.
+                  <a href="./video/Diagnostica_HA_Status.mp4">Scarica il video</a>.
+                </video>
               </div>
-              <br />
-              <br />
+              <br>
               <div class="obj-trace">
                 <h4>Problemi riscontrati</h4>
                 <p>
                   Subito dopo la formazione del cluster, il comando diagnostico
-                  get system ha status mostrava FW-2 come "out-of-sync" su
-                  entrambi i nodi. Diagnosticato con diagnose sys ha checksum
-                  show: i checksum (global, root, all) risultavano già identici
-                  su entrambi i firewall — confermando che la configurazione era
-                  realmente sincronizzata, e che l'etichetta "out-of-sync" era
-                  solo un ritardo transitorio nell'aggiornamento dello stato
+                  <code>get system ha status</code> mostrava FW-2 come
+                  "out-of-sync" su entrambi i nodi. Diagnosticato con
+                  <code>diagnose sys ha checksum show</code>: i checksum
+                  (global, root, all) risultavano già identici su entrambi i
+                  firewall — confermando che la configurazione era realmente
+                  sincronizzata, e che l'etichetta "out-of-sync" era solo un
+                  ritardo transitorio nell'aggiornamento dello stato
                   visualizzato, non una discrepanza reale. Risolto da solo con
                   il passare di qualche minuto, senza bisogno di ricalcolo
                   forzato.
@@ -2098,53 +1813,30 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-inprogress">
-            <summary>
-              <span class="obj-text">2.3 — Routing (subinterfacce VLAN)</span>
-            </summary>
+
+          <details class="obj-item status-todo">
+            <summary><span class="obj-text">3.3 — Routing verso Internet</span></summary>
             <div class="obj-content">
-              <div class="obj-trace">
-                <h4>Traccia / Note</h4>
-                <p>
-                  In questo punto configuriamo il routing inter-VLAN sul Fortigate, <br>
-                  l'obbiettivo è creare una subinterface virtuale per ciascuna VLAN (10,20,30,40) sopra l'inerfaccia fisica trunk porta 2 che si collega direttamente allo switch. <br>
-                  E' il classico modello 'router-on-a-stick', ogni subinterface, riceve l'IP di default gateway, <br>
-                  già definito nel piano di indirizzamento, il traffico, <br>
-                  viene distinto per VLAN tramite tag 802.1Q sullo stesso cavo fisico. <br>
-                  Grazie a questa configurazione, le reti direttamente connesse, <br>
-                  non consumano nessuna delle 3 route statiche disponibili con la nostra licenza. <br>
-                  Il limite delle 3 route ci servirà solo per la route di default verso internet. <br> <br>
-                  Inoltre grazie alla configurazione precedente del cluster HA, tutta la configurazione <br>
-                  va eseguita solo una volta su FW-1 e automaticamente replicata su FW-2. <br> <br>
-                  - Creazione delle 4 subinterface VLAN. <br>
-                  - Verifica tabella di routing. <br>
-                  - Configurazione della route di default verso internet. <br>
-                  - Verifiche finali. <br>
-                </p>
-              </div>
+              <p class="obj-caption">
+                Da completare. Il routing inter-VLAN, originariamente previsto
+                qui, è stato spostato al Capitolo 2 (Router) — vedi punto 2.0
+                per il dettaglio del limite di licenza riscontrato.
+              </p>
             </div>
           </details>
           <details class="obj-item status-todo">
-            <summary>
-              <span class="obj-text">2.4 — Firewall Policy</span>
-            </summary>
+            <summary><span class="obj-text">3.4 — Firewall Policy</span></summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
-            </div>
-          </details>
-          <details class="obj-item status-todo">
-            <summary><span class="obj-text">2.5 — DHCP</span></summary>
-            <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <p class="obj-caption">Da completare — regole compatibili con il limite di 3 policy della licenza.</p>
             </div>
           </details>
         </div>
 
-        <h3>3. Configurazione Windows Server</h3>
+        <h3>4. Configurazione Windows Server</h3>
         <div class="obj-list">
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">3.1 — Definizione Active Directory</span>
+              <span class="obj-text">4.1 — Definizione Active Directory</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2153,7 +1845,7 @@
           <details class="obj-item status-todo">
             <summary>
               <span class="obj-text"
-                >3.2 — Domain Controller (DNS integrato)</span
+                >4.2 — Domain Controller (DNS integrato)</span
               >
             </summary>
             <div class="obj-content">
@@ -2161,18 +1853,18 @@
             </div>
           </details>
           <details class="obj-item status-todo">
-            <summary><span class="obj-text">3.3 — GPO</span></summary>
+            <summary><span class="obj-text">4.3 — GPO</span></summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
             </div>
           </details>
         </div>
 
-        <h3>4. Deployment client</h3>
+        <h3>5. Deployment client</h3>
         <div class="obj-list">
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">4.1 — Creazione VM master Windows 11</span>
+              <span class="obj-text">5.1 — Creazione VM master Windows 11</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2180,7 +1872,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">4.2 — Clonazione e Sysprep (×3)</span>
+              <span class="obj-text">5.2 — Clonazione e Sysprep (×3)</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2188,7 +1880,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">4.3 — Join al dominio</span>
+              <span class="obj-text">5.3 — Join al dominio</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2196,11 +1888,11 @@
           </details>
         </div>
 
-        <h3>5. Validazione e collaudo</h3>
+        <h3>6. Validazione e collaudo</h3>
         <div class="obj-list">
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">5.1 — Connettività inter-VLAN</span>
+              <span class="obj-text">6.1 — Connettività inter-VLAN</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2208,7 +1900,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">5.2 — Risoluzione DNS interna</span>
+              <span class="obj-text">6.2 — Risoluzione DNS interna</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2216,7 +1908,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">5.3 — Lease DHCP per VLAN</span>
+              <span class="obj-text">6.3 — Lease DHCP per VLAN</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2224,7 +1916,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">5.4 — Test failover HA</span>
+              <span class="obj-text">6.4 — Test failover HA/HSRP</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2233,7 +1925,7 @@
           <details class="obj-item status-todo">
             <summary>
               <span class="obj-text"
-                >5.5 — Autenticazione dominio multi-client</span
+                >6.5 — Autenticazione dominio multi-client</span
               >
             </summary>
             <div class="obj-content">
@@ -2242,10 +1934,10 @@
           </details>
         </div>
 
-        <h3>6. Documentazione</h3>
+        <h3>7. Documentazione</h3>
         <div class="obj-list">
           <details class="obj-item status-done">
-            <summary><span class="obj-text">6.1 — README.md</span></summary>
+            <summary><span class="obj-text">7.1 — README.md</span></summary>
             <div class="obj-content">
               <p class="obj-caption">
                 Completato: panoramica, obiettivi, prerequisiti.
@@ -2255,7 +1947,7 @@
           <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text"
-                >6.2 — Documento HTML/CSS di tracciamento</span
+                >7.2 — Documento HTML/CSS di tracciamento</span
               >
             </summary>
             <div class="obj-content">
@@ -2264,7 +1956,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">6.3 — Troubleshooting log</span>
+              <span class="obj-text">7.3 — Troubleshooting log</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2280,7 +1972,7 @@
         <a href="https://github.com/RobyLedda94" target="_blank"
           >github.com/RobyLedda94</a
         >
-        — Ultimo aggiornamento: correzione stati obiettivi 0.2/0.3
+        — Ultimo aggiornamento: v1.1 — introduzione router R1/R2, rinumerazione capitoli
       </p>
     </footer>
 
