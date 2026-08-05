@@ -2064,9 +2064,9 @@
                   checksum per tre categorie (global, root, all). Il valore che
                   ci interessa di più è all: se il valore esadecimale mostrato
                   per all coincide esattamente tra FW-1 e FW-2, la
-                  configurazione è davvero identica. 
-                  <br /> 
-                  <br>
+                  configurazione è davvero identica.
+                  <br />
+                  <br />
                   <video class="obj-video" controls muted preload="metadata">
                     <source
                       src="./video/Diagnostica_HA_Status.mp4"
@@ -2098,12 +2098,30 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-todo">
+          <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text">2.3 — Routing (subinterfacce VLAN)</span>
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / Note</h4>
+                <p>
+                  In questo punto configuriamo il routing inter-VLAN sul Fortigate, <br>
+                  l'obbiettivo è creare una subinterface virtuale per ciascuna VLAN (10,20,30,40) sopra l'inerfaccia fisica trunk porta 2 che si collega direttamente allo switch. <br>
+                  E' il classico modello 'router-on-a-stick', ogni subinterface, riceve l'IP di default gateway, <br>
+                  già definito nel piano di indirizzamento, il traffico, <br>
+                  viene distinto per VLAN tramite tag 802.1Q sullo stesso cavo fisico. <br>
+                  Grazie a questa configurazione, le reti direttamente connesse, <br>
+                  non consumano nessuna delle 3 route statiche disponibili con la nostra licenza. <br>
+                  Il limite delle 3 route ci servirà solo per la route di default verso internet. <br> <br>
+                  Inoltre grazie alla configurazione precedente del cluster HA, tutta la configurazione <br>
+                  va eseguita solo una volta su FW-1 e automaticamente replicata su FW-2. <br> <br>
+                  - Creazione delle 4 subinterface VLAN. <br>
+                  - Verifica tabella di routing. <br>
+                  - Configurazione della route di default verso internet. <br>
+                  - Verifiche finali. <br>
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
