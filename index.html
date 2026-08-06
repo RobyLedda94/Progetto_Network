@@ -2075,6 +2075,11 @@
               <br />
               <div class="obj-trace">
                 <h4>2.1.1 - Identità dispositivo, Accesso privilegiato, AAA</h4>
+                <p>
+                  Impostiamo un'identità al dispositivo, la password di accesso privilegiato
+                  e l'autenticazione AAA locale con relativo utente amministrativo.
+                </p>
+                <br>
                 <img
                   src="./img/Hardening_Router_Cisco.png"
                   alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
@@ -2119,10 +2124,85 @@
                 <br />
                 <h4>Comandi di diagnostica</h4>
                 <ul class="config-explain">
-                  <li><code>show running-config | include hostbname :</code>verifica hostname.</li>
-                  <li><code>show running-config | include enable secret:</code>verifica hash delle password di enable.</li>
-                  <li><code>show running-config | include service password-encryption :</code>verifica presenza del service password-encryption.</li>
-                  <li><code>show running-config | include aaa :</code>verifica presenza del framework AAA.</li>
+                  <li>
+                    <code>show running-config | include hostbname :</code
+                    >verifica hostname.
+                  </li>
+                  <li>
+                    <code>show running-config | include enable secret:</code
+                    >verifica hash delle password di enable.
+                  </li>
+                  <li>
+                    <code
+                      >show running-config | include service password-encryption
+                      :</code
+                    >verifica presenza del service password-encryption.
+                  </li>
+                  <li>
+                    <code>show running-config | include aaa :</code>verifica
+                    presenza del framework AAA.
+                  </li>
+                </ul>
+              </div>
+              <br />
+              <div class="obj-trace">
+                <h4>2.1.2 - Attivazione SSH v2, disabilitazione Telnet</h4>
+                <p>
+                  Configuriamo i prerequisiti per SSH 'dominio DNS e chiavi RSA', poi
+                  arriviamo SSH verione 2 sulle linee VTY, disabilitando il Telnet.
+                </p>
+                <br>
+                <img
+                  src="./img/Attivazione_SSHv2_no_Telnet_Router.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <ul class="config-explain">
+                  <li>
+                    <code>ip domain-name leonardo.local :</code>Impostiamo il dominio DNS necessario
+                    per generare le chiavi RSA.
+                  </li>
+                  <li>
+                    <code>crypto key generate rsa :</code>Genera la
+                    coppia di chiavi RSA utilizzata da SSH, a 2048 bit
+                  </li>
+                  <li>
+                    <code>ip ssh version 2 :</code>Forza solo SSH v2, disabilitando la versione 1
+                  </li>
+                  <li>
+                    <code>line vty 0 4 :</code>Entra nella configurazione delle linee VTY 'Accesso remoto'
+                  </li>
+                  <li>
+                    <code
+                      >transport input ssh:</code
+                    >Consente solo SSH come protocollo di accesso remoto, escludendo Telnet
+                  </li>
+                  <li>
+                    <code>login authentication default :</code>applica l'autenticazione
+                    AAA anche nelle sessioni remote
+                  </li>
+                  <li>
+                    <code>exec-timeout 5 0 :</code>Disconnette automaticamente una 
+                    sessione dopo 5 minuti di inattività
+                  </li>
+                </ul>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li>
+                    <code>show crypto key mypubkey rsa :</code
+                    >conferma la generazione delle chiavi RSA.
+                  </li>
+                  <li>
+                    <code>show ip ssh:</code
+                    >Mostra la versione SSH attiva.
+                  </li>
+                  <li>
+                    <code
+                      >show running-config
+                      :</code
+                    >verifica la configurazione delle linee VTY applicata.
+                  </li>
                 </ul>
               </div>
             </div>
