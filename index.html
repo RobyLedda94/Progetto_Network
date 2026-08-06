@@ -2058,12 +2058,71 @@
                   funzionale. (sub-interface VLAN, routing, DHCP e HSRP). <br />
                 </p>
                 <ul class="config-explain">
-                  <li>Accesso privilegiato (enable secret) + AAA locale.</li>
+                  <li>
+                    Identità dispositivo + Accesso privilegiato (enable secret)
+                    + AAA locale.
+                  </li>
                   <li>Attivazione SSH v2, disabilitazione Telnet.</li>
                   <li>Hardening linee console/aux + banner di accesso</li>
                   <li>Protezione brute-force e limitazione sessioni SSH</li>
-                  <li>Disabilitazione servizi non essenziali (incluso no service config)</li>
+                  <li>
+                    Disabilitazione servizi non essenziali (incluso no service
+                    config)
+                  </li>
                   <li>Verifiche finali</li>
+                </ul>
+              </div>
+              <br />
+              <div class="obj-trace">
+                <h4>2.1.1 - Identità dispositivo, Accesso privilegiato, AAA</h4>
+                <img
+                  src="./img/Hardening_Router_Cisco.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <ul class="config-explain">
+                  <li>
+                    <code>hostname R1 :</code>Impostiamo esplicitamente
+                    l'identità del dispositivo, utile per distinguerlo
+                    chiaramente nell'infrastruttura
+                  </li>
+                  <li>
+                    <code>enable secret StrongPassword123 :</code>Impostiamo la
+                    password per accedere alla modalità con il massimo
+                    privilegio
+                  </li>
+                  <li>
+                    <code>service password-encryprion :</code>Applica cifratura
+                    debole a eventuali password in chiaro presenti in
+                    configuraqzione
+                  </li>
+                  <li>
+                    <code>aaa new-model :</code>attiva il framework AAA,
+                    sostituendo il modello legacy basato solo su password di
+                    linea
+                  </li>
+                  <li>
+                    <code
+                      >user admin privilege 15 secret StongPassword123 :</code
+                    >Crea un utente con il massimo dei privilegi
+                  </li>
+                  <li>
+                    <code>aaa authentication login default local :</code>impone
+                    che il login su line console/aux utilizzi il db utenti
+                    locale
+                  </li>
+                  <li>
+                    <code>aaa authorization exec default local :</code>Applica
+                    il privilegio locale al login.
+                  </li>
+                </ul>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show running-config | include hostbname :</code>verifica hostname.</li>
+                  <li><code>show running-config | include enable secret:</code>verifica hash delle password di enable.</li>
+                  <li><code>show running-config | include service password-encryption :</code>verifica presenza del service password-encryption.</li>
+                  <li><code>show running-config | include aaa :</code>verifica presenza del framework AAA.</li>
                 </ul>
               </div>
             </div>
