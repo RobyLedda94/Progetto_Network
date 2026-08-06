@@ -2076,10 +2076,12 @@
               <div class="obj-trace">
                 <h4>2.1.1 - Identità dispositivo, Accesso privilegiato, AAA</h4>
                 <p>
-                  Impostiamo un'identità al dispositivo, la password di accesso privilegiato
-                  e l'autenticazione AAA locale con relativo utente amministrativo.
+                  Impostiamo un'identità al dispositivo, la password di accesso
+                  privilegiato e l'autenticazione AAA locale con relativo utente
+                  amministrativo. Ricordiamoci
+                  di replicare gli stessi comandi anche su R2.
                 </p>
-                <br>
+                <br />
                 <img
                   src="./img/Hardening_Router_Cisco.png"
                   alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
@@ -2148,10 +2150,12 @@
               <div class="obj-trace">
                 <h4>2.1.2 - Attivazione SSH v2, disabilitazione Telnet</h4>
                 <p>
-                  Configuriamo i prerequisiti per SSH 'dominio DNS e chiavi RSA', poi
-                  arriviamo SSH verione 2 sulle linee VTY, disabilitando il Telnet.
+                  Configuriamo i prerequisiti per SSH 'dominio DNS e chiavi
+                  RSA', poi arriviamo SSH verione 2 sulle linee VTY,
+                  disabilitando il Telnet. Ricordiamoci
+                  di replicare gli stessi comandi anche su R2.
                 </p>
-                <br>
+                <br />
                 <img
                   src="./img/Attivazione_SSHv2_no_Telnet_Router.png"
                   alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
@@ -2159,49 +2163,93 @@
                 />
                 <ul class="config-explain">
                   <li>
-                    <code>ip domain-name leonardo.local :</code>Impostiamo il dominio DNS necessario
-                    per generare le chiavi RSA.
+                    <code>ip domain-name leonardo.local :</code>Impostiamo il
+                    dominio DNS necessario per generare le chiavi RSA.
                   </li>
                   <li>
-                    <code>crypto key generate rsa :</code>Genera la
-                    coppia di chiavi RSA utilizzata da SSH, a 2048 bit
+                    <code>crypto key generate rsa :</code>Genera la coppia di
+                    chiavi RSA utilizzata da SSH, a 2048 bit
                   </li>
                   <li>
-                    <code>ip ssh version 2 :</code>Forza solo SSH v2, disabilitando la versione 1
+                    <code>ip ssh version 2 :</code>Forza solo SSH v2,
+                    disabilitando la versione 1
                   </li>
                   <li>
-                    <code>line vty 0 4 :</code>Entra nella configurazione delle linee VTY 'Accesso remoto'
+                    <code>line vty 0 4 :</code>Entra nella configurazione delle
+                    linee VTY 'Accesso remoto'
                   </li>
                   <li>
-                    <code
-                      >transport input ssh:</code
-                    >Consente solo SSH come protocollo di accesso remoto, escludendo Telnet
+                    <code>transport input ssh:</code>Consente solo SSH come
+                    protocollo di accesso remoto, escludendo Telnet
                   </li>
                   <li>
-                    <code>login authentication default :</code>applica l'autenticazione
-                    AAA anche nelle sessioni remote
+                    <code>login authentication default :</code>applica
+                    l'autenticazione AAA anche nelle sessioni remote
                   </li>
                   <li>
-                    <code>exec-timeout 5 0 :</code>Disconnette automaticamente una 
-                    sessione dopo 5 minuti di inattività
+                    <code>exec-timeout 5 0 :</code>Disconnette automaticamente
+                    una sessione dopo 5 minuti di inattività
                   </li>
                 </ul>
                 <br />
                 <h4>Comandi di diagnostica</h4>
                 <ul class="config-explain">
                   <li>
-                    <code>show crypto key mypubkey rsa :</code
-                    >conferma la generazione delle chiavi RSA.
+                    <code>show crypto key mypubkey rsa :</code>conferma la
+                    generazione delle chiavi RSA.
                   </li>
                   <li>
-                    <code>show ip ssh:</code
-                    >Mostra la versione SSH attiva.
+                    <code>show ip ssh:</code>Mostra la versione SSH attiva.
                   </li>
                   <li>
-                    <code
-                      >show running-config
-                      :</code
-                    >verifica la configurazione delle linee VTY applicata.
+                    <code>show running-config :</code>verifica la configurazione
+                    delle linee VTY applicata.
+                  </li>
+                </ul>
+              </div>
+              <br />
+              <div class="obj-trace">
+                <h4>2.1.3 - Hardening linee console/aux e banner di accesso</h4>
+                <p>
+                  Completiamo l'hardening delle linee di accesso locale (console
+                  e ausialiaria), e aggiungiamo il banner di accesso. Ricordiamoci
+                  di replicare gli stessi comandi anche su R2.
+                </p>
+                <br />
+                <img
+                  src="./img/Hardening_linee_console_aux_banner_Router.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <ul class="config-explain">
+                  <li>
+                    <code>exec-timeout 5 0 :</code>Imposta il timeout di
+                    inattività a 5 minuti
+                  </li>
+                  <li>
+                    <code>no privilege level 15 :</code>Rimuove l'elevazione
+                    automatica del massimo privilegio dalle linee
+                  </li>
+                  <li>
+                    <code>no exec :</code> eseguito solo sulla line ausiliaria,
+                    disabilita la possibilità di aprire una sessione sulla line
+                    aux.
+                  </li>
+                  <li>
+                    <code>banner motd #...# :</code>Mostra un messaggio di
+                    avviso a chiunque si connetta al dispositivo
+                  </li>
+                </ul>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li>
+                    <code>show running-config :</code>verifica la configurazione
+                    delle linee applicata.
+                  </li>
+                  <li>
+                    <code>show running-config | include banner :</code>Verifica la presenza
+                    dell'avviso banner
                   </li>
                 </ul>
               </div>
