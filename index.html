@@ -2253,6 +2253,57 @@
                   </li>
                 </ul>
               </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.1.4 - Protezione brute-force e limitazione sessioni SSH</h4>
+                <p>
+                  Aggiungiamo la protezione contro i tentativi di accesso ripetuti (brute-force) e i 
+                  log di successo/fallimento del login. <br>
+                  Limitiamo anche la durata della negoziazione SSH. Gli stessi comandi vanno eseguiti anche sul secondo router.
+                  Aggiungo una piccola nota, se effettuate dei test in merito al comportamento atteso, il comando <code>login block-for</code>
+                  si applica solo alle linee VTY/TTY, mai alla line console, se il blocco valesse anche per la console, un amministratore
+                  legittimo che sbagliasse 3 volte la password me è fisicamente davanti al dispositivo (magari proprio durante un attacco in corso da remoto),
+                  resterebbe anche lui escluso per 2 minuti. Lo stesso vale per il conteggio dei fallimenti del login.
+                </p>
+                <br />
+                <img
+                  src="./img/Protezione_brute_force_router.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <ul class="config-explain">
+                  <li>
+                    <code>login block-for 120 attempts 3 within 60 :</code>se il dispositivo,
+                    rileva 3 tentativi di login falliti entro 60 secondi, blocca tutti i nuovi tentativi di accesso per 120 secondi.
+                  </li>
+                  <li>
+                    <code>login delay 2 :</code>Impone un ritardo di 2 secondi tra un tentativo di login e il sucessivo.
+                  </li>
+                  <li>
+                    <code>login on-failure log :</code> registra nel logi di sistema ogni tentativo di accesso fallito.
+                    aux.
+                  </li>
+                  <li>
+                    <code>login on-success log :</code>registra nel log di sistema ogni accesso riuscito.
+                  </li>
+                  <li>
+                    <code>ip ssh time-out 60 :</code>limita a 60 secondi il tempo massimo per completare la fase di negoziazione/autenticazione SSH.
+                  </li>
+                  <li>
+                    <code>ip ssh authentication-retries 3 :</code>limita a 3 i tentativi di login consentiti dentro la stessa sessione SSH già aperta, prima della chiusura forzata.
+                  </li>
+                </ul>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li>
+                    <code>show login :</code>Mostra lo stato della protezione brute-force.
+                  </li>
+                  <li>
+                    <code>show ip ssh :</code>Verifica le configurazioni applicate al processo SSH.
+                  </li>
+                </ul>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
