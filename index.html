@@ -2078,8 +2078,8 @@
                 <p>
                   Impostiamo un'identità al dispositivo, la password di accesso
                   privilegiato e l'autenticazione AAA locale con relativo utente
-                  amministrativo. Ricordiamoci
-                  di replicare gli stessi comandi anche su R2.
+                  amministrativo. Ricordiamoci di replicare gli stessi comandi
+                  anche su R2.
                 </p>
                 <br />
                 <img
@@ -2152,8 +2152,8 @@
                 <p>
                   Configuriamo i prerequisiti per SSH 'dominio DNS e chiavi
                   RSA', poi arriviamo SSH verione 2 sulle linee VTY,
-                  disabilitando il Telnet. Ricordiamoci
-                  di replicare gli stessi comandi anche su R2.
+                  disabilitando il Telnet. Ricordiamoci di replicare gli stessi
+                  comandi anche su R2.
                 </p>
                 <br />
                 <img
@@ -2212,8 +2212,8 @@
                 <h4>2.1.3 - Hardening linee console/aux e banner di accesso</h4>
                 <p>
                   Completiamo l'hardening delle linee di accesso locale (console
-                  e ausialiaria), e aggiungiamo il banner di accesso. Ricordiamoci
-                  di replicare gli stessi comandi anche su R2.
+                  e ausialiaria), e aggiungiamo il banner di accesso.
+                  Ricordiamoci di replicare gli stessi comandi anche su R2.
                 </p>
                 <br />
                 <img
@@ -2248,22 +2248,30 @@
                     delle linee applicata.
                   </li>
                   <li>
-                    <code>show running-config | include banner :</code>Verifica la presenza
-                    dell'avviso banner
+                    <code>show running-config | include banner :</code>Verifica
+                    la presenza dell'avviso banner
                   </li>
                 </ul>
               </div>
-              <br>
+              <br />
               <div class="obj-trace">
-                <h4>2.1.4 - Protezione brute-force e limitazione sessioni SSH</h4>
+                <h4>
+                  2.1.4 - Protezione brute-force e limitazione sessioni SSH
+                </h4>
                 <p>
-                  Aggiungiamo la protezione contro i tentativi di accesso ripetuti (brute-force) e i 
-                  log di successo/fallimento del login. <br>
-                  Limitiamo anche la durata della negoziazione SSH. Gli stessi comandi vanno eseguiti anche sul secondo router.
-                  Aggiungo una piccola nota, se effettuate dei test in merito al comportamento atteso, il comando <code>login block-for</code>
-                  si applica solo alle linee VTY/TTY, mai alla line console, se il blocco valesse anche per la console, un amministratore
-                  legittimo che sbagliasse 3 volte la password me è fisicamente davanti al dispositivo (magari proprio durante un attacco in corso da remoto),
-                  resterebbe anche lui escluso per 2 minuti. Lo stesso vale per il conteggio dei fallimenti del login.
+                  Aggiungiamo la protezione contro i tentativi di accesso
+                  ripetuti (brute-force) e i log di successo/fallimento del
+                  login. <br />
+                  Limitiamo anche la durata della negoziazione SSH. Gli stessi
+                  comandi vanno eseguiti anche sul secondo router. Aggiungo una
+                  piccola nota, se effettuate dei test in merito al
+                  comportamento atteso, il comando <code>login block-for</code>
+                  si applica solo alle linee VTY/TTY, mai alla line console, se
+                  il blocco valesse anche per la console, un amministratore
+                  legittimo che sbagliasse 3 volte la password me è fisicamente
+                  davanti al dispositivo (magari proprio durante un attacco in
+                  corso da remoto), resterebbe anche lui escluso per 2 minuti.
+                  Lo stesso vale per il conteggio dei fallimenti del login.
                 </p>
                 <br />
                 <img
@@ -2273,34 +2281,145 @@
                 />
                 <ul class="config-explain">
                   <li>
-                    <code>login block-for 120 attempts 3 within 60 :</code>se il dispositivo,
-                    rileva 3 tentativi di login falliti entro 60 secondi, blocca tutti i nuovi tentativi di accesso per 120 secondi.
+                    <code>login block-for 120 attempts 3 within 60 :</code>se il
+                    dispositivo, rileva 3 tentativi di login falliti entro 60
+                    secondi, blocca tutti i nuovi tentativi di accesso per 120
+                    secondi.
                   </li>
                   <li>
-                    <code>login delay 2 :</code>Impone un ritardo di 2 secondi tra un tentativo di login e il sucessivo.
+                    <code>login delay 2 :</code>Impone un ritardo di 2 secondi
+                    tra un tentativo di login e il sucessivo.
                   </li>
                   <li>
-                    <code>login on-failure log :</code> registra nel logi di sistema ogni tentativo di accesso fallito.
-                    aux.
+                    <code>login on-failure log :</code> registra nel logi di
+                    sistema ogni tentativo di accesso fallito. aux.
                   </li>
                   <li>
-                    <code>login on-success log :</code>registra nel log di sistema ogni accesso riuscito.
+                    <code>login on-success log :</code>registra nel log di
+                    sistema ogni accesso riuscito.
                   </li>
                   <li>
-                    <code>ip ssh time-out 60 :</code>limita a 60 secondi il tempo massimo per completare la fase di negoziazione/autenticazione SSH.
+                    <code>ip ssh time-out 60 :</code>limita a 60 secondi il
+                    tempo massimo per completare la fase di
+                    negoziazione/autenticazione SSH.
                   </li>
                   <li>
-                    <code>ip ssh authentication-retries 3 :</code>limita a 3 i tentativi di login consentiti dentro la stessa sessione SSH già aperta, prima della chiusura forzata.
+                    <code>ip ssh authentication-retries 3 :</code>limita a 3 i
+                    tentativi di login consentiti dentro la stessa sessione SSH
+                    già aperta, prima della chiusura forzata.
                   </li>
                 </ul>
                 <br />
                 <h4>Comandi di diagnostica</h4>
                 <ul class="config-explain">
                   <li>
-                    <code>show login :</code>Mostra lo stato della protezione brute-force.
+                    <code>show login :</code>Mostra lo stato della protezione
+                    brute-force.
                   </li>
                   <li>
-                    <code>show ip ssh :</code>Verifica le configurazioni applicate al processo SSH.
+                    <code>show ip ssh :</code>Verifica le configurazioni
+                    applicate al processo SSH.
+                  </li>
+                </ul>
+              </div>
+              <br />
+              <div class="obj-trace">
+                <h4>2.1.5 - Disabilitazione servizi non essenziali</h4>
+                <p>
+                  Ogni router Cisco, appena acceso con la configurazione di
+                  fabbrica, ha una serie di servizi gia attivi di default,
+                  pernsati per garantire compatibilità con scenari di rete molto
+                  vecchi o particolari, che oggi nella stragrande maggioranza
+                  dei casi non servono più. <br />
+                  Il problema non è che questi servizi 'facciano danno' presi
+                  singolarmente, il vero problema è che
+                  <strong
+                    >ogni servizio attivo e non necessario è una porta aperta in
+                    più da gestire</strong
+                  >
+                  in sostanza rappresentano una superfice in più che un
+                  malintenzionato potrebbe provare a sfruttare, anche solo per
+                  raccogliere informazioni utili a preparare un attacco mirato.
+                  La logica è semplice
+                  <strong>se non lo utilizziamo lo spegnamo</strong>.
+                </p>
+                <br />
+                <img
+                  src="./img/Disattivazione_servizi_non_essenziali_router.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <ul class="config-explain">
+                  <li>
+                    <code>no ip http server :</code>Spegnamo il server web di
+                    amministazione integrato nel dispositivo, questo
+                    permetterebbe di gestire il router aprendo un browser
+                    digitando il suo indirizzo IP, invece di gestirlo solamente
+                    da linea di comando. <br />
+                    Dato che stiamo gestendo il router da CLI lasciare attivo
+                    questo servizio significherebbe lasciare una porta aperta
+                    che nessuno controlla o utilizza.
+                  </li>
+                  <li>
+                    <code>no ip http secure-server :</code>Stessa logica del
+                    comando precedente ma per la variante HTTPS 'cifrata', anche
+                    se sicura rimane comunque un servizio che non utilizziamo.
+                  </li>
+                  <li>
+                    <code>no ip domain-lookup :</code>Questo comando ha più a
+                    che fare con la comodità operativa che con la sicurezza
+                    pura, ma è comunque buona prassi escluderlo. <br />
+                    Se digiti per errore un comando che IOS non riconosce (es.
+                    scrivi sohw invece di show), il router — senza questo
+                    comando — prova a interpretare quella parola come se fosse
+                    il nome di un host da raggiungere, e tenta una query DNS per
+                    risolverlo. Il risultato è che resti bloccato per diversi
+                    secondi ad aspettare un timeout, invece di ricevere subito
+                    il messaggio d'errore. Disattivandolo, eviti questa attesa
+                    inutile e riduci anche il traffico DNS che il router
+                    potrebbe generare senza che tu l'abbia voluto.
+                  </li>
+                  <li>
+                    <code>no service pad :</code>Il PAD (Packet Assembler/Dissembler) è un protocollo che serviva per la comunicazione
+                    in reti basate su X.25, uno standard di comunicazione ormai completamente scomparso. Nessuna rete moderna 
+                    lo utilizza, ma molte immagini IOS lo attivano ancora di default, lo disattiviamo perche rappresenta un servizio fantasma attivo 
+                    che non trova utilità.
+                  </li>
+                  <li>
+                    <code>no ip finger :</code>Il servizio 'finger' è un protocollo molto datato che
+                    permetteva a chiunque, da remoto, di interrogare il router e scoprire quali utenti avessero una sessione attiva in quel momento. <br>
+                    Rappresenta un problema, perchè darebbe ad un attaccante la possibilità di raccogliere informazioni su chi sta amministrando il dispositivo, molto utili
+                    per orientare un attacco mirato.
+                  </li>
+                  <li>
+                    <code>no ip bootp server :</code> BOOTP è il protocollo che ha preceduto storicamente il DHCP, serviva a far scaricare a un dispositivo la prorpia configurazione IP 'in alcuni casi anche
+                    il sistema operativo' da un altro apparato di rete. 
+                  </li>
+                  <li>
+                    <code>no service tcp-small-servers / no service upd-small-servers :</code>Questi due comandi disattivano un gruppo di piccoli servizi diagnstici
+                    ('echo', 'daytime', discard), che giravano su porte TCP/UDP utilizzati per semplici test di connettività.
+                  </li>
+                  <li>
+                    <code>no ip source-route :</code>Questo comando disattiva una funzionalità del protocollo IP che, se lasciata attiva, permetterebbe a chi invia un pacchetto di 
+                    specificare lui stesso il percorso che quel pacchetto deve seguire, invece di lasciare che sia il router a decidere in base alle 
+                    proprie tabelle di routing. E' una tecnica per aggirare i controlli di sicurezza basati sul percorso di rete atteso.
+                  </li>
+                  <li>
+                    <code>no service config :</code>Di default, alcuni router Cisco, all'avvio provano a contattare la rete per verificare se esiste una configurazione da scaricare automaticamente,
+                    via TFTP, è una funzionalità pensata per scenari di provisoring di massa dove centinaia di dispositivi si configurano in autonomia prendendo le configurazioni da un server
+                    centrale. E' una falla di sicurezza reale immaginiamo un malintenzionato che riesce a fingersi quello specifico server TFTP, potrebbe spingere sul router una 
+                    configurazione malevola al prossimo riavvio. Disattivando questo servizio ci assicuraimo che il router usi sempre e solo la configurazione salvata localmente.
+                  </li>
+                </ul>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li>
+                    <code>show running-config | include http|domain-lookup|pad|finger|bootp|small-servers|source-route|service config :</code>Filtriamo l'intera configurazione mostrando solamente le 
+                    righe relative a tutti i servizi appena disattivati.
+                  </li>
+                  <li>
+                    <code>show ip http server status :</code>Entra nel dettaglio specifico del server HTTP/HTTPS mostrando se risulta 'Disabled'.
                   </li>
                 </ul>
               </div>
