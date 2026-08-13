@@ -2423,6 +2423,46 @@
                   </li>
                 </ul>
               </div>
+              <br>
+              <div class="obj-trace">
+                <h4>
+                  2.1.6 - Verifiche configurazioni Hardening
+                </h4>
+                <p>
+                  Concludiamo il punto 2.1 con una verifica d'insieme riguardante le configurazioni eseguite sui router.
+                </p>
+                <br />
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li>
+                    <code>show running-config | include hostname|enable secret :</code> Verifica identità del dispositivo e tipo di hash della password di enable
+                  </li>
+                  <li>
+                    <code>show running-config | include aaa :</code> presenza e correttezza delle direttive AAA
+                  </li>
+                    <li>
+                    <code>show ip ssh :</code> Verifica stato e versione del servizio SSH
+                  </li>
+                  <li>
+                    <code>show running-config | section line con :</code> Verifica configurazione linee console
+                  </li>
+                  <li>
+                    <code>show running-config | section line aux :</code> Verifica configurazione linee ausiliaria
+                  </li>
+                  <li>
+                    <code>show running-config | section line vty :</code> Verifica configurazione linee VTY
+                  </li>
+                  <li>
+                    <code>show running-config | include banner :</code> Verifica presenza del messaggio banner
+                  </li>
+                  <li>
+                    <code>show login :</code> Verifica stato protezione brute-force
+                  </li>
+                  <li>
+                    <code>show ip http server status :</code> Verifica stato dei servizi HTTP/HTTPS.
+                  </li>
+                </ul>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
