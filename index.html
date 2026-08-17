@@ -2042,7 +2042,7 @@
             </div>
           </details>
 
-          <details class="obj-item status-inprogress">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text">2.1 — Hardening dispositivo</span>
             </summary>
@@ -2380,99 +2380,248 @@
                     potrebbe generare senza che tu l'abbia voluto.
                   </li>
                   <li>
-                    <code>no service pad :</code>Il PAD (Packet Assembler/Dissembler) è un protocollo che serviva per la comunicazione
-                    in reti basate su X.25, uno standard di comunicazione ormai completamente scomparso. Nessuna rete moderna 
-                    lo utilizza, ma molte immagini IOS lo attivano ancora di default, lo disattiviamo perche rappresenta un servizio fantasma attivo 
-                    che non trova utilità.
+                    <code>no service pad :</code>Il PAD (Packet
+                    Assembler/Dissembler) è un protocollo che serviva per la
+                    comunicazione in reti basate su X.25, uno standard di
+                    comunicazione ormai completamente scomparso. Nessuna rete
+                    moderna lo utilizza, ma molte immagini IOS lo attivano
+                    ancora di default, lo disattiviamo perche rappresenta un
+                    servizio fantasma attivo che non trova utilità.
                   </li>
                   <li>
-                    <code>no ip finger :</code>Il servizio 'finger' è un protocollo molto datato che
-                    permetteva a chiunque, da remoto, di interrogare il router e scoprire quali utenti avessero una sessione attiva in quel momento. <br>
-                    Rappresenta un problema, perchè darebbe ad un attaccante la possibilità di raccogliere informazioni su chi sta amministrando il dispositivo, molto utili
-                    per orientare un attacco mirato.
+                    <code>no ip finger :</code>Il servizio 'finger' è un
+                    protocollo molto datato che permetteva a chiunque, da
+                    remoto, di interrogare il router e scoprire quali utenti
+                    avessero una sessione attiva in quel momento. <br />
+                    Rappresenta un problema, perchè darebbe ad un attaccante la
+                    possibilità di raccogliere informazioni su chi sta
+                    amministrando il dispositivo, molto utili per orientare un
+                    attacco mirato.
                   </li>
                   <li>
-                    <code>no ip bootp server :</code> BOOTP è il protocollo che ha preceduto storicamente il DHCP, serviva a far scaricare a un dispositivo la prorpia configurazione IP 'in alcuni casi anche
-                    il sistema operativo' da un altro apparato di rete. 
+                    <code>no ip bootp server :</code> BOOTP è il protocollo che
+                    ha preceduto storicamente il DHCP, serviva a far scaricare a
+                    un dispositivo la prorpia configurazione IP 'in alcuni casi
+                    anche il sistema operativo' da un altro apparato di rete.
                   </li>
                   <li>
-                    <code>no service tcp-small-servers / no service upd-small-servers :</code>Questi due comandi disattivano un gruppo di piccoli servizi diagnstici
-                    ('echo', 'daytime', discard), che giravano su porte TCP/UDP utilizzati per semplici test di connettività.
+                    <code
+                      >no service tcp-small-servers / no service
+                      upd-small-servers :</code
+                    >Questi due comandi disattivano un gruppo di piccoli servizi
+                    diagnstici ('echo', 'daytime', discard), che giravano su
+                    porte TCP/UDP utilizzati per semplici test di connettività.
                   </li>
                   <li>
-                    <code>no ip source-route :</code>Questo comando disattiva una funzionalità del protocollo IP che, se lasciata attiva, permetterebbe a chi invia un pacchetto di 
-                    specificare lui stesso il percorso che quel pacchetto deve seguire, invece di lasciare che sia il router a decidere in base alle 
-                    proprie tabelle di routing. E' una tecnica per aggirare i controlli di sicurezza basati sul percorso di rete atteso.
+                    <code>no ip source-route :</code>Questo comando disattiva
+                    una funzionalità del protocollo IP che, se lasciata attiva,
+                    permetterebbe a chi invia un pacchetto di specificare lui
+                    stesso il percorso che quel pacchetto deve seguire, invece
+                    di lasciare che sia il router a decidere in base alle
+                    proprie tabelle di routing. E' una tecnica per aggirare i
+                    controlli di sicurezza basati sul percorso di rete atteso.
                   </li>
                   <li>
-                    <code>no service config :</code>Di default, alcuni router Cisco, all'avvio provano a contattare la rete per verificare se esiste una configurazione da scaricare automaticamente,
-                    via TFTP, è una funzionalità pensata per scenari di provisoring di massa dove centinaia di dispositivi si configurano in autonomia prendendo le configurazioni da un server
-                    centrale. E' una falla di sicurezza reale immaginiamo un malintenzionato che riesce a fingersi quello specifico server TFTP, potrebbe spingere sul router una 
-                    configurazione malevola al prossimo riavvio. Disattivando questo servizio ci assicuraimo che il router usi sempre e solo la configurazione salvata localmente.
+                    <code>no service config :</code>Di default, alcuni router
+                    Cisco, all'avvio provano a contattare la rete per verificare
+                    se esiste una configurazione da scaricare automaticamente,
+                    via TFTP, è una funzionalità pensata per scenari di
+                    provisoring di massa dove centinaia di dispositivi si
+                    configurano in autonomia prendendo le configurazioni da un
+                    server centrale. E' una falla di sicurezza reale immaginiamo
+                    un malintenzionato che riesce a fingersi quello specifico
+                    server TFTP, potrebbe spingere sul router una configurazione
+                    malevola al prossimo riavvio. Disattivando questo servizio
+                    ci assicuraimo che il router usi sempre e solo la
+                    configurazione salvata localmente.
                   </li>
                 </ul>
                 <br />
                 <h4>Comandi di diagnostica</h4>
                 <ul class="config-explain">
                   <li>
-                    <code>show running-config | include http|domain-lookup|pad|finger|bootp|small-servers|source-route|service config :</code>Filtriamo l'intera configurazione mostrando solamente le 
+                    <code
+                      >show running-config | include
+                      http|domain-lookup|pad|finger|bootp|small-servers|source-route|service
+                      config :</code
+                    >Filtriamo l'intera configurazione mostrando solamente le
                     righe relative a tutti i servizi appena disattivati.
                   </li>
                   <li>
-                    <code>show ip http server status :</code>Entra nel dettaglio specifico del server HTTP/HTTPS mostrando se risulta 'Disabled'.
+                    <code>show ip http server status :</code>Entra nel dettaglio
+                    specifico del server HTTP/HTTPS mostrando se risulta
+                    'Disabled'.
                   </li>
                 </ul>
               </div>
-              <br>
+              <br />
               <div class="obj-trace">
-                <h4>
-                  2.1.6 - Verifiche configurazioni Hardening
-                </h4>
+                <h4>2.1.6 - Verifiche configurazioni Hardening</h4>
                 <p>
-                  Concludiamo il punto 2.1 con una verifica d'insieme riguardante le configurazioni eseguite sui router.
+                  Concludiamo il punto 2.1 con una verifica d'insieme
+                  riguardante le configurazioni eseguite sui router.
                 </p>
                 <br />
                 <h4>Comandi di diagnostica</h4>
                 <ul class="config-explain">
                   <li>
-                    <code>show running-config | include hostname|enable secret :</code> Verifica identità del dispositivo e tipo di hash della password di enable
+                    <code
+                      >show running-config | include hostname|enable secret
+                      :</code
+                    >
+                    Verifica identità del dispositivo e tipo di hash della
+                    password di enable
                   </li>
                   <li>
-                    <code>show running-config | include aaa :</code> presenza e correttezza delle direttive AAA
-                  </li>
-                    <li>
-                    <code>show ip ssh :</code> Verifica stato e versione del servizio SSH
+                    <code>show running-config | include aaa :</code> presenza e
+                    correttezza delle direttive AAA
                   </li>
                   <li>
-                    <code>show running-config | section line con :</code> Verifica configurazione linee console
+                    <code>show ip ssh :</code> Verifica stato e versione del
+                    servizio SSH
                   </li>
                   <li>
-                    <code>show running-config | section line aux :</code> Verifica configurazione linee ausiliaria
+                    <code>show running-config | section line con :</code>
+                    Verifica configurazione linee console
                   </li>
                   <li>
-                    <code>show running-config | section line vty :</code> Verifica configurazione linee VTY
+                    <code>show running-config | section line aux :</code>
+                    Verifica configurazione linee ausiliaria
                   </li>
                   <li>
-                    <code>show running-config | include banner :</code> Verifica presenza del messaggio banner
+                    <code>show running-config | section line vty :</code>
+                    Verifica configurazione linee VTY
                   </li>
                   <li>
-                    <code>show login :</code> Verifica stato protezione brute-force
+                    <code>show running-config | include banner :</code> Verifica
+                    presenza del messaggio banner
                   </li>
                   <li>
-                    <code>show ip http server status :</code> Verifica stato dei servizi HTTP/HTTPS.
+                    <code>show login :</code> Verifica stato protezione
+                    brute-force
+                  </li>
+                  <li>
+                    <code>show ip http server status :</code> Verifica stato dei
+                    servizi HTTP/HTTPS.
                   </li>
                 </ul>
               </div>
             </div>
           </details>
-          <details class="obj-item status-todo">
+          <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text"
                 >2.2 — Configurazione subinterfacce VLAN</span
               >
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / Note</h4>
+                <p>
+                  Creaimo su ciascun router una subinterfaccia virtuale per
+                  ogniuna delle 4 VLAN (10,20,30,40), agganciate all'interfaccia
+                  fisica che collega il router allo switch, configurazione
+                  'router-on-a-stick'.
+                </p>
+                <br />
+                <p>
+                  Un aspetto importante da considerare già in questo punto,
+                  anche se il protocollo vero e proprio lo configureremo solo al
+                  punto 2.6: nella configurazione dei router andremo ad attivare
+                  HSRP, che ci servirà per creare un indirizzo IP virtuale
+                  condiviso tra R1 e R2 — l'indirizzo che i client useranno
+                  sempre come gateway, indipendentemente da quale dei due router
+                  sia effettivamente attivo in un dato momento.
+                </p>
+                <br />
+                <p>
+                  Il comando che crea questo indirizzo virtuale si scrive dentro
+                  la stessa subinterfaccia che stiamo creando adesso, quindi va
+                  pianificato correttamente lo spazio di indirizzamento fin da
+                  ora: per ogni VLAN non serve più un solo indirizzo di gateway,
+                  ma tre — un IP reale su R1, un IP reale su R2, e l'IP virtuale
+                  condiviso gestito da HSRP.
+                </p>
+                <br />
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>VLAN</th>
+                        <th>Nome</th>
+                        <th>Subnet</th>
+                        <th>Gateway virtuale (HSRP)</th>
+                        <th>IP reale R1</th>
+                        <th>IP reale R2</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="vlan-guest">
+                        <td>10</td>
+                        <td>GUEST_NET</td>
+                        <td>192.168.0.0/26</td>
+                        <td>192.168.0.1</td>
+                        <td>192.168.0.2</td>
+                        <td>192.168.0.3</td>
+                      </tr>
+                      <tr class="vlan-admin">
+                        <td>20</td>
+                        <td>ADMIN_NET</td>
+                        <td>192.168.0.64/27</td>
+                        <td>192.168.0.65</td>
+                        <td>192.168.0.66</td>
+                        <td>192.168.0.67</td>
+                      </tr>
+                      <tr class="vlan-mgmt">
+                        <td>30</td>
+                        <td>MANAGEMENT_NET</td>
+                        <td>192.168.0.96/28</td>
+                        <td>192.168.0.97</td>
+                        <td>192.168.0.98</td>
+                        <td>192.168.0.99</td>
+                      </tr>
+                      <tr class="vlan-dmz">
+                        <td>40</td>
+                        <td>SERVER_NET</td>
+                        <td>192.168.0.112/29</td>
+                        <td>192.168.0.113</td>
+                        <td>192.168.0.114</td>
+                        <td>192.168.0.115</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <ul class="config-explain">
+                  <li>Attivazione interfaccia fisica</li>
+                  <li>Creazione delle 4 subinterface VLAN con IP reali dedicati</li>
+                  <li>Verifiche</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.2.1 - Attivazione interfaccia fisica</h4>
+                <p>
+                  Prima di procedere con la creazione delle subinterface, dobbiamo attivare l'interfaccia fisica su cui si appoggeranno,
+                  nella configurazione 'router-on-a-stick', la porta fisica resta senza un indirizzo IP proprio (tutto l'indirizzamento vive nelle subinterface), <br>
+                  ma la porta fisica deve essere accesa 'attiva', perche lo stato della porta fisica si riflette su tutte le subinterface ad essa agganciate.
+                </p>
+                <br>
+                <img
+                  src="./img/Attivazione_Interfaccia_Fisica_sui_router.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li>
+                    <code>show ip interface brief :</code> Mostra un riepilogo compatto di tutte le interfacce incluso il loro stato.
+                  </li>
+                  <li>
+                    <code>show interfaces FastEthernet'n' :</code> Mostra il dettaglio completo di una specifica porta.
+                  </li>
+                </ul>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
