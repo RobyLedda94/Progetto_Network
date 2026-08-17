@@ -2594,7 +2594,6 @@
                 <ul class="config-explain">
                   <li>Attivazione interfaccia fisica</li>
                   <li>Creazione delle 4 subinterface VLAN con IP reali dedicati</li>
-                  <li>Verifiche</li>
                 </ul>
               </div>
               <br>
@@ -2619,6 +2618,47 @@
                   </li>
                   <li>
                     <code>show interfaces FastEthernet'n' :</code> Mostra il dettaglio completo di una specifica porta.
+                  </li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.2.3 - Creazione delle 4 subinterface VLAN</h4>
+                <p>
+                  Creaiamo ora le 4 subinterface virtuali agganciate alla porta fisica, assegnando a ciascuna l'IP reale dedicato secondo,
+                  il piano di indirizzamento visto in precedenza. <br>
+                  Ogni subinterface viene 'legata' alla propria VLAN tramiete il comando encapsulation dot1q, che indica il router quale tag 802.1Q
+                  intercettare, senza questo comando, la subinterface esisterebbe ma non riconoscerebbe alcun traffico. <br>
+                  Il seguente blocco di comandi è da eseguire su entrambi i router rispettando nell'asegnazione dell'indirizzo IP della subinterface il piano
+                  di indirizzamento definito in precedenza.
+                </p>
+                <br>
+                <img
+                  src="./img/Creazione_Sub-interfaces_sui_router.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <ul class="config-explain">
+                  <li>
+                    <code>interface FastEthernet0/1.10 :</code> Crea la sotto interfaccia virtuale numero 10 sopra la porta fisica f0/1, il numero dopo il punto
+                    è arbitratio ma lo facciamo conicidere con l'ID della VLAN corrispondente.
+                  </li>
+                  <li>
+                    <code>encapsulation dot1Q 10 :</code> Il comando associa questa subinterface specificatamente al traffico taggato VLAN 10.
+                  </li>
+                  <li>
+                    <code>ip address 192.168.n.n 255.255.255.n</code> Assegna l'indirizzo IP reale e Subnet Mask di R1 per una specifica VLAN.
+                  </li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li>
+                    <code>show ip interface brief :</code> Mostra un riepilogo compatto di tutte le interfacce incluso il loro stato.
+                  </li>
+                  <li>
+                    <code>show interfaces FastEthernet0/1.10 :</code> Mostra il dettaglio completo di una specifica porta.
                   </li>
                 </ul>
               </div>
