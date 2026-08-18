@@ -2664,12 +2664,37 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-todo">
+          <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text">2.3 — Routing inter-VLAN</span>
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>traccia / note</h4>
+                <p>
+                  In questo punto affrontiamo due aspetti concettualmente diversi del routing, ed è importante
+                  distinguerli fin da subito. <br>
+                  Il primo passo e quasi completo, ma va comunque dimostrato e non dato per scontato ovvero il routing tra 
+                  le 4 VLAN che  abbiamo appena creato. <br> <br>
+                  Su un router Cisco, quando assegni un indirizzo IP a un interfaccia o sub-interface, quella rete diventa
+                  automaticamente riconosciuta come direttamente connessa, pertanto il router sa come raggiungerla, senza
+                  bisogo di scrivere alcun comando aggiuntivo 'i ping tra le interfacce dei router passa attraverso la maglia di switch'. <br>
+                  E' una differenza importante rispetto ad un firewall, dove invece serve sempre una policy esplicita che autorizzi,
+                  il traffico tra segmenti diversi. <br> <br>
+                  Il secondo aspetto da considerare è che le 4 VLAN sanno parlare tra loro, ma non hanno ancora alcun modo di raggiungere
+                  l'esterno, nessuna di esse conosce la strada verso internet. <br>
+                  Per colmare questa lacuna dobbiamo attivare e indirizzare l'interfaccia che collega il router al firewall Fortigate e poi
+                  insegnare esplicitamente ai router una regola semplice ma fondamentale 'qualsiasi destinazione che non riconosci tra le tue reti locali, mandala
+                  verso il firewall, che penserà lui a instradarla verso internet', questa regola prende il nome di route default. <br> <br>
+                  Al momento il collegamento diretto tra R1 e R2 resta volutamente escluso da questo punto e rimandato allo Step 2.5 dove troverà
+                  la sua cllocazione naturale insieme a HSRP. <br> <br>
+                <ul class="config-explain">
+                  <li>Verifica routing inter-VLAN (locale e tra R1-R2 via maglia switch)</li>
+                  <li>Assegnazione IP sull'interfaccia dei router verso i firewall</li>
+                  <li>Configurazione route di default verso Internet</li>
+                </ul>
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
