@@ -2508,7 +2508,7 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-inprogress">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text"
                 >2.2 — Configurazione subinterfacce VLAN</span
@@ -2627,7 +2627,7 @@
                 <p>
                   Creaiamo ora le 4 subinterface virtuali agganciate alla porta fisica, assegnando a ciascuna l'IP reale dedicato secondo,
                   il piano di indirizzamento visto in precedenza. <br>
-                  Ogni subinterface viene 'legata' alla propria VLAN tramiete il comando encapsulation dot1q, che indica il router quale tag 802.1Q
+                  Ogni subinterface viene 'legata' alla propria VLAN tramiete il comando encapsulation dot1q, che indica al router quale tag 802.1Q
                   intercettare, senza questo comando, la subinterface esisterebbe ma non riconoscerebbe alcun traffico. <br>
                   Il seguente blocco di comandi è da eseguire su entrambi i router rispettando nell'asegnazione dell'indirizzo IP della subinterface il piano
                   di indirizzamento definito in precedenza.
