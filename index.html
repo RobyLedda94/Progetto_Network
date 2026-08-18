@@ -2748,6 +2748,36 @@
                   class="obj-image"
                 />
               </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.3.2 - Assegnazione IP sull'interfaccia verso il Fortigate (R1 - R2)</h4>
+                <p>
+                  Ora andremo ad attivare e ad assegnare un indirizzo IP all'interfaccia del router che si collega direttamente al firewall FortiGate,
+                  Non sarà possibile in questo momento testare a seguito della configurazione dell'interfaccia la raggiungibilità verso i firewall. <br>
+                  La porta corrispondente sul FortiGate (port2) resta ancora priva di IP, e lo sarà fino al Capitolo 3, punto 3.3. Un ping tentato ora fallirebbe sempre, 
+                  non per un problema di configurazione, ma perché manca ancora un dispositivo dall'altra parte del cavo pronto a rispondere. 
+                  Meglio rimandare la verifica al momento in cui avrà davvero senso farla, 
+                  quando l'intera catena sarà completa e potremo validarla end-to-end in un colpo solo.
+                </p>
+                <br>
+                <img
+                  src="./img/Configurazione_interfaccia_router_verso_firewall.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <p>Questi comandi vanno eseguiti su entrambi i router, rispettando nell'assegnazione dell'indirizzo IP il piano di indirizzamento.</p>
+                <br>
+                <ul class="config-explain">
+                  <li><code>interface FastEthernet1/0 :</code>Entra nella configurazione della porta del router direttamente connessa al firewall</li>
+                  <li><code>ip address 192.168.0.'n' 255.255.255.'n' :</code>Assegna indirizzo IP e subnet dedicata</li>
+                  <li><code>no shutdown :</code>Attiva la porta</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show ip interface brief :</code>Conferma che l'interfaccia sia attiva stato up e mostra l'indirizzo IP assegnato</li>
+                </ul>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
