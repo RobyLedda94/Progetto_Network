@@ -2527,7 +2527,7 @@
                 <p>
                   Un aspetto importante da considerare già in questo punto,
                   anche se il protocollo vero e proprio lo configureremo solo al
-                  punto 2.6: nella configurazione dei router andremo ad attivare
+                  punto 2.5: nella configurazione dei router andremo ad attivare
                   HSRP, che ci servirà per creare un indirizzo IP virtuale
                   condiviso tra R1 e R2 — l'indirizzo che i client useranno
                   sempre come gateway, indipendentemente da quale dei due router
@@ -2686,7 +2686,7 @@
                   Per colmare questa lacuna dobbiamo attivare e indirizzare l'interfaccia che collega il router al firewall Fortigate e poi
                   insegnare esplicitamente ai router una regola semplice ma fondamentale 'qualsiasi destinazione che non riconosci tra le tue reti locali, mandala
                   verso il firewall, che penserà lui a instradarla verso internet', questa regola prende il nome di route default. <br> <br>
-                  Al momento il collegamento diretto tra R1 e R2 resta volutamente escluso da questo punto e rimandato allo Step 2.5 dove troverà
+                  Al momento il collegamento diretto tra R1 e R2 resta volutamente escluso da questo punto e rimandato allo Step 2.4 dove troverà
                   la sua cllocazione naturale insieme a HSRP. <br> <br>
                 <ul class="config-explain">
                   <li>Verifica routing inter-VLAN (locale e tra R1-R2 via maglia switch)</li>
@@ -2752,7 +2752,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">2.4 — DHCP verso gli endpoint</span>
+              <span class="obj-text">2.4 — Collegamento punto-punto R1↔R2</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2760,7 +2760,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">2.5 — Collegamento punto-punto R1↔R2</span>
+              <span class="obj-text">2.5 — Configurazione HSRP</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -2768,7 +2768,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">2.6 — Configurazione HSRP</span>
+              <span class="obj-text">2.6 — DHCP verso gli endpoint</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>

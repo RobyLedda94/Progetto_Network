@@ -33,9 +33,10 @@ Obiettivi :
 2.1 Hardening dispositivo
 2.2 Configurazione subinterfacce VLAN
 2.3 Routing inter-VLAN
-2.4 DHCP verso gli endpoint
-2.5 Collegamento punto-punto R1↔R2
-2.6 Configurazione HSRP
+2.4 Collegamento punto-punto R1↔R2
+2.5 Configurazione HSRP
+2.6 DHCP verso gli endpoint
+
 
 3. Configurazione firewall (FortiGate)
 
