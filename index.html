@@ -2695,6 +2695,59 @@
                 </ul>
                 </p>
               </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.3.1 - Verifica routing inter-VLAN</h4>
+                <p>
+                  Verifichiamo che il routing tra le VLAN avvenga automaticamente, eseguiamo sia il routing locale
+                  'tra le sub-interface dello stesso router' sia la raggiungibilità tra i 2 router che passa attraverso la maglia di switch. <br>
+                  Queste verifiche vanno eseguite su entrambi i router.
+                </p>
+                <br>
+                <img
+                  src="./img/Test_Ping_Routing-Inter_VLAN.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <p>
+                  Risultato atteso : 
+                </p>
+                <br>
+                <img
+                  src="./img/Risultato_atteso_routing_inter-VLAN.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <p>
+                  Da quest'immagine possiamo notare i tempi di round-trip 'RTT - Round-trip time', rappresenta il tempo che passa tra il momento in cui il router invia
+                  un pacchetto ICMP Echo request 'ping' e il momento in cui riceve indietro la risposta 'Echo Reply' da parte del dispositivo di destinazione. <br>
+                  E' quindi il tempo del percorso completo di andata e ritorno da qui il nome 'round-trip', notiamo diversi valori
+                </p>
+                <br>
+                <ul class="config-explain">
+                  <li><code>min :</code>Tempo più basso registrato tra i 5 tentativi</li>
+                  <li><code>avg :</code>Media di tempo registrata tra i 5 tentativi</li>
+                  <li><code>max :</code>Tempo più alto registrato</li>
+                </ul>
+                <br>
+                <p>
+                  Le tempistiche di round-trip variano, i ping in locale di R1 hanno una media di tempo di 4ms 'istantaneo', mentre i ping da R1 verso le sub-interface di R2 variano 
+                  sui 40ms / 80ms 'elaborato', ci da conferma pratica che il traffico stia realmente seguendo il percorso previsto attraverso la maglia di switch. 
+                </p>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show ip route :</code>Mostra la tabella di routing, dovremmo vedere le 4 subnet delle VLAN elecante come reti 'C - Connected'</li>
+                </ul>
+                <br>
+                <img
+                  src="./img/Verifica_Route.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
