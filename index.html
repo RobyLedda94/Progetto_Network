@@ -2664,7 +2664,7 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-inprogress">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text">2.3 — Routing inter-VLAN</span>
             </summary>
@@ -2776,6 +2776,34 @@
                 <h4>Comandi di diagnostica</h4>
                 <ul class="config-explain">
                   <li><code>show ip interface brief :</code>Conferma che l'interfaccia sia attiva stato up e mostra l'indirizzo IP assegnato</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.3.3 - Configurazione route di default verso Internet</h4>
+                <p>
+                  In questo step insegnamo ai router una regola fondamentale, qualsiasi destinazione che non riconoscono tra 
+                  le prorie reti locali (le 4 VLAN, gia note come direttamente connesse) deve essere inoltrata verso
+                  il Fortigate, che si occuperà di instradarla verso internet. <br>
+                  Questa regola si chiama route di default (gateway of last resort).
+                </p>
+                <br>
+                <img
+                  src="./img/Default_route.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <p>Questi comandi vanno eseguiti su entrambi i router, rispettando nell'assegnazione dell'indirizzo IP il piano di indirizzamento.</p>
+                <br>
+                <ul class="config-explain">
+                  <li><code>ip route 0.0.0.0 0.0.0.0 192.168.99.'n' :</code>Crea una route statica dove 0.0.0.0 0.0.0.0 rappresenta simbolicamente qualisasi destinazione IP possibile,
+                  mentre 192.168.99.'n' è il next hop ovvero l'indirizzo IP del firewall</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show ip route :</code>Mostra 'Gateway of last resort is 192.168.99.'n' to network 0.0.0.0, insieme alla voce 'S' static, questo conferma che la rotta 
+                  è stata definita correttamente</li>
                 </ul>
               </div>
             </div>
