@@ -2808,12 +2808,56 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-todo">
+          <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text">2.4 — Collegamento punto-punto R1↔R2</span>
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  In questo punto andremo a configurare il collegamento diretto tra R1 e R2 sull'interfaccia f0/0, utilizzeremo la subnet dedicata
+                  gia definita in precedenza nel piano di indirizzamnto. <br>
+                  Questo link avrà 2 scopi, sarà il canale su cui viaggeranno i messaggi HSRP in modo diretto e isolato anziche utilizzare la maglia di switch,
+                  funzionerà anche da percorso di backup verso internet se uno dei 2 router dovesse guastarsi.
+                </p>
+                <br>
+                <ul class="config-explain">
+                  <li>Assegnazione IP e attivazione interfaccia f0/0</li>
+                  <li>Verifica connettività diretta</li>
+                  <li>Route di backup verso internet tramite il router 'gemello'</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.4.1 - Assegnazione IP e attivazione interfaccia f0/0</h4>
+                <p>
+                  Assegniamo l'indirizzo IP sull'interfaccia fisica f0/0, il collegamento diretto dedicato tra R1 e R2, 
+                  usando la subnet 192.168.99.12/30 già riservata nel piano di indirizzamento (range .13-.14).
+                </p>
+                <br>
+                <img
+                  src="./img/Attivazione_link_diretto_R1_R2.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <p>Questi comandi vanno eseguiti su entrambi i router, rispettando nell'assegnazione dell'indirizzo IP il piano di indirizzamento.</p>
+                <br>
+                <ul class="config-explain">
+                  <li><code>interface FastEthernet0/0 :</code>Entra nella configurazione della porta</li>
+                  <li><code>ip address 192.168.99.'n' 255.255.255.'n' :</code>Assegna indirizzo IP e subnet dedicata al collegamento diretto tra R1 - R2</li>
+                  <li><code>no shutdown : </code>Attivazione della porta</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show ip interface brief :</code>Conferma che l'nterfaccia risulti attiva con IP correttamente assegnato</li>
+                </ul>
+                <br>
+                <p>A differenza della configurazione precedente, dove il firewall non ha ancora l'interfaccia attiva, in questo caso il link diretto dei
+                  due router è configurato pertanto possiamo testare la connettività attraverso i ping.
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
