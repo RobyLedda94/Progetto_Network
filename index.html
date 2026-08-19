@@ -2858,6 +2858,33 @@
                   due router è configurato pertanto possiamo testare la connettività attraverso i ping.
                 </p>
               </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.4.2 - Verifica connetività diretta R1 - R2</h4>
+                <p>
+                  A differenza del collegamento verso il FortiGate, qui entrambi gli estremi sono configurati, possiamo dunque,
+                  eseguire dei test di connettività.
+                </p>
+                <br>
+                <img
+                  src="./img/Test_Connettività_R1_R2.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <p>Il risultato atteso sarà la risposta da parte del nodo gemello :</p>
+                <img
+                  src="./img/Risualtato_atteso_connettività_R1_R2.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show interfaces FastEtherner0/0 :</code>Mostra il dettaglio completo dell'interfaccia, utile per confermare non solo lo stato up/up
+                  ma anche il conteggio dei pacchetti trasmessi e ricevuti</li>
+                </ul>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
