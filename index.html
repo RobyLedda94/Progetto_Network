@@ -176,7 +176,7 @@
                       <td>2</td>
                     </tr>
                     <tr class="vlan-ha">
-                      <td>FW-1 ↔ R1 (transito)</td>
+                      <td>R1 ↔ FW-1 (transito)</td>
                       <td>—</td>
                       <td>192.168.99.4/30</td>
                       <td>255.255.255.252</td>
@@ -186,7 +186,7 @@
                       <td>2</td>
                     </tr>
                     <tr class="vlan-ha">
-                      <td>FW-2 ↔ R2 (transito)</td>
+                      <td>R2 ↔ FW-2 (transito)</td>
                       <td>—</td>
                       <td>192.168.99.8/30</td>
                       <td>255.255.255.252</td>
@@ -2808,7 +2808,7 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-inprogress">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text">2.4 — Collegamento punto-punto R1↔R2</span>
             </summary>
@@ -2825,7 +2825,7 @@
                 <ul class="config-explain">
                   <li>Assegnazione IP e attivazione interfaccia f0/0</li>
                   <li>Verifica connettività diretta</li>
-                  <li>Route di backup verso internet tramite il router 'gemello'</li>
+                  <li>Route di backup verso internet con IP SLA tracking</li>
                 </ul>
               </div>
               <br>
@@ -2884,6 +2884,62 @@
                   <li><code>show interfaces FastEtherner0/0 :</code>Mostra il dettaglio completo dell'interfaccia, utile per confermare non solo lo stato up/up
                   ma anche il conteggio dei pacchetti trasmessi e ricevuti</li>
                 </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.4.3 - Route di backup verso Internet con IP SLA tracking</h4>
+                <p>
+                  Fino ad ora, ogni volta che abbiamo verificato se un collegamento fosse attivo, lo abbiamo fatto in modo passivo,
+                  guardavamo se un'interfaccia risultava 'up/up' o 'down'. <br>
+                  Ma un'interfaccia può benissimo restare attiva anche quando il dispositivo dall'altra parte non risponde piu correttamente,
+                  ad esempio per problemi legati al software.
+                  <br>
+                  IP SLA (Service Level Agreement), nasce per colmare esattamente questo buco, invece di aspettare passivamente che
+                  un'interfaccia cambi stato, genera attivamente traffico di test (nel nostro caso ICMP 'Ping') verso una destinazione specifica,
+                  a intervalli regolari misurando se le risposte arrivano davvero, si tratta di una verifica continua e concreta della raggiungibilità.
+                </p>
+                <br>
+                <img
+                  src="./img/IP_SLA_Route_Backup_Route_Default.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <ul class="config-explain">
+                  <li><code>ip sla 1 :</code>Crea un'istanza di monitoraggio IP SLA identificata con il numero 1</li>
+                  <li><code>icmp-echo 192.168.99.6 source-interface FastEthernet1/0 : </code>Configura il probe per inviare i ping verso FW-1,
+                  specificando esplicitamente l'interfaccia sorgente</li>
+                  <li><code>frequency 5 :</code>Ripete il probe ogni 5 secondi</li>
+                  <li><code>ip sla schedule 1 life forever start-time now :</code>Avvia il probe immediatamente, per una durata indefinita</li>
+                  <li><code>track 1 rtr 1 reachability :</code>Crea l'oggetto di tracking collegato al probe</li>
+                  <li><code>no ip route 0.0.0.0 0.0.0.0 192.168.99.6 :</code>Rimuove la route di default creata al punto 2.3.3</li>
+                  <li><code>ip route 0.0.0.0 0.0.0.0 192.168.99.6 track 1 :</code>Ricrea la route di default primaria, ora pero collegata all'oggetto di tracking</li>
+                  <li><code>ip route 0.0.0.0 0.0.0.0 192.168.99.14 10 :</code>Crea la route di default verso R2, con distanza amministrativa 10</li>
+                </ul>
+                <br>
+                <p>I tre pezzi del meccanismo si parlano in questo modo :</p>
+                <ul class="config-explain">
+                  <li>Il probe SLA ( ip sla 1 icmp-echo 192.168.99.6 source-interface FastEthernet1/0; frequency 5; ip sla schedule 1 life forever start-time now ); E' il
+                    chiamante che invia effettivamente i ping verso il bersaglio (FW-1), secondo la frequenza indicata, e registra se le risposte arrivano oppure no.
+                  </li>
+                  <li>L'oggetto di tracking ( track 1 rtr 1 reachability ); E' un'osservatore che guarda il risultato del probe e lo traduce in un semplice
+                    stato binario : UP (risposte in arrivo) o DOWN (nessuna risposta).
+                  </li>
+                  <li>La route legata al tracking ( ip route 0.0.0.0 0.0.0.0 192.168.99.6 track 1 ); E' l'azione vera e propria, la route di default primaria,
+                    resta nella tabella di routing solo finchè l'oggetto di tracking segnala UP, nel momento in cui passa a Down quella riga non esiste più lasciando
+                    strada libera alla route di default.
+                  </li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show ip sla configuration :</code>Ci conferma i parametri impostati</li>
+                  <li><code>show track 1 :</code>Mostra lo stato attuale del tracking</li>
+                  <li><code>show ip route :</code>Mostra quale route risulti attiva</li>
+                </ul>
+                <br>
+                <p>In questo momento è normale vedere il tracking in stato 'Down', FW-1 non risponde ancora, essendo la sua interfaccia direttamente connessa al router,
+                  priva di indirizzo IP, verificheremo lo stato 'UP' reale una volta configurato al capitolo 3.
+                </p>
               </div>
             </div>
           </details>
