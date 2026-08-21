@@ -709,6 +709,7 @@
                     di pacchetti con percorso di rete specificato dal mittente,
                     tecnica usata per aggirare la sicurezza.
                   </li>
+                  <li><code>no ip igmp snooping</code> — disattiva l'ottimizzazione multicast dello switch, necessaria perché altrimenti blocca la corretta propagazione degli hello HSRP</li>
                 </ul>
                 <br />
                 <h4>Comandi di diagnostica</h4>
@@ -2943,12 +2944,148 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-todo">
+          <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text">2.5 — Configurazione HSRP</span>
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / Note</h4>
+                <p>
+                  In questo step andremo a creare gli indirizzi IP virtuali (192.168.0.1 / .65 / .97 / .113), che diventeranno i veri gateway per i client,
+                  seguendo nel dettaglio il piano di indirizzamento. <br>
+                  Con HSRP (Hot Standby Router Protocol), R1 sarà sempre il router attivo su tutte le 4 VLAN, invece R2 sarà sempre di riserva. <br>
+                  Un altro passo fondamentale e collegare il protocollo HSRP allo stesso oggetto di trackinh IP SLA, già costruito al punto precedente, 
+                  in questo caso se R1 dovesse smettere di funzionare o non riesce ad instradare correttamente il traffico la sua priorità HSRP scende, 
+                  cedendo il ruolo di attivo a R2.
+                </p>
+                <br>
+                <ul class="config-explain">
+                  <li>Configurazione HSRP su R1 (Attivo su tutte le VLAN)</li>
+                  <li>Configurazione HSRP su R2 (Standby su tutte le VLAN)</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.5.1 - Configurazione HSRP su R1</h4>
+                <p>
+                  Su ciascuna delle 4 sub-interface VLAN di R1, configuriamo HSRP per chreare l'indirizzo IP virtuale,
+                  che diventerà il vero gateway usato dai client e impostiamo i parametri che decidono chi tra R1 e R2 deve 
+                  essere considerato il router attivo in condizioni normali.
+                  <br>
+                  <br>
+                  Fino ad ora, ogni VLAN ha un solo gateway reale per router : R1 e R2 rispondono su indirizzi rali differenti 2 per VLAN, il problema
+                  è che un client può avere configurato un solo indirizzo di gateway. <br>
+                  L'indirizzo IP virtuale risolve questo problema e di fatto un terzo indirizzo che non appartiene fisicamente a nessuno dei 2 router è condiviso 
+                  tra loro, e in un dato momento solo uno dei due router risponde effettivamente a quell' IP virtuale. <br>
+                  Se R1 attivo dovesse spegnersi, R2 eredita automaticamente quell'indirizzo a cui puntano i client.
+                  <br>
+                  <br>
+                  La priority che vedremo nella sequenza di comandi di HSRP decide chi tra i due router diventa attivo, è esattamente 
+                  lo stesso principio della priority vista con STP, ma con una differenza importante, ne caso di HSRP vince il valore più alto,
+                  non quello più basso. <br>
+                  Attualmente i 2 router hanno un valore di default pari a 100, se non lo configuriamo l'elezione del router attivo non avviene in modo
+                  deterministico.
+                </p>
+                <br>
+                <img
+                  src="./img/Configurazione_HSRP_R1.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <ul class="config-explain">
+                  <li><code>standby 'gruppo' ip 'indirizzo' :</code>Crea l'indirizzo IP virtuale condiviso per una specifica VLAN</li>
+                  <li><code>standby 'gruppo' priority 110 :</code>Imposta la priorità</li>
+                  <li><code>standby 'gruppo' preempt :</code>Permette a R1 di ripendere il ruolo attivo non appena torna disponibile</li>
+                  <li><code>standby 'gruppo' track 1 decrement 20 :</code>Collega il gruppo HSRP all'oggetto di tracking 1, se il tracking rileva 'Down', la priorità di R1 scende di 20
+                  qundi da 110 a 90, essendo inferiore a 100 di R2, permette a R2 di prendere il ruolo di attivo.</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show standby brief :</code>mostra un riepilogo compatto di tutti i gruppi HSRP configurati su questo router, con stato ("Active"/"Standby"), 
+                    priorità e IP virtuale</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.5.2 - Configurazione HSRP su R2</h4>
+                <p>
+                  Ripetiamo lo stesso schema già visto su R1, IP virtuale identico, nessuna priority esplicita resta quella di default con valore 100, per il resto la configurazione
+                  resta invariata.
+                </p>
+                <br>
+                <img
+                  src="./img/Configurazione_HSRP_R2.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <ul class="config-explain">
+                  <li><code>standby 'gruppo' ip 'indirizzo' :</code>Crea l'indirizzo IP virtuale condiviso per una specifica VLAN</li>
+                  <li><code>standby 'gruppo' preempt :</code>Permette a R1 di ripendere il ruolo attivo non appena torna disponibile</li>
+                  <li><code>standby 'gruppo' track 1 decrement 20 :</code>Collega il gruppo HSRP all'oggetto di tracking 1, se il tracking rileva 'Down', la priorità di R1 scende di 20
+                  qundi da 110 a 90, essendo inferiore a 100 di R2, permette a R2 di prendere il ruolo di attivo.</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show standby brief :</code>mostra un riepilogo compatto di tutti i gruppi HSRP configurati su questo router, con stato ("Active"/"Standby"), 
+                    priorità e IP virtuale</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>Problemi riscontrati - 2.5 Configurazione HSRP </h4>
+                <p>
+                  Durante la configurazione HSRP non si stabiliva correttamente la relazione
+                  Active/Standby tra R1 e R2: entrambi i router si eleggevano "Active",
+                  nonostante la connettività unicast tra i due dispositivi fosse già
+                  verificata e funzionante.
+                </p>
+                <br>
+                <p>
+                  Il problema riguardava gli hello HSRP: si tratta di pacchetti che ciascun
+                  router del gruppo invia periodicamente, di default ogni 3 secondi, a tutti
+                  i partecipanti, in modo da farsi riconoscere e comunicare il proprio stato
+                  attuale. Sono il componente principale del protocollo HSRP: grazie a questo
+                  scambio continuo i dispositivi restano consapevoli del loro reciproco stato
+                  di attività — se gli hello HSRP smettessero di arrivare, il router in
+                  standby arriverebbe alla conclusione che il partner non risponde più, e
+                  inizierebbe la procedura per diventare lui stesso attivo. Nel nostro caso,
+                  questi pacchetti viaggiano come traffico multicast (indirizzo 224.0.0.2,
+                  porta UDP 1985).
+                </p>
+                <br>
+                <p>
+                  IGMP Snooping, attivo di default sugli switch, ottimizza il traffico
+                  multicast inoltrandolo solo verso porte con ricevitori registrati tramite
+                  IGMP, ma HSRP non si registra mai in questo modo, e in assenza di un querier
+                  IGMP nella rete i suoi pacchetti non venivano correttamente inoltrati
+                  attraverso la maglia switch.
+                </p>
+                <br>
+                <p>
+                  La soluzione è stata eseguire, in configurazione globale su tutti e quattro
+                  gli switch, il comando <code>no ip igmp snooping</code>. Questo comando
+                  disattiva interamente la funzionalità di IGMP Snooping sullo switch,
+                  facendolo tornare al comportamento predefinito di uno switch Layer 2
+                  classico: qualsiasi frame multicast ricevuto viene inoltrato su tutte le
+                  porte appartenenti alla stessa VLAN, esattamente come avviene già per il
+                  traffico broadcast, invece di essere filtrato in base a una tabella di
+                  ricevitori registrati. Nel nostro caso questo comportamento "più permissivo"
+                  non comporta alcuno svantaggio reale, dato che non abbiamo altre applicazioni
+                  multicast nella rete oltre agli hello HSRP stessi — disattivare
+                  completamente il filtro, invece di provare a "correggerlo" con un querier
+                  IGMP dedicato, è quindi la soluzione più semplice ed efficace per questo
+                  specifico scenario.
+                </p>
+                <br>
+                <p>
+                  Il comando è stato aggiunto allo step 1.1.8 disabilitazione servizi non essenziali switch.
+                </p>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
