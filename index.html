@@ -3088,12 +3088,34 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-todo">
+          <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text">2.6 — DHCP verso gli endpoint</span>
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Configuriamo il servizio DHCP su entrambi i router, con ridondanza tramite split dello spazio di indirizzi 
+                  (range di esclusione complementari) — il server DHCP nativo di IOS non ha un protocollo di failover tra due dispositivi, 
+                  quindi evitiamo sovrapposizioni assegnando a ciascun router solo metà del range libero per VLAN.
+                </p>
+                <br>
+                <p>
+                  La VLAN 40 sarà esclusa dal servizio DHCP, essendo un Domani
+                  Controller richiede un IP statico per una ragione pratica,
+                  tutti i client si affideranno a un indirizzo IP statico 
+                  per la risoluzione DNS e l'autenticazione al dominio, pertanto
+                  non può mai cambiare inavertitamente.
+                </p>
+                <br>
+                <ul class="config-explain">
+                  <li>Esclusione indirizzi riservati</li>
+                  <li>Pool DHCP su R1</li>
+                  <li>Pool DHCP su R2</li>
+                  <li>Verifiche con assegnazione IP ai VPSC</li>
+                </ul>
+              </div>
             </div>
           </details>
         </div>
