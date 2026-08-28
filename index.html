@@ -3170,6 +3170,65 @@
                   Mostra se gli indirizzi risultano correttamente esclusi dal servizio DHCP</li>
                 </ul>
               </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.6.2 - Pool DHCP su R1</h4>
+                <p>
+                  Creiamo su R1 i pool DHCP per le tre VLAN client (10, 20, 30), assegnandogli solo metà del range di indirizzi liberi 
+                  — mai l'intero range, per evitare conflitti con R2 
+                  in assenza di un protocollo di failover sincronizzato tra i due router.
+                </p>
+                <br>
+                <img
+                  src="./img/Pool_DHCP_R1.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <ul class="config-explain">
+                  <li><code>excluded-address :</code>Escludono la metà alta di ciascuna VLAN (.34-.62, .82-.94, .106-.110): dopo queste, R1 può assegnare solo .4-.33, .68-.81, .100-.10</li>
+                  <li><code>ip dhcp pool 'nome' :</code>Crea il pool identificato da un nome descrittivo</li>
+                  <li><code>network 'rete' 'maschera' :</code>Dichiara l'intera subnet di riferimento (le esclusioni restano comunque valide)</li>
+                  <li><code>default-router 'ip' :</code>Il gateway comunicato ai client è l'IP virtuale HSRP, non l'IP reale di R1</li>
+                  <li><code>dns-server 8.8.8.8 :</code>Server DNS temporaneo, sarà sostituito con il Domain Controller al Capitolo 4</li>
+                  <li><code>lease 7 :</code>Durata della concessione in giorni</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show ip dhcp pool :</code>Conferma i 3 pool creati con le rispettive subnet</li>
+                  <li><code>show running-config | include excluded-address :</code>Conferma tutti gli indirizzi 'range' riservati non assegnabili</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.6.3 - Pool DHCP su R2</h4>
+                <p>
+                  Ripetiamo lo stesso schema già validato su R1, con lo split speculare: R2 gestisce la metà bassa del range libero per ciascuna VLAN, 
+                  quindi escludiamo la metà alta (l'opposto di quanto fatto su R1, che escludeva la bassa).
+                </p>
+                <br>
+                <img
+                  src="./img/Pool_DHCP_R2.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <ul class="config-explain">
+                  <li><code>excluded-address :</code>Escludono la metà alta di ciascuna VLAN (.4-.33, .68-.81, .100-.105): dopo queste, R2 può assegnare solo .34-.62, .82-.94, .106-.110</li>
+                  <li><code>ip dhcp pool 'nome' :</code>Crea il pool identificato da un nome descrittivo</li>
+                  <li><code>network 'rete' 'maschera' :</code>Dichiara l'intera subnet di riferimento (le esclusioni restano comunque valide)</li>
+                  <li><code>default-router 'ip' :</code>Il gateway comunicato ai client è l'IP virtuale HSRP, non l'IP reale di R1</li>
+                  <li><code>dns-server 8.8.8.8 :</code>Server DNS temporaneo, sarà sostituito con il Domain Controller al Capitolo 4</li>
+                  <li><code>lease 7 :</code>Durata della concessione in giorni</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show ip dhcp pool :</code>Conferma i 3 pool creati con le rispettive subnet</li>
+                  <li><code>show running-config | include excluded-address :</code>Conferma tutti gli indirizzi 'range' riservati non assegnabili</li>
+                </ul>
+              </div>
             </div>
           </details>
         </div>
