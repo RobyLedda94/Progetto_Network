@@ -3096,9 +3096,30 @@
               <div class="obj-trace">
                 <h4>Traccia / note</h4>
                 <p>
-                  Configuriamo il servizio DHCP su entrambi i router, con ridondanza tramite split dello spazio di indirizzi 
-                  (range di esclusione complementari) — il server DHCP nativo di IOS non ha un protocollo di failover tra due dispositivi, 
-                  quindi evitiamo sovrapposizioni assegnando a ciascun router solo metà del range libero per VLAN.
+                  Configuriamo il servizio DHCP su entrambi i router, con ridondanza
+                  tramite split dello spazio di indirizzi - il server DHCP nativo su 
+                  IOS non ha un protocollo di failover tra due dispositivi, quindi 
+                  evitiamo sovrapposizioni assegnando a ciascun router solo metà 
+                  del range libero per VLAN.
+                </p>
+                <br>
+                <p>
+                  Una precisazione importante sulla scelta architetturale, il 
+                  DHCP sui router è una soluzione temporanea e didattica, non è
+                  quella che consiglierei su un ambiente enterprice reale.
+                  Un vero ambiente di produzione userebbe un server DHCP dedicato
+                  tipicamente 'Windows Server', che supporta un vero protocollo di 
+                  failover con scambio in tempo reale delle concessioni attive.
+                </p>
+                <br>
+                <p>
+                  Lo configuriamo comunque sui router per un motivo pratico legato alla
+                  sequenza di costruzione del progetto, il Domain Controller (dove risiederà
+                  il servizio DHCP definitivo), arriverà al capitolo 4. <br>
+                  Senza questa soluzione intermedia, la rete resterebbe priva di DHCP, 
+                  impedendo di testare concretamente VLAN, HSRP e connettività. <br>
+                  Al capitolo 4, una volta pronto il DC, migreremo il servizio DHCP 
+                  disattivandolo sui router, il progetto documenterà anche questa evoluzione
                 </p>
                 <br>
                 <p>
@@ -3114,6 +3135,39 @@
                   <li>Pool DHCP su R1</li>
                   <li>Pool DHCP su R2</li>
                   <li>Verifiche con assegnazione IP ai VPSC</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.6.1 - Esclusione indirizzi riservati</h4>
+                <p>
+                  Il server DHCP di IOS, di default, 
+                  considera assegnabile a un client qualsiasi indirizzo appartenente 
+                  alla subnet dichiarata nel pool — inclusi quelli che in realtà sono già occupati da altri dispositivi 
+                  (gateway, router stessi). Se non lo dicessimo esplicitamente, 
+                  il DHCP potrebbe un giorno offrire a un VPCS proprio l'indirizzo del gateway o di uno dei router, 
+                  causando un conflitto di IP. Il comando ip dhcp excluded-address serve 
+                  esattamente a prevenire questo: dichiara un intervallo di indirizzi che il DHCP deve sempre saltare, 
+                  senza mai offrirlo a nessun client, qualunque sia il pool configurato. È una direttiva globale 
+                  e locale al router su cui viene digitata — va quindi ripetuta identica su entrambi (R1 e R2), 
+                  non si sincronizza da sola tra i due.
+                </p>
+                <br>
+                <img
+                  src="./img/Esclusione_Indirizzi_Riservati_DHCP.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <ul class="config-explain">
+                  <li><code>ip dhcp excluded-address 'inizio' 'fine' :</code>Esclude l'intero intervallo continuo
+                  tra i due indirizzi indicati (estremi inclusi), risparmiando di doverli elencare uno per uno.</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show running-config | include excluded-address :</code>
+                  Mostra se gli indirizzi risultano correttamente esclusi dal servizio DHCP</li>
                 </ul>
               </div>
             </div>
@@ -3533,7 +3587,13 @@
             </div>
           </details>
           <details class="obj-item status-todo">
-            <summary><span class="obj-text">4.3 — GPO</span></summary>
+            <summary><span class="obj-text">4.3 — Migrazione DHCP dai router al DC</span></summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary><span class="obj-text">4.4 — GPO</span></summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
             </div>

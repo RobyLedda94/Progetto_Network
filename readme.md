@@ -49,7 +49,10 @@ Obiettivi :
 
 4.1 Definizione Active Directory (foresta/dominio)
 4.2 Domain Controller (DNS integrato)
-4.3 GPO (Group Policy Object) — criteri applicati ai client di dominio
+4.3 Migrazione DHCP dai router al Domain
+Controller disattivazione pool su R1 - R2
+4.4 GPO (Group Policy Object) — criteri applicati ai client di dominio
+
 
 5. Deployment client
 
