@@ -72,6 +72,8 @@ Controller disattivazione pool su R1 - R2
 
 7.1 README.md — panoramica progetto
 7.2 Documento HTML/CSS — tracciamento dettagliato di ogni fase
+
+
 Prerequisiti
 GNS3 + GNS3 VM
 VMware Workstation Pro

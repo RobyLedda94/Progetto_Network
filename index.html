@@ -357,30 +357,30 @@
                     </tr>
                     <tr class="vlan-guest">
                       <td>11</td>
-                      <td>PC1</td>
+                      <td>Lab-ad-endpoint-1</td>
                       <td>Endpoint provvisorio</td>
-                      <td>VPCS</td>
-                      <td>—</td>
+                      <td>DOCKER</td>
+                      <td></td>
                       <td>→ futuro WIN11-CLIENT-01</td>
-                      <td>trascurabile</td>
+                      <td>279MB</td>
                     </tr>
                     <tr class="vlan-admin">
                       <td>12</td>
-                      <td>PC2</td>
+                      <td>Lab-ad-endpoint-2</td>
                       <td>Endpoint provvisorio</td>
-                      <td>VPCS</td>
-                      <td>—</td>
+                      <td>DOCKER</td>
+                      <td></td>
                       <td>→ futuro WIN11-CLIENT-02</td>
-                      <td>trascurabile</td>
+                      <td>279MB</td>
                     </tr>
                     <tr class="vlan-mgmt">
                       <td>13</td>
-                      <td>PC3</td>
+                      <td>Lab-ad-endpoint-3</td>
                       <td>Endpoint provvisorio</td>
-                      <td>VPCS</td>
-                      <td>—</td>
+                      <td>DOCKER</td>
+                      <td></td>
                       <td>→ futuro WIN11-CLIENT-03</td>
-                      <td>trascurabile</td>
+                      <td>279MB</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1306,7 +1306,7 @@
                 <p>
                   Al momento ho deciso di non specificare gli indirizzi MAC che
                   possono avere accesso al dispositivo, in quanto in questa fase
-                  del progetto la topologia di rete comprende i VPCS, utilizzati
+                  del progetto la topologia di rete comprende i Docker, utilizzati
                   per testare la connettività — non appena verranno importate le
                   virtual machine Windows, applicheremo un ulteriore livello di
                   restrizione sul Port Security.
@@ -3134,7 +3134,7 @@
                   <li>Esclusione indirizzi riservati</li>
                   <li>Pool DHCP su R1</li>
                   <li>Pool DHCP su R2</li>
-                  <li>Verifiche con assegnazione IP ai VPSC</li>
+                  <li>Verifiche con assegnazione IP ai Docker</li>
                 </ul>
               </div>
               <br>
@@ -3145,7 +3145,7 @@
                   considera assegnabile a un client qualsiasi indirizzo appartenente 
                   alla subnet dichiarata nel pool — inclusi quelli che in realtà sono già occupati da altri dispositivi 
                   (gateway, router stessi). Se non lo dicessimo esplicitamente, 
-                  il DHCP potrebbe un giorno offrire a un VPCS proprio l'indirizzo del gateway o di uno dei router, 
+                  il DHCP potrebbe un giorno offrire a un Docker proprio l'indirizzo del gateway o di uno dei router, 
                   causando un conflitto di IP. Il comando ip dhcp excluded-address serve 
                   esattamente a prevenire questo: dichiara un intervallo di indirizzi che il DHCP deve sempre saltare, 
                   senza mai offrirlo a nessun client, qualunque sia il pool configurato. È una direttiva globale 
