@@ -842,10 +842,7 @@
                   <li>Configurazione dominio VTP e versionamento</li>
                   <li>Password VTP</li>
                   <li>Impostazione modalità VTP</li>
-                  <li>Creazione Port-Channel (LACP)</li>
-                  <li>
-                    Configurazione trunk 802.1Q sulle interfacce Port-Channel
-                  </li>
+                  <li>Creazione dei Port-Channel (LACP)</li>
                   <li>
                     Configurazione interfacce in trunk verso i firewall
                     FortiGate
@@ -1357,38 +1354,94 @@
                   "LEONARDO") + Port Channel
                 </h4>
                 <p>
-                  Durante la configurazione del protocollo VTP, quando abbiamo
-                  impostato una password per il dominio VTP, questa veniva
-                  mostrata in chiaro — inizialmente ho pensato fosse un problema
-                  legato alla versione del VTP, ma anche impostando la versione
-                  3 la password rimaneva comunque in chiaro senza hash. Il
-                  problema è stato risolto con il comando completo
-                  <code>vtp password StrongPassword123 hidden</code>: la parola
-                  chiave "hidden" è proprio quella che memorizza la password
-                  cifrata.
+                  <p>Nel capitolo 2, è stata osservata, sui collegamenti
+                    aggregati in Port-Channel, una perdita di pacchetti intermittente
+                    verso gli indirizzi virtuali HSRP, questo creava dei loop di rete.
+                    L'ipotesi di di una correlazione diretta tra Port-Channel e HSRP
+                    non è stata confermata. <br>
+                    Durante la fase di test è stato osservato che le porte impostate in
+                    Blocking dal protocollo STP, continuavano ad apprendere MAC, causando
+                    la perdita di pacchetti verso gli indirizzi virtuali HSRP. <br>
+                    Come mitigazione, è stata rimossa la configurazione dei Port-Channel,
+                    sostituita da un singolo cavo fisico per definire il collegamento. <br>
+                    A seguito di questa modifica, ho notato un netto miglioramento della
+                    connettività, anche attraverso i test di failover i protocolli
+                    rispondevano correttamente. <br>
+                    Ho notato un ritardo dei tempi di convergenza durante lo spegnimento
+                    dello switch eletto a Root Bridge nella rete. <br>
+                    La causa è stata isolata nei link-type RSTP, i link vengono rilevati
+                    automaticamente come 'Shared' e non come 'Point-to-Point', 
+                    causando un ritardo nella convergenza del protocollo STP. <br>
+                  </p>
+                  <br>
+                  <ul class="config-explain">
+                    <li>
+                      Dismissione della porta ridondante e rimozione dei Port-Channel
+                    </li>
+                    <li>
+                      Applicazione del link-type 'Point-to-Point'
+                    </li>
+                  </ul>
                 </p>
-                <p>
-                  Durante la configurazione del Port-Channel, alcune interfacce
-                  risultavano sospese; il problema si è risolto una volta
-                  completata su tutti gli switch la configurazione del
-                  Port-Channel — è un comportamento normale del protocollo LACP.
-                </p>
-                <p>
-                  Valori di banda (BW) inconsistenti e casuali sui Port-Channel:
-                  ogni Port-Channel su ogni switch mostrava valori di banda
-                  diversi e imprevedibili (10.000, 20.000 o 100.000 Kbit/sec,
-                  invece del corretto 20.000), accompagnati da errori di log
-                  %IDBMAN-3-INVALIDAGGPORTBANDWIDTH e %IDBMAN-3-AGGPORTMISMATCH
-                  — difetto di sincronizzazione interna della piattaforma tra la
-                  struttura dati del Port-Channel e quella delle interfacce
-                  fisiche. Corretto forzando manualmente
-                  <code>bandwidth 20000</code> su ogni Port-Channel di ogni
-                  switch, per garantire un valore coerente ai fini del calcolo
-                  del costo STP. Questo passaggio va eseguito entrando
-                  nell'interfaccia aggregata con
-                  <code>interface port-channel n</code>, e va ripetuto su tutti
-                  i link aggregati.
-                </p>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>1 - Dismissione della porta ridondante e rimozione dei Port-Channel</h4>
+                  <img
+                  src="./img/Dismissione della porta ridondante e rimozione del Port-Channel.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"m
+                />
+                <p>Questo blocco di comandi va eseguito su tutti gli switch.</p>
+                <br>
+                 <ul class="config-explain">
+                    <li>
+                      <code>shutdown :</code> Spegne la porta ridondante
+                    </li>
+                    <li>
+                      <code>no channel-group 'n' mode active :</code> Rimuove la configurazione del Port-Channel
+                    </li>
+                    <li>
+                      <code>switchport mode access + switchport access vlan 'n' :</code> Riassegna la porta alla vlan parcheggio
+                    </li>
+                    <li>
+                      <code>no interface port-channel 'n' :</code> Elimina l'interfaccia logica del Port-Channel.
+                    </li>
+                  </ul>
+                  <br>
+                  <h4>Comandi di diagnostica</h4>
+                  <ul class="config-explain">
+                    <li>
+                      <code>show etherchannel summary :</code> Mostra l'insieme di tutti i pool logici creati, le interfacce fisiche coinvolte e il loro stato di attività.
+                    </li>
+                    <li>
+                      <code>show interfaces port-channel 'n' :</code> Mostra nel dettaglio ogni singola interfaccia logica, elencando stato di attività, banda aggregata e indirizzo fisico.
+                    </li>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2 - Applicazione del link-type 'Point-to-Point'</h4>
+                  <img
+                  src="./img/Applicazione_Link_Type.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"m
+                />
+                <p>Questo blocco di comandi va eseguito su tutti gli switch.</p>
+                <br>
+                 <ul class="config-explain">
+                    <li>
+                      <code>spanning-tree link-type point-to-point :</code> Applica il tipo di link 'Point-to-Point' alla porta
+                    </li>
+                  </ul>
+                  <br>
+                  <h4>Comandi di diagnostica</h4>
+                  <ul class="config-explain">
+                    <li>
+                      <code>show spanning-tree interface Etherner'n' detal :</code> Conferma la tipologia del collegamento
+                    </li>
+                    <li>
+                      <code>show spanning-tree vlan 'n' :</code> Mostra in colonna la tipologia del collegamento
+                    </li>
               </div>
             </div>
           </details>
