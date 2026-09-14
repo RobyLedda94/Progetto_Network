@@ -3824,16 +3824,41 @@
             </div>
           </details>
 
-          <details class="obj-item status-todo">
+          <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text">3.3 — Routing verso Internet</span>
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">
-                Da completare. Il routing inter-VLAN, originariamente previsto
-                qui, è stato spostato al Capitolo 2 (Router) — vedi punto 2.0
-                per il dettaglio del limite di licenza riscontrato.
-              </p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Con il cluster fortigate in HA operativo e il routing
+                  inter-VLAN interamente delegato a R1/R2, il Fortigate deve
+                  svolgere 2 compiti distinti, fornire l'uscita verso internet
+                  per tutta la rete interna e sapere come raggiungere le VLAN
+                  interne '192.168.0.0/24' attraverso i router. <br>
+                  Questo richiede una configurazione simmetrica su due dispositivi 
+                  diversi. <br>
+                  Sul fortigate andremo a definire una rotta di default verso il gateway ISP e
+                  una rotta statica verso 192.168.0.0/24; <br>
+                  Sui router definiamo una rotta di default verso il fortigate
+                </p>
+                <br>
+                <ul class="config-explain">
+                  <li>
+                    Verifica stato attuale delle interfacce del Fortigare, e tabelle routing.
+                  </li>
+                  <li>
+                    Rotta di default sul Fortigate verso l'ISP
+                  </li>
+                  <li>
+                    Rotta statica sul F1ortigate verso la rete interna
+                  </li>
+                  <li>
+                    Rotta di default su R1 e R2 verso il Fortigate
+                  </li>
+                </ul>
+              </div>
             </div>
           </details>
           <details class="obj-item status-todo">
