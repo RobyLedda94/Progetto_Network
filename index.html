@@ -3282,6 +3282,177 @@
                   <li><code>show running-config | include excluded-address :</code>Conferma tutti gli indirizzi 'range' riservati non assegnabili</li>
                 </ul>
               </div>
+              <br>
+              <div class="obj-trace">
+                <h4>2.6.4 - Verifiche con assegnazione IP ai Docker</h4>
+                <p>
+                  Veriffichiamo che i pool DHCP configurati su R1 e R2
+                  funzionino correttamente, richiedendo un indirizzo 
+                  IP dai tre container Docker.
+                </p>
+                <br>
+                <img
+                  src="./img/Richiesta_DHCP_Docker.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <ul class="config-explain">
+                  <li><code>dhclient 'interfaccia' :</code>Avvia il processo DORA (Discover -
+                    Offer - Request - Acknowledge)</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>ip addr show eth0 :</code>Conferma l'assegnazione dell'indirizzo IP</li>
+                  <li><code>ip route show :</code>Conferma la rotta di default che deve puntare all'IP virtuale</li>
+                   <li><code>cat /etc/resolv.conf :</code>Conferma la configurazione dei server DNS</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>Problemi riscontrati - 2.6</h4>
+                <p>
+                  Durante lo step 2.6.4 'Verifica assegnazione DHCP',
+                  i VPCS precedentemente configurati mostravano,
+                  un'anomalia specifica : il log del processo
+                  DORA indicava un'assegnazione completata con successo,
+                  ma il comando 'show ip' continuava a restituire
+                  0.0.0.0/0 sia come indirizzo IP che come rotta di default.
+                </p>
+                <br>
+                <p>
+                  Verificato sul forum ufficiale della community GNS3 'fonte 
+                  pubblica del produttore' che questo identico sintomo è 
+                  segnalato ripetutamente da più utenti indipendenti. <br>
+                  In almeno un caso pubblicato, il suggerimento della community,
+                  per isolare il problema era identico alla soluzione qui adottata :
+                  sostituire temporaneamente i VPCS con i Docker, a seguito di questa
+                  sostituzione il servizio DHCP ha funzionato correttamente.
+                </p>
+                <br>
+                <p>
+                  Con i container che ricevevano correttamente l'indirizzo IP, ho
+                  iniziato a definire i primi test di connettività, ma durante 
+                  questi stessi test, è emerso un problema distinto più serio :
+                  Una forte perdita di pacchetti di pacchetti fino al 90 % in modo
+                  intermittente verso gli indirizzi IP virtuali HSRP. <br>
+                  Prima di individuare la causa reale sono state verificate e
+                  scartate le seeguenti ipotesi, ciascuna con un test diretto : <br>
+                  <div class="table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Ipotesi verificata</th>
+                          <th>Esito</th>
+                          <th>Metodo di verifica</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Differenza di configurazione tra R1 e R2</td>
+                          <td>Esclusa</td>
+                          <td>Confronto completo <code>show running-config</code>, identiche</td>
+                        </tr>
+                        <tr>
+                          <td>Instabilità dello stato HSRP (Active/Standby)</td>
+                          <td>Esclusa</td>
+                          <td><code>show standby brief</code> + log, nessun cambio di stato</td>
+                        </tr>
+                        <tr>
+                          <td>Sovraccarico CPU totale sui router</td>
+                          <td>Esclusa</td>
+                          <td><code>show processes cpu</code>, sempre 1-17%</td>
+                        </tr>
+                        <tr>
+                          <td>Calibrazione Idle-PC errata</td>
+                          <td>Esclusa</td>
+                          <td>Ricalibrata, nessun cambiamento</td>
+                        </tr>
+                        <tr>
+                          <td>Processo router "invecchiato" da troppi test</td>
+                          <td>Esclusa</td>
+                          <td>Riavvio pulito del nodo, nessun cambiamento</td>
+                        </tr>
+                        <tr>
+                          <td>Contesa di risorse host (VM FortiGate accese)</td>
+                          <td>Esclusa</td>
+                          <td>Nessun cambiamento a firewall spenti</td>
+                        </tr>
+                        <tr>
+                          <td>Errori fisici su interfacce router e switch</td>
+                          <td>Esclusa</td>
+                          <td><code>show interfaces</code>, 0 errori ovunque</td>
+                        </tr>
+                        <tr>
+                          <td>Sovraccarico CPU sullo switch access</td>
+                          <td>Esclusa</td>
+                          <td><code>show processes cpu</code>, 0% costante</td>
+                        </tr>
+                        <tr>
+                          <td>Port Security sulla porta access</td>
+                          <td>Esclusa</td>
+                          <td>Disattivato temporaneamente, nessun cambiamento</td>
+                        </tr>
+                        <tr>
+                          <td>Scarti per congestione sulle interfacce</td>
+                          <td>Esclusa</td>
+                          <td>0 drop su tutte le interfacce coinvolte</td>
+                        </tr>
+                        <tr>
+                          <td>Restrizione ping source su IP virtuale HSRP</td>
+                          <td>Non correlata</td>
+                          <td>Comportamento IOS documentato e normale, non un difetto</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>                  
+                </p>
+                <br>
+                <p>
+                  Con le ipotesi pizù semplici escluse, la diagnosi
+                  si è concentrata sulla cattura dei pacchetti in tempo reale integrata,
+                  in GNS3 'Wireshark', applicata in sequenza su più tratti della rete :
+                  <ul class="config-explain">
+                    <li>- Collegamento di accesso (Container - Switch), tutte le 
+                      richieste ICMP risultavano generate correttamente dal container, nessuna 
+                      perdita in partenza.
+                    </li>
+                    <li>- Collegamento verso il router primario (Switch core - Router)
+                      comparivano solo le richieste ICMP riuscite, quelle fallite non 
+                      arrivavano mai in questo tratto della rete.
+                    </li>
+                  </ul>
+                </p>
+                <br>
+                <p>
+                  Questo confronto ha localizzato la perdita dei pacchetti,
+                  all'interno della maglia switch. <br>
+                  Monitorando in parallelo l'esito del ping e la tabella MAC 
+                  dello switch in access, è emersa una correlazione diretta
+                  e ripetibile : ping riuscito quando la tabella MAC puntava 
+                  ai link aggregati in stato 'Forwarding', ping fallito quando 
+                  puntava ai link aggregati in stato 'Blocking'. <br> 
+                  Questo è stato confermato su entrambi gli switch in access, sia
+                  in condizioni normali che durante un failover reale. <br>
+                  Per specifica standard una porta in stato Blocking, deve 
+                  scartare i frame ricevuti e non deve mai aggiornare il 
+                  proprio database di indirizzi MAC. <br>
+                  L'immagine IOU dello switch, riporta correttamente 
+                  lo stato delle porte nel protocollo STP, ma presumo
+                  che il motore di commutazione non applica in modo corretto
+                  questa regola potrebbe trattardi di un difetto della 
+                  piattaforma non un errore nella configurazione.
+                </p>
+                <br>
+                <p>
+                  La soluzione adatta è stato rimuovere l'aggregazione dei 
+                  link Port-Channel, su tutte le tratte, questo ha permesso
+                  di eliminare il problema della perdita dei pacchetti ICMP,
+                  e di conseguenza di completare con successo tutti i test di 
+                  connettività previsti.
+                </p>
+              </div>
             </div>
           </details>
         </div>
