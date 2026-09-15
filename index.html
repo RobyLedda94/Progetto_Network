@@ -17,7 +17,7 @@
         Port Channel, Active Directory
       </p>
       <span class="badge badge-progress"
-        >In corso — 7.2 Documento HTML/CSS di tracciamento</span
+        >In corso — 8.2 Documento HTML/CSS di tracciamento</span
       >
 
       <div class="progress-wrap">
@@ -2824,7 +2824,7 @@
                 <p>
                   Ora andremo ad attivare e ad assegnare un indirizzo IP all'interfaccia del router che si collega direttamente al firewall FortiGate,
                   Non sarà possibile in questo momento testare a seguito della configurazione dell'interfaccia la raggiungibilità verso i firewall. <br>
-                  La porta corrispondente sul FortiGate (port2) resta ancora priva di IP, e lo sarà fino al Capitolo 3, punto 3.3. Un ping tentato ora fallirebbe sempre, 
+                  La porta corrispondente sul FortiGate (port2) resta ancora priva di IP, e lo sarà fino al Capitolo 4, punto 4.3. Un ping tentato ora fallirebbe sempre, 
                   non per un problema di configurazione, ma perché manca ancora un dispositivo dall'altra parte del cavo pronto a rispondere. 
                   Meglio rimandare la verifica al momento in cui avrà davvero senso farla, 
                   quando l'intera catena sarà completa e potremo validarla end-to-end in un colpo solo.
@@ -3008,7 +3008,7 @@
                 </ul>
                 <br>
                 <p>In questo momento è normale vedere il tracking in stato 'Down', FW-1 non risponde ancora, essendo la sua interfaccia direttamente connessa al router,
-                  priva di indirizzo IP, verificheremo lo stato 'UP' reale una volta configurato al capitolo 3.
+                  priva di indirizzo IP, verificheremo lo stato 'UP' reale una volta configurato al capitolo 4.
                 </p>
               </div>
             </div>
@@ -3184,10 +3184,10 @@
                 <p>
                   Lo configuriamo comunque sui router per un motivo pratico legato alla
                   sequenza di costruzione del progetto, il Domain Controller (dove risiederà
-                  il servizio DHCP definitivo), arriverà al capitolo 4. <br>
+                  il servizio DHCP definitivo), arriverà al capitolo 5. <br>
                   Senza questa soluzione intermedia, la rete resterebbe priva di DHCP, 
                   impedendo di testare concretamente VLAN, HSRP e connettività. <br>
-                  Al capitolo 4, una volta pronto il DC, migreremo il servizio DHCP 
+                  Al capitolo 5, una volta pronto il DC, migreremo il servizio DHCP 
                   disattivandolo sui router, il progetto documenterà anche questa evoluzione
                 </p>
                 <br>
@@ -3259,7 +3259,7 @@
                   <li><code>ip dhcp pool 'nome' :</code>Crea il pool identificato da un nome descrittivo</li>
                   <li><code>network 'rete' 'maschera' :</code>Dichiara l'intera subnet di riferimento (le esclusioni restano comunque valide)</li>
                   <li><code>default-router 'ip' :</code>Il gateway comunicato ai client è l'IP virtuale HSRP, non l'IP reale di R1</li>
-                  <li><code>dns-server 8.8.8.8 :</code>Server DNS temporaneo, sarà sostituito con il Domain Controller al Capitolo 4</li>
+                  <li><code>dns-server 8.8.8.8 :</code>Server DNS temporaneo, sarà sostituito con il Domain Controller al Capitolo 5</li>
                   <li><code>lease 7 :</code>Durata della concessione in giorni</li>
                 </ul>
                 <br>
@@ -3288,7 +3288,7 @@
                   <li><code>ip dhcp pool 'nome' :</code>Crea il pool identificato da un nome descrittivo</li>
                   <li><code>network 'rete' 'maschera' :</code>Dichiara l'intera subnet di riferimento (le esclusioni restano comunque valide)</li>
                   <li><code>default-router 'ip' :</code>Il gateway comunicato ai client è l'IP virtuale HSRP, non l'IP reale di R1</li>
-                  <li><code>dns-server 8.8.8.8 :</code>Server DNS temporaneo, sarà sostituito con il Domain Controller al Capitolo 4</li>
+                  <li><code>dns-server 8.8.8.8 :</code>Server DNS temporaneo, sarà sostituito con il Domain Controller al Capitolo 5</li>
                   <li><code>lease 7 :</code>Durata della concessione in giorni</li>
                 </ul>
                 <br>
@@ -3473,11 +3473,106 @@
           </details>
         </div>
 
-        <h3>3. Configurazione firewall (FortiGate)</h3>
+        <h3>3. Switch di transito FortiGate↔Router (SW-TRANSIT)</h3>
         <div class="obj-list">
           <details class="obj-item status-done">
             <summary>
-              <span class="obj-text">3.1 — Hardening Firewall Fortigate</span>
+              <span class="obj-text"
+                >3.0 — Evoluzione architetturale: perché è stato introdotto
+                SW-TRANSIT</span
+              >
+            </summary>
+            <div class="obj-content">
+              <img
+                src="./img/Topology.png"
+                alt="Topologia di rete aggiornata v1.2 - canvas GNS3"
+                class="obj-image"
+              />
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Durante il punto "Routing verso Internet" sul FortiGate è
+                  emerso un secondo vincolo della piattaforma, distinto da
+                  quello sulle interfacce che aveva portato all'introduzione
+                  di R1/R2: in un cluster FortiGate in Alta Affidabilità
+                  (FGCP), la configurazione delle interfacce dati — incluso
+                  l'indirizzo IP — è sincronizzata identica su entrambi i nodi
+                  del cluster.
+                </p>
+                <ul class="config-explain">
+                  <li>
+                    Verificato su documentazione ufficiale Fortinet: l'unica
+                    eccezione a questa sincronizzazione è la "Reserved
+                    Management Interface", esplicitamente vietata per il
+                    traffico di routing — non utilizzabile per risolvere il
+                    problema.
+                  </li>
+                  <li>
+                    Con la topologia originale (un collegamento punto-punto
+                    dedicato per ciascuna coppia firewall-router), questo
+                    rendeva impossibile assegnare a ciascun nodo il proprio
+                    indirizzo reale sul rispettivo segmento fisico — non un
+                    limite cosmetico, ma un singolo punto di guasto reale
+                    sulla connettività a Internet, confermato empiricamente
+                    dal probe IP SLA di R2, risultato permanentemente "Down"
+                    perché puntava a un indirizzo mai realmente esistito sul
+                    proprio segmento.
+                  </li>
+                  <li>
+                    Soluzione architetturale adottata: introduzione di uno
+                    switch dedicato (SW-TRANSIT), su cui convergono entrambi i
+                    nodi del cluster FortiGate ed entrambi i router, sostituendo
+                    le due subnet /30 separate con un'unica subnet condivisa
+                    (192.168.99.4/29) — così l'indirizzo IP sincronizzato del
+                    cluster risulta raggiungibile da entrambi i router.
+                  </li>
+                </ul>
+                <br />
+                <p>
+                  Questo dispositivo non fa parte del dominio VTP e non
+                  trasporta alcuna VLAN utente: le sue porte restano tutte in
+                  VLAN 1 di default, senza necessità di trunk o di tuning STP,
+                  dato che non esistono percorsi ridondanti su questo segmento.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">3.1 — Hardening dispositivo</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text"
+                >3.2 — Configurazione delle porte verso FortiGate e router</span
+              >
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">3.3 — Verifica finale</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+        </div>
+
+        <h3>4. Configurazione firewall (FortiGate)</h3>
+        <div class="obj-list">
+          <details class="obj-item status-done">
+            <summary>
+              <span class="obj-text">4.1 — Hardening Firewall Fortigate</span>
             </summary>
             <div class="obj-content">
               <div class="obj-trace">
@@ -3497,7 +3592,7 @@
               </div>
               <br />
               <div class="obj-trace">
-                <h4>3.1.1 - Impostazione hostname (GUI)</h4>
+                <h4>4.1.1 - Impostazione hostname (GUI)</h4>
                 <p>
                   Il primo passo è assegnare un nome identificativo univoco a
                   ciascun FortiGate — la documentazione ufficiale Fortinet è
@@ -3530,7 +3625,7 @@
               </div>
               <br />
               <div class="obj-trace">
-                <h4>3.1.2 - Timeout sessione amministrativa (GUI)</h4>
+                <h4>4.1.2 - Timeout sessione amministrativa (GUI)</h4>
                 <p>
                   In questo punto impostiamo dopo quanti minuti di inattività
                   una sessione GUI/CLI amministrativa viene disconnessa
@@ -3561,7 +3656,7 @@
               </div>
               <br />
               <div class="obj-trace">
-                <h4>3.1.3 - Soglia e durata blocco account</h4>
+                <h4>4.1.3 - Soglia e durata blocco account</h4>
                 <img
                   src="./img/Soglia_e_durata_blocco_account.png"
                   alt="Traccia configurazioni - canvas GNS3"
@@ -3578,7 +3673,7 @@
               </div>
               <br />
               <div class="obj-trace">
-                <h4>3.1.4 - Password policy amministratori</h4>
+                <h4>4.1.4 - Password policy amministratori</h4>
                 <p>
                   In questo punto impostiamo esplicitamente i requisiti minimi
                   di robustezza per le password amministrative locali.
@@ -3642,7 +3737,7 @@
 
           <details class="obj-item status-done">
             <summary>
-              <span class="obj-text">3.2 — Alta affidabilità (cluster HA)</span>
+              <span class="obj-text">4.2 — Alta affidabilità (cluster HA)</span>
             </summary>
             <div class="obj-content">
               <div class="obj-trace">
@@ -3680,7 +3775,7 @@
               </div>
               <br />
               <div class="obj-trace">
-                <h4>3.2.1 - Assegnazione IP dedicato per il link HA</h4>
+                <h4>4.2.1 - Assegnazione IP dedicato per il link HA</h4>
                 <p>
                   In questo punto assegniamo staticamente l'indirizzo IP
                   dedicato all'interfaccia fisica che collega i due firewall —
@@ -3720,7 +3815,7 @@
               </div>
               <br />
               <div class="obj-trace">
-                <h4>3.2.2 - Configurazione cluster HA Active-Passive</h4>
+                <h4>4.2.2 - Configurazione cluster HA Active-Passive</h4>
                 <p>
                   Definiamo ora i parametri che permettono ai due FortiGate di
                   riconoscersi a vicenda e formare il cluster HA: modalità,
@@ -3842,7 +3937,7 @@
 
           <details class="obj-item status-inprogress">
             <summary>
-              <span class="obj-text">3.3 — Routing verso Internet</span>
+              <span class="obj-text">4.3 — Routing verso Internet</span>
             </summary>
             <div class="obj-content">
               <div class="obj-trace">
@@ -3887,7 +3982,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">3.4 — Firewall Policy</span>
+              <span class="obj-text">4.4 — Firewall Policy</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">
@@ -3898,11 +3993,11 @@
           </details>
         </div>
 
-        <h3>4. Configurazione Windows Server</h3>
+        <h3>5. Configurazione Windows Server</h3>
         <div class="obj-list">
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">4.1 — Definizione Active Directory</span>
+              <span class="obj-text">5.1 — Definizione Active Directory</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -3911,7 +4006,7 @@
           <details class="obj-item status-todo">
             <summary>
               <span class="obj-text"
-                >4.2 — Domain Controller (DNS integrato)</span
+                >5.2 — Domain Controller (DNS integrato)</span
               >
             </summary>
             <div class="obj-content">
@@ -3919,52 +4014,24 @@
             </div>
           </details>
           <details class="obj-item status-todo">
-            <summary><span class="obj-text">4.3 — Migrazione DHCP dai router al DC</span></summary>
+            <summary><span class="obj-text">5.3 — Migrazione DHCP dai router al DC</span></summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
             </div>
           </details>
           <details class="obj-item status-todo">
-            <summary><span class="obj-text">4.4 — GPO</span></summary>
-            <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
-            </div>
-          </details>
-        </div>
-
-        <h3>5. Deployment client</h3>
-        <div class="obj-list">
-          <details class="obj-item status-todo">
-            <summary>
-              <span class="obj-text">5.1 — Creazione VM master Windows 11</span>
-            </summary>
-            <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
-            </div>
-          </details>
-          <details class="obj-item status-todo">
-            <summary>
-              <span class="obj-text">5.2 — Clonazione e Sysprep (×3)</span>
-            </summary>
-            <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
-            </div>
-          </details>
-          <details class="obj-item status-todo">
-            <summary>
-              <span class="obj-text">5.3 — Join al dominio</span>
-            </summary>
+            <summary><span class="obj-text">5.4 — GPO</span></summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
             </div>
           </details>
         </div>
 
-        <h3>6. Validazione e collaudo</h3>
+        <h3>6. Deployment client</h3>
         <div class="obj-list">
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">6.1 — Connettività inter-VLAN</span>
+              <span class="obj-text">6.1 — Creazione VM master Windows 11</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -3972,7 +4039,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">6.2 — Risoluzione DNS interna</span>
+              <span class="obj-text">6.2 — Clonazione e Sysprep (×3)</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -3980,7 +4047,19 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">6.3 — Lease DHCP per VLAN</span>
+              <span class="obj-text">6.3 — Join al dominio</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+        </div>
+
+        <h3>7. Validazione e collaudo</h3>
+        <div class="obj-list">
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">7.1 — Connettività inter-VLAN</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -3988,7 +4067,23 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">6.4 — Test failover HA/HSRP</span>
+              <span class="obj-text">7.2 — Risoluzione DNS interna</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">7.3 — Lease DHCP per VLAN</span>
+            </summary>
+            <div class="obj-content">
+              <p class="obj-caption">Da completare.</p>
+            </div>
+          </details>
+          <details class="obj-item status-todo">
+            <summary>
+              <span class="obj-text">7.4 — Test failover HA/HSRP</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -3997,7 +4092,7 @@
           <details class="obj-item status-todo">
             <summary>
               <span class="obj-text"
-                >6.5 — Autenticazione dominio multi-client</span
+                >7.5 — Autenticazione dominio multi-client</span
               >
             </summary>
             <div class="obj-content">
@@ -4006,10 +4101,10 @@
           </details>
         </div>
 
-        <h3>7. Documentazione</h3>
+        <h3>8. Documentazione</h3>
         <div class="obj-list">
           <details class="obj-item status-done">
-            <summary><span class="obj-text">7.1 — README.md</span></summary>
+            <summary><span class="obj-text">8.1 — README.md</span></summary>
             <div class="obj-content">
               <p class="obj-caption">
                 Completato: panoramica, obiettivi, prerequisiti.
@@ -4019,7 +4114,7 @@
           <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text"
-                >7.2 — Documento HTML/CSS di tracciamento</span
+                >8.2 — Documento HTML/CSS di tracciamento</span
               >
             </summary>
             <div class="obj-content">
@@ -4028,7 +4123,7 @@
           </details>
           <details class="obj-item status-todo">
             <summary>
-              <span class="obj-text">7.3 — Troubleshooting log</span>
+              <span class="obj-text">8.3 — Troubleshooting log</span>
             </summary>
             <div class="obj-content">
               <p class="obj-caption">Da completare.</p>
@@ -4045,6 +4140,8 @@
           >github.com/RobyLedda94</a
         >
         — Ultimo aggiornamento: v1.1 — introduzione router R1/R2, rinumerazione
+        capitoli <br>
+        — Ultimo aggiornamento: v1.2 — introduzione SW-Transit, rinumerazione
         capitoli
       </p>
     </footer>
