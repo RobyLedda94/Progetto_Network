@@ -176,16 +176,6 @@
                       <td>2</td>
                     </tr>
                     <tr class="vlan-ha">
-                      <td>R1 / R2 ↔ Cluster FortiGate (transito condiviso, via SW-TRANSIT)</td>
-                      <td>—</td>
-                      <td>192.168.99.4/29</td>
-                      <td>255.255.255.248</td>
-                      <td>— (segmento condiviso)</td>
-                      <td>.5 – .10</td>
-                      <td>192.168.99.11</td>
-                      <td>6</td>
-                    </tr>
-                    <tr class="vlan-ha">
                       <td>R1 ↔ R2 (HSRP + backup Internet)</td>
                       <td>—</td>
                       <td>192.168.99.12/30</td>
@@ -194,6 +184,16 @@
                       <td>.13 – .14</td>
                       <td>192.168.99.15</td>
                       <td>2</td>
+                    </tr>
+                    <tr class="vlan-ha">
+                      <td>R1 / R2 ↔ Cluster FortiGate (transito condiviso, via SW-TRANSIT)</td>
+                      <td>—</td>
+                      <td>192.168.99.16/29</td>
+                      <td>255.255.255.248</td>
+                      <td>— (segmento condiviso)</td>
+                      <td>.17 – .22</td>
+                      <td>192.168.99.23</td>
+                      <td>6</td>
                     </tr>
                   </tbody>
                 </table>
@@ -235,7 +235,7 @@
                 <p>
                   <strong>Aggiornamento v1.2</strong>: le due subnet separate
                   riservate a R1↔FW-1 e R2↔FW-2 sono state accorpate in
-                  un'unica subnet condivisa (192.168.99.4/29), a seguito della
+                  un'unica subnet condivisa (192.168.99.16/29), a seguito della
                   scoperta di un vincolo della piattaforma FortiGate: in un
                   cluster HA (FGCP), la configurazione delle interfacce —
                   incluso l'indirizzo IP — è sincronizzata identica su
@@ -244,10 +244,10 @@
                   segmenti fisici separati. La soluzione adottata introduce
                   uno switch dedicato (SW-TRANSIT) a cui si collegano entrambi
                   i nodi del cluster FortiGate ed entrambi i router, così
-                  l'unico IP sincronizzato del cluster (192.168.99.6) risulta
-                  raggiungibile da entrambi (R1 = .5, R2 = .9) sullo stesso
+                  l'unico IP sincronizzato del cluster (192.168.99.19) risulta
+                  raggiungibile da entrambi (R1 = .17, R2 = .18) sullo stesso
                   segmento condiviso. Degli 6 indirizzi assegnabili, 3 restano
-                  liberi (.7, .8, .10) per eventuale crescita futura.
+                  liberi (.20, .21, .22) per eventuale crescita futura.
                 </p>
               </div>
             </div>
@@ -2835,11 +2835,17 @@
                   alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
                   class="obj-image"
                 />
+                <br>
+                <img
+                  src="./img/Configurazione_interfacciaa_router_verso_firewall_R2.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
                 <p>Questi comandi vanno eseguiti su entrambi i router, rispettando nell'assegnazione dell'indirizzo IP il piano di indirizzamento.</p>
                 <br>
                 <ul class="config-explain">
                   <li><code>interface FastEthernet1/0 :</code>Entra nella configurazione della porta del router direttamente connessa al firewall</li>
-                  <li><code>ip address 192.168.0.'n' 255.255.255.'n' :</code>Assegna indirizzo IP e subnet dedicata</li>
+                  <li><code>ip address 192.168.99.'n' 255.255.255.'n' :</code>Assegna indirizzo IP e subnet dedicata</li>
                   <li><code>no shutdown :</code>Attiva la porta</li>
                 </ul>
                 <br>
