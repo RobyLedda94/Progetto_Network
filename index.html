@@ -3832,30 +3832,38 @@
               <div class="obj-trace">
                 <h4>Traccia / note</h4>
                 <p>
-                  Con il cluster fortigate in HA operativo e il routing
-                  inter-VLAN interamente delegato a R1/R2, il Fortigate deve
-                  svolgere 2 compiti distinti, fornire l'uscita verso internet
-                  per tutta la rete interna e sapere come raggiungere le VLAN
-                  interne '192.168.0.0/24' attraverso i router. <br>
-                  Questo richiede una configurazione simmetrica su due dispositivi 
-                  diversi. <br>
-                  Sul fortigate andremo a definire una rotta di default verso il gateway ISP e
-                  una rotta statica verso 192.168.0.0/24; <br>
-                  Sui router definiamo una rotta di default verso il fortigate
+                  Il FortiGate deve svolgere due compiti in questo step, 
+                  fornire l'uscita a internet per tutta la rete e sapere
+                  come rispondere al traffico di ritorno diretto alle VLAN
+                  interne, che fisicamente non conosce direttamente.
+                </p>
+                <br>
+                <p>
+                  La rotta di default verso l'ISP è gia presente, appresa
+                  automanticamente via DHCP. <br>
+                  La rotta di defaurlt su R1 e R2 verso il fortigate era
+                  gia stata configurata in precedenza, insieme al meccanismo
+                  IP SLA Tracking 'Internet Protocol Service Level Agreement'
+                  la funzionalità CISCO che genera probe attivi (ping periodici)
+                  verso un targhet specifico per verificarne la reale raggiungibilità,
+                  invece di limitarsi al controllo dello stato dell'interfaccia. <br>
+                  L'esito del probe alimenta un oggetto di tracking, che a sua volta 
+                  controlla sia la presenza della rotta statica primaria sia la 
+                  priorità HSRP di R1 su tutte le VAN, se il fortigate smette di 
+                  rispondere, la rotta sparisce e R2 prende automaticamente il
+                  ruolo di router attivo. <br>
+                  Resta solo da verificare che questo traking passi da Down a Up.
                 </p>
                 <br>
                 <ul class="config-explain">
                   <li>
-                    Verifica stato attuale delle interfacce del Fortigare, e tabelle routing.
+                    Configurazione IP statico su port2 (verso R1)
                   </li>
                   <li>
-                    Rotta di default sul Fortigate verso l'ISP
+                    Rotta statica sul FortiGate verso la rete interna (192.168.0.0/24)
                   </li>
                   <li>
-                    Rotta statica sul F1ortigate verso la rete interna
-                  </li>
-                  <li>
-                    Rotta di default su R1 e R2 verso il Fortigate
+                    Verifica end-to-end
                   </li>
                 </ul>
               </div>
