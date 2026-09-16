@@ -3544,12 +3544,73 @@
             </div>
           </details>
 
-          <details class="obj-item status-todo">
+          <details class="obj-item status-inprogress">
             <summary>
               <span class="obj-text">3.1 — Hardening dispositivo</span>
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <p>
+                Sw-TRANSIT è la stessa piattaforma Cisco IOU L2 già usata
+                per gli altri 4 switch. <br>
+                Applichiamo quindi lo stesso identico schema di hardening
+                già validato al punto 1.1. <br>
+                Le uniche differenze sono contestuali qui non esiste un 
+                dominio VTP da proteggere, e non ci sono VLAN da gestire,
+                l'hardening riguarda solo l'identità del dispoditivo e 
+                l'accesso amministrativo.
+                </p>
+                <br>
+                <ul class="config-explain">
+                  <li>
+                    Accesso privlegiato + AAA locale
+                  </li>
+                  <li>Prerequisiti SSH (dominio DNS + chiavi RSA) attivazione SSH v2, 
+                    disabilitazione Telnet
+                  </li>
+                  <li>
+                    Hardening linee console/aux + banner di accesso
+                  </li>
+                  <li>
+                    Protezione brute-force e limitazione sessioni SSH
+                  </li>
+                  <li>
+                    Creazione VLAN parcheggio assegnazione porte, e disattivazione 
+                    porte non utilizzate
+                  </li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>3.1.1 - Accesso privilegiato + AAA locale</h4>
+                <p>
+                  Stabiliamo l'identità del dispositivo e l'accesso amministrativo
+                  di base, seguiamo la stessa logica vita al punto 1.1.
+                </p>
+                <br>
+               <img
+                src="./img/SW_TRANSIT_Hardening_step_1.png"
+                alt="Topologia di rete aggiornata v1.2 - canvas GNS3"
+                class="obj-image"
+               />
+               <br>
+                <ul class="config-explain">
+                  <li><code>hostname :</code>Imposta il nome al dispositivo</li>
+                  <li><code>enable secret StrongPassword123 :</code>Imposta la password per accedere alla modalità enable, generando con secret un hash Type 4 limite noto di quest'immagine</li>
+                  <li><code>service password-encription :</code>Applica cifratura debole ad eventuali password in chiaro</li>
+                  <li><code>aaa new-model :</code>Attiva il framework AAA</li>
+                  <li><code>username admin priviledge 15 secret StrongPassword123 :</code>Crea un utente locale con privilegio massimo</li>
+                  <li><code>aaa authentication login default local :</code>Impone che il login su console/VTY usi il db utenti locale</li>
+                  <li><code>aaa authorization exec default local :</code>Applica lo stesso privilegio locale al login</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show runnig-config | include hostname :</code>Conferma il nome impostato</li>
+                  <li><code>show running-config | include enable secret :</code>Conferma le password con hash</li>
+                  <li><code>show running-config | include aaa :</code>Conferma la presenza del framework AAA</li>
+                </ul>
+              </div>
             </div>
           </details>
 
