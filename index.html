@@ -2884,7 +2884,7 @@
               </div>
             </div>
           </details>
-          <details class="obj-item status-inprogress">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text">2.4 — Collegamento punto-punto R1↔R2</span>
             </summary>
@@ -2980,16 +2980,22 @@
                   alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
                   class="obj-image"
                 />
+                <br>
+                <img
+                  src="./img/IP_SLA_Route_Backup_Route_Default_R2.png"
+                  alt="Topologia di rete aggiornata v1.1 - canvas GNS3"
+                  class="obj-image"
+                />
                 <ul class="config-explain">
                   <li><code>ip sla 1 :</code>Crea un'istanza di monitoraggio IP SLA identificata con il numero 1</li>
-                  <li><code>icmp-echo 192.168.99.6 source-interface FastEthernet1/0 : </code>Configura il probe per inviare i ping verso FW-1,
+                  <li><code>icmp-echo 192.168.99.19 source-interface FastEthernet1/0 : </code>Configura il probe per inviare i ping verso FW-1,
                   specificando esplicitamente l'interfaccia sorgente</li>
                   <li><code>frequency 5 :</code>Ripete il probe ogni 5 secondi</li>
                   <li><code>ip sla schedule 1 life forever start-time now :</code>Avvia il probe immediatamente, per una durata indefinita</li>
                   <li><code>track 1 rtr 1 reachability :</code>Crea l'oggetto di tracking collegato al probe</li>
-                  <li><code>no ip route 0.0.0.0 0.0.0.0 192.168.99.6 :</code>Rimuove la route di default creata al punto 2.3.3</li>
-                  <li><code>ip route 0.0.0.0 0.0.0.0 192.168.99.6 track 1 :</code>Ricrea la route di default primaria, ora pero collegata all'oggetto di tracking</li>
-                  <li><code>ip route 0.0.0.0 0.0.0.0 192.168.99.14 10 :</code>Crea la route di default verso R2, con distanza amministrativa 10</li>
+                  <li><code>no ip route 0.0.0.0 0.0.0.0 192.168.99.19 :</code>Rimuove la route di default creata al punto 2.3.3</li>
+                  <li><code>ip route 0.0.0.0 0.0.0.0 192.168.99.19 track 1 :</code>Ricrea la route di default primaria, ora pero collegata all'oggetto di tracking</li>
+                  <li><code>ip route 0.0.0.0 0.0.0.0 192.168.99.n 10 :</code>Crea la route di default verso R2, con distanza amministrativa 10</li>
                 </ul>
                 <br>
                 <p>I tre pezzi del meccanismo si parlano in questo modo :</p>
@@ -4270,6 +4276,64 @@
                   <li>
                     Verifica end-to-end
                   </li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>4.3.1 - Configurazione IP statico su porta 2 Firewall</h4>
+                <p>
+                  Configuriamo l'interfaccia port2 del cluster FortiGate con l'indirizzo IP statico sul segmento condiviso 192.168.99.16/29, 
+                  raggiungibile da entrambi i router (R1 e R2) tramite SW-TRANSIT.
+                </p>
+                <br>
+                <img
+                  src="./img/Configurazione_IP_statico_FW.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <ul class="config-explain">
+                  <li><code>config system interface :</code>entra nel contesto di configurazione delle interfacce di rete del FortiGate</li>
+                  <li><code>edit "port2" :</code>seleziona l'interfaccia fisica port2, quella collegata a SW-TRANSIT</li>
+                  <li><code>set mode static :</code>imposta l'interfaccia su indirizzo IP statico, invece di DHCP o nessun indirizzo</li>
+                  <li><code>set ip 192.168.99.19 255.255.255.248 :</code>assegna l'indirizzo e la subnet mask dedicata secondo il piano di indirizzamento (192.168.99.16/29, condiviso con R1 e R2 tramite SW-TRANSIT)</li>
+                  <li><code>set allowaccess ping :</code>consente risposte ICMP sull'interfaccia, necessario perché i probe IP SLA di R1 e R2 ricevano effettivamente risposta e il tracking possa passare a "Up"</li>
+                  <li><code>next :</code>conferma le modifiche all'oggetto corrente e passa al successivo (se presente) nello stesso blocco edit</li>
+                  <li><code>end :</code>esce dal blocco di configurazione e applica le modifiche</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>get system interface physical :</code>conferma che port2 mostri ip: 192.168.99.19 255.255.255.248 e status: up su entrambi i nodi del cluster (sincronizzazione automatica, come già verificato).</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>4.3.2 - Rotta statica verso la rete interna (192.168.0.0/24)</h4>
+                <p>
+                  Il FortiGate non conosce direttamente le VLAN interne — ci arriva solo attraverso R1. 
+                  Configuriamo quindi una rotta statica che gli indichi il percorso per raggiungere quel blocco, necessaria per il traffico di ritorno verso i client interni.
+                </p>
+                <br>
+                <img
+                  src="./img/FW_Configurazione_rotta_rete_interna.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <ul class="config-explain">
+                  <li><code>config router static :</code>entra nel contesto di configurazione delle rotte statiche</li>
+                  <li><code>edit 1 :</code>crea la voce di rotta con numero di sequenza 1</li>
+                  <li><code>set dst 192.168.0.0 255.255.255.0 :</code>la destinazione: l'intero blocco che racchiude tutte e 4 le VLAN</li>
+                  <li><code>set gateway 192.168.99.17 :</code>il next-hop è R1, sul segmento condiviso 192.168.99.16/29 raggiunto tramite SW-TRANSIT</li>
+                  <li><code>set device "port2" :</code>l'interfaccia fisica da cui instradare questo traffico</li>
+                  <li><code>next / end :</code>confermano la voce e chiudono il blocco di configurazione</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show router static :</code>show router static deve mostrare la voce appena creata con gateway 192.168.99.17</li>
+                  <li><code>get router info routing-table static :</code>get router info routing-table static deve mostrare la rotta verso 192.168.0.0/24 effettivamente installata, tramite port2</li>
                 </ul>
               </div>
             </div>
