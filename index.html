@@ -3858,12 +3858,43 @@
             </div>
           </details>
 
-          <details class="obj-item status-todo">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text">3.3 — Verifica finale</span>
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <p>
+                  Prima di chiudere questo capitolo, ricapitoliamo brevemente perche SW-TRANSIT esiste e poi
+                  verifichiamo che abbia davvero risolto il problema per cui è nato.
+                </p>
+                <br>
+                <p>
+                  <strong>Perche è stato introdotto :</strong> In un cluster FortiGate ad Alta Affidabilità, 
+                  i due firewall condividono sempre la stessa configurazione di rete, se si imposta in indirizzo IP
+                  su un'interfaccia di uno dei due, quello stesso IP si copia automaticamente anche sull'altro.
+                  Il problema nasce perche. all'inizio, avevamo collegato ciascu firewall al prorpio router con un 
+                  cavo dedicato a una rete separata. <br>
+                  Ma se l'IP è uguale su entrambi i firewall e le due reti sono diverse, quell'ip può essere valido
+                  su una sola delle due reti, l'altro collegamento resta inutilizzabile. <br>
+                  In pratica se il router primario si fosse guastato, l'intera rete avrebbe perso internet, senza alcuna via di riserva reale.
+                </p>
+                <br>
+                <p>
+                  La soluzione è stata mettere in mezzo uno switch a cui si collegano tutti e quattro i dispositivi (2 firewall 2 router),
+                  sulla stessa rete condivisa. <br>
+                  Così quell'unico IP che i 2 firewall si copiano a vicenda diventa raggiungibile da entrambi i router, indipendentemente da quale 
+                  router si guasti.
+                </p>
+                <br>
+                <p>
+                  <strong>Cosa abbiamo verificato :</strong>Per essere sicuri che questa struttura funzioni, abbiamo fatto 
+                  pingare tra loro tutti e quattro i dispositivi collegati allo switch. Tutti i test sono andati a buon fine. <br>
+                  Abbiamo controllato anche lo stato dello switch stesso le porte direttamente connesse ai router e ai firewall risultavano
+                  arrive e correttamente configurate, mentre tutte le altre porte non utilizzate sono state spente e isolate. <br>
+                  La protezione Port Security, attiva su tutte e quattro le porte in uso, non ha registrato alcuna violazione.
+                </p>
+              </div>
             </div>
           </details>
         </div>
@@ -4274,6 +4305,9 @@
                     Rotta statica sul FortiGate verso la rete interna (192.168.0.0/24)
                   </li>
                   <li>
+                    Rotta di backup verso la rete interna via Router 2
+                  </li>
+                  <li>
                     Verifica end-to-end
                   </li>
                 </ul>
@@ -4334,6 +4368,36 @@
                 <ul class="config-explain">
                   <li><code>show router static :</code>show router static deve mostrare la voce appena creata con gateway 192.168.99.17</li>
                   <li><code>get router info routing-table static :</code>get router info routing-table static deve mostrare la rotta verso 192.168.0.0/24 effettivamente installata, tramite port2</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>4.3.3 - Rotta di backup verso la rete interna via R2</h4>
+                <p>
+                  Ora che R2 è raggiungibile sullo stesso segmento condiviso grazie a SW-TRANSIT, aggiungiamo una seconda rotta verso 192.168.0.0/24 
+                  passando per R2 — una vera ridondanza sul lato interno, impossibile da ottenere con la vecchia topologia a collegamenti separati.
+                </p>
+                <br>
+                <img
+                  src="./img/FW_Configurazione_rotta_di_backup.png"
+                  alt="Traccia configurazioni - canvas GNS3"
+                  class="obj-image"
+                />
+                <br>
+                <ul class="config-explain">
+                  <li><code>config router static :</code>entra nel contesto di configurazione delle rotte statiche</li>
+                  <li><code>edit 2 :</code>crea la voce di rotta con numero di sequenza 2</li>
+                  <li><code>set dst 192.168.0.0 255.255.255.0 :</code>la destinazione: l'intero blocco che racchiude tutte e 4 le VLAN</li>
+                  <li><code>set gateway 192.168.99.18 :</code>il next-hop è R2, sul segmento condiviso 192.168.99.16/29 raggiunto tramite SW-TRANSIT</li>
+                  <li><code>set device "port2" :</code>l'interfaccia fisica da cui instradare questo traffico</li>
+                  <li><code>set distance 20 :</code>distanza amministrativa superiore ai 10 di default della rotta primaria (via R1): questa rotta resta inattiva finché la primaria è disponibile, e subentra automaticamente solo se R1 (o il suo percorso) dovesse guastarsi</li>
+                  <li><code>next / end :</code>confermano la voce e chiudono il blocco di configurazione</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show router static :</code>deve mostrare due voci verso 192.168.0.0/24: la primaria (edit 1, distanza default 10) e questa nuova (edit 2, distanza 20)</li>
+                  <li><code>get router info routing-table static :</code>deve mostrare solo la rotta con distanza più bassa come effettivamente installata (quella via R1) — la voce di backup resta presente in configurazione ma non attiva finché non serve.</li>
                 </ul>
               </div>
             </div>
