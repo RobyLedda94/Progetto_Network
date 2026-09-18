@@ -3544,7 +3544,7 @@
             </div>
           </details>
 
-          <details class="obj-item status-inprogress">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text">3.1 — Hardening dispositivo</span>
             </summary>
@@ -3573,6 +3573,9 @@
                   </li>
                   <li>
                     Protezione brute-force e limitazione sessioni SSH
+                  </li>
+                  <li>
+                    Disabilitazione servizi non essenziali
                   </li>
                   <li>
                     Creazione VLAN parcheggio assegnazione porte, e disattivazione 
@@ -3640,6 +3643,123 @@
                   <li><code>show crypto key mypubkey rsa :</code>Conferma la generazioni delle chiavi RSA a 2048 bit</li>
                   <li><code>show ip ssh :</code>Conferma la versione SSH attiva</li>
                   <li><code>show running-config | section line vty :</code>Conferma la configurazione corretta sulla line VTY</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>3.1.3 - Hardening linee console/aux e banner di accesso  </h4>
+                <p>
+                  Completiamo l'hardening delle linee di accesso locale 'console e ausiliaria' e aggiungiamo il banner di accesso,
+                  seguendo sempre la stessa logica già applicata.
+                </p>
+                <br>
+               <img
+                src="./img/SW_TRANSIT_Hardening_step_3.png"
+                alt="Topologia di rete aggiornata v1.2 - canvas GNS3"
+                class="obj-image"
+               />
+               <br>
+                <ul class="config-explain">
+                  <li><code>line console 0 / line aux 0 :</code>entra nella configurazione delle rispettive linee locali</li>
+                  <li><code>exec-timeout 5 0 :</code>allinea il timeout di inattività già impostato su VTY (5 minuti)</li>
+                  <li><code>no privilege level 15 :</code>rimuove l'elevazione automatica al massimo privilegio da entrambe le linee</li>
+                  <li><code>no exec :</code>impostato solo su aux, disabilita completamente la possibilità di aprire una sessione su quella porta</li>
+                  <li><code>banner motd #...# :</code>mostra un messaggio di avviso a chiunque si connetta al dispositivo, prima del login</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show running-config | section line con :</code>conferma la configurazione applicata su line console</li>
+                  <li><code>show running-config | section line aux :</code>conferma la configurazione applicata su line ausialiaria</li>
+                  <li><code>show running-config | include banner :</code>conferma la presenza del banner</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>3.1.4 - Protezione brute-force e limitazione sessioni SSH  </h4>
+                <p>
+                  Aggiungiamo la protezione contro i tentativi di accesso ripetuti 'brute-force', e logging di accesso, oltre a limitare la 
+                  durata della negoziazione SSH.
+                </p>
+                <br>
+               <img
+                src="./img/SW_TRANSIT_HArdening_step_4.png"
+                alt="Topologia di rete aggiornata v1.2 - canvas GNS3"
+                class="obj-image"
+               />
+               <br>
+                <ul class="config-explain">
+                  <li><code>login block-for 120 attempts 3 within 60 :</code>se rileva 3 tentativi di login falliti entro 60 secondi, blocca tutti i nuovi tentativi di accesso per 120 secondi (si applica solo alle linee VTY/TTY, mai alla console)</li>
+                  <li><code>login delay 2 :</code>impone un ritardo di 2 secondi tra un tentativo di login e il successivo</li>
+                  <li><code>login on-failure log :</code>registra nel log di sistema ogni tentativo di accesso fallito</li>
+                  <li><code>login on-success log :</code>registra nel log di sistema ogni accesso riuscito</li>
+                  <li><code>ip ssh time-out 60 :</code>limita a 60 secondi il tempo massimo per completare la negoziazione/autenticazione SSH</li>
+                  <li><code>ip ssh authentication-retries 3 :</code>limita a 3 i tentativi di login consentiti dentro la stessa sessione SSH già aperta</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show login :</code>conferma lo stato della protezione brute-force</li>
+                  <li><code>show ip ssh :</code>conferma i parametri SSH applicati</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>3.1.5 - Disabilitazione servizi non essenziali</h4>
+                <p>
+                  Disattiviamo i servizi legacy attivi di default non necessari in questo contesto, al fine di ridurre la superfice d'attacco.
+                </p>
+                <br>
+               <img
+                src="./img/SW_TRANSIT_Hardening_step_5.png"
+                alt="Topologia di rete aggiornata v1.2 - canvas GNS3"
+                class="obj-image"
+               />
+               <br>
+                <ul class="config-explain">
+                  <li><code>no ip http server / no ip http secure-server :</code>disattiva i server di gestione web HTTP/HTTPS integrati</li>
+                  <li><code>no ip domain-lookup :</code>evita che IOS tenti una risoluzione DNS per ogni comando non riconosciuto</li>
+                  <li><code>no service pad :</code>disabilita il protocollo PAD (X.25), ormai scomparso</li>
+                  <li><code>no ip finger :</code>disattiva il servizio che permette di interrogare da remoto le sessioni attive</li>
+                  <li><code>no ip bootp server :</code>disabilita BOOTP, predecessore di DHCP</li>
+                  <li><code>no service tcp-small-servers / no service udp-small-servers :</code>disattiva i servizi diagnostici legacy (echo, chargen, discard, daytime)</li>
+                  <li><code>no ip source-route :</code>impedisce l'elaborazione di pacchetti con percorso specificato dal mittente</li>
+                  <li><code>no service config :</code>impedisce il tentativo di caricare una configurazione via TFTP all'avvio</li>
+                  <li><code>no ip igmp snooping :</code>disattiva l'ottimizzazione multicast, già documentata come necessaria al punto 2.5 per la corretta propagazione degli hello HSRP; qui non c'è HSRP, ma manteniamo la coerenza con la configurazione degli altri switch della topologia, dato che questo switch collega comunque il segmento su cui viaggia il traffico del cluster FortiGate</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show running-config | include http|domain-lookup|pad|finger|bootp|small-servers|source-route|service config|igmp snooping :</code>Conferma la disabilitazione dei servizi</li>
+                  <li><code>show ip http server status :</code>Conferma la disabilitazione dei servizi</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>3.1.6 - VLAN parcheggio e gestione porte non utilizzate</h4>
+                <p>
+                  Creazione VLAN parcheggio locale per questo switch, a cui assegnamo tutte le porte non utilizzate spegnendole.
+                </p>
+                <br>
+               <img
+                src="./img/SW_TRANSIT_Hardening_step_6.png"
+                alt="Topologia di rete aggiornata v1.2 - canvas GNS3"
+                class="obj-image"
+               />
+               <br>
+                <ul class="config-explain">
+                  <li><code>vlan 999 :</code>crea la VLAN parcheggio con ID 999</li>
+                  <li><code>name PARKING_VLAN :</code>assegna un nome descrittivo alla VLAN</li>
+                  <li><code>interface range Ethernet1/0-3, Ethernet2/0-3, Ethernet3/0-3 :</code>seleziona le 12 porte non utilizzate (l'intero blocco Et1/x, Et2/x, Et3/x); il blocco Et0/x resta completamente escluso perché in uso</li>
+                  <li><code>switchport mode access :</code>imposta le porte in modalità access, necessario prima di poterle assegnare a una VLAN specifica</li>
+                  <li><code>switchport access vlan 999 :</code>assegna le porte alla VLAN parcheggio, isolata dal resto della rete</li>
+                  <li><code>shutdown :</code>spegne fisicamente le porte non utilizzate</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show vlan brief :</code>Mostra la VLAN parcheggio creata e le porte in access associate</li>
+                  <li><code>show interfaces status :</code>Mostra lo stato effettivo delle porte</li>
                 </ul>
               </div>
             </div>
