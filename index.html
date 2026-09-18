@@ -3550,6 +3550,7 @@
             </summary>
             <div class="obj-content">
               <div class="obj-trace">
+                <h4>Traccia / note</h4>
                 <p>
                 Sw-TRANSIT è la stessa piattaforma Cisco IOU L2 già usata
                 per gli altri 4 switch. <br>
@@ -3765,14 +3766,89 @@
             </div>
           </details>
 
-          <details class="obj-item status-todo">
+          <details class="obj-item status-done">
             <summary>
               <span class="obj-text"
                 >3.2 — Configurazione delle porte verso FortiGate e router</span
               >
             </summary>
             <div class="obj-content">
-              <p class="obj-caption">Da completare.</p>
+              <div class="obj-trace">
+                <h4>Traccia / note</h4>
+                <p>
+                  Configuriamo esplicitamente le quattro porte in uso (Et0/0→R1, Et0/1→R2, Et0/2→FW-1, Et0/3→FW-2). 
+                  Restano tutte in modalità access, non trunk: 
+                  il criterio che decide tra le due è sempre lo stesso già usato altrove nel progetto — trunk serve quando un singolo cavo deve trasportare traffico di più VLAN contemporaneamente, 
+                  distinguendole con tag 802.1Q (come i collegamenti tra gli switch di distribuzione/accesso al punto 1.2.6, dove viaggiano insieme le VLAN 10/20/30/40). 
+                  Qui invece, su ciascuna delle quattro porte viaggia una sola rete non taggata — il segmento IP semplice 192.168.99.16/29 — e nessuno dei dispositivi collegati 
+                  (R1, R2, cluster FortiGate) invia frame 802.1Q su queste interfacce. Impostarle come trunk non aggiungerebbe alcuna funzionalità, 
+                  introdurrebbe solo un disallineamento con un traffico che in realtà è "piatto", non multi-VLAN. <br>
+
+                  La configurazione qui riguarda quindi: rendere esplicita la modalità access 
+                  (buona pratica di hardening, coerente con quanto fatto ovunque nel progetto), 
+                  assegnare una descrizione a ciascuna porta per chiarezza operativa, 
+                  e infine risolvere il tema duplex/CDP mismatch rimasto in sospeso dal capitolo precedente.
+                </p>
+                <br>
+                <ul class="config-explain">
+                  <li>Modalità access esplicità + desctizione delle quattro porte</li>
+                  <li>Port Security sulle quattro porte</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>3.2.1 - Modalità access + descrizione</h4>
+                <p>
+                  Anche se VLAN 1 è già il default, la rendiamo esplicita per coerenza con il resto del progetto 
+                  (mai lasciare una configurazione implicita quando può essere dichiarata), 
+                  e aggiungiamo una descrizione a ciascuna porta per identificare
+                   a colpo d'occhio cosa c'è dall'altra parte del cavo — utile in fase di troubleshooting.
+                </p>
+                <br>
+               <img
+                src="./img/SW_TRANSIT_configurazione_porte.png"
+                alt="Topologia di rete aggiornata v1.2 - canvas GNS3"
+                class="obj-image"
+               />
+                <br>
+                <ul class="config-explain">
+                  <li><code>switchport mode access :</code>dichiara esplicitamente la modalità access, anche se già di fatto tale per default</li>
+                  <li><code>description 'testo' :</code>etichetta descrittiva</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show interfaces status :</code>Conferma lo stato delle porte e descrizione</li>
+                </ul>
+              </div>
+              <br>
+              <div class="obj-trace">
+                <h4>3.2.2 - Port security sulle porte verso i router e i firewall</h4>
+                <p>
+                  Applichiamo la stessa misura di sicurezza già vista al punto 1.2.13 — limitare l'accesso fisico di ciascuna porta a un solo indirizzo MAC, 
+                  per impedire che un dispositivo non autorizzato collegato fisicamente a questi cavi possa ottenere accesso al segmento. 
+                  Come già fatto altrove nel progetto, non specifichiamo staticamente gli indirizzi MAC, 
+                  riservandoci di irrigidire ulteriormente quando l'infrastruttura sarà a regime.
+                </p>
+                <br>
+               <img
+                src="./img/SW_TRANSIT_configurazione_port_security.png"
+                alt="Topologia di rete aggiornata v1.2 - canvas GNS3"
+                class="obj-image"
+               />
+                <br>
+                <ul class="config-explain">
+                  <li><code>interface range Ethernet0/0-3 :</code>Selezioniamo attraverso il range le porte da configurare</li>
+                  <li><code>switchport port-security :</code>attiva la funzionalità sulla porta (richiede che sia già in modalità access, come già impostato al 3.2.1)</li>
+                  <li><code>switchport port-security maximum 1 :</code>limita l'accesso fisico a un solo indirizzo MAC</li>
+                  <li><code>switchport port-security violation restrict :</code>in caso di violazione, scarta il traffico dell'indirizzo non autorizzato e genera un log, senza spegnere la porta</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show port-security :</code>Conferma l'attivazione del port security su tutte le porte</li>
+                </ul>
+              </div>
             </div>
           </details>
 
