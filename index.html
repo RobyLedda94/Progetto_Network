@@ -3611,6 +3611,37 @@
                   <li><code>show running-config | include aaa :</code>Conferma la presenza del framework AAA</li>
                 </ul>
               </div>
+              <br>
+              <div class="obj-trace">
+                <h4>3.1.2 - Prerequisiti SSH (Dominio DNS + Chiavi RSA) attivazione SSH v2</h4>
+                <p>
+                  Con la stella logica gia applicata ai punti 1.1.3/1.1.4, impostiamo il dominio DNS necessario, 
+                  per generare le chiavi RSA, poi attiviamo SSH v2 disabilitando telnet.
+                </p>
+                <br>
+               <img
+                src="./img/SW_TRANSIT_Hardening_step_2.png"
+                alt="Topologia di rete aggiornata v1.2 - canvas GNS3"
+                class="obj-image"
+               />
+               <br>
+                <ul class="config-explain">
+                  <li><code>ip domain-name lab-leonardo.local :</code>imposta il dominio DNS, coerente con quello già confermato sugli altri switch della maglia</li>
+                  <li><code>crypto key generate rsa modulus 2048 :</code>genera la coppia di chiavi RSA per SSH, specificando esplicitamente 2048 bit nel comando stesso (evita il prompt interattivo separato, e garantisce che non venga mai accettato per errore il default debole a 512 bit)</li>
+                  <li><code>ip ssh version 2 :</code>forza SSH v2, più sicuro della v1</li>
+                  <li><code>line vty 0 4 :</code>entra nella configurazione delle linee VTY (accesso remoto)</li>
+                  <li><code>transport input ssh :</code>abilita solo SSH, disabilitando Telnet</li>
+                  <li><code>login authentication default :</code>applica l'autenticazione AAA anche alle sessioni remote</li>
+                  <li><code>exec-timeout 5 0 :</code>timeout di inattività a 5 minuti</li>
+                </ul>
+                <br>
+                <h4>Comandi di diagnostica</h4>
+                <ul class="config-explain">
+                  <li><code>show crypto key mypubkey rsa :</code>Conferma la generazioni delle chiavi RSA a 2048 bit</li>
+                  <li><code>show ip ssh :</code>Conferma la versione SSH attiva</li>
+                  <li><code>show running-config | section line vty :</code>Conferma la configurazione corretta sulla line VTY</li>
+                </ul>
+              </div>
             </div>
           </details>
 
